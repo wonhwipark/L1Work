@@ -1,0 +1,94 @@
+# ============================================================
+# unresolved 상태 예시 — 담당영역 밖 문제로 판단되어 이관 대기 중
+#
+# 파일 위치 규칙: rca_kg/cases/unresolved/<date>_<issue_type>_<seq>_PENDING.yaml
+# (확정 케이스는 rca_kg/cases/ 에 위치 — 폴더 자체가 "처리 대기" 신호)
+#
+# root_cause / fix / review 가 명시적으로 null인 것이 "분석자 미입력" 신호입니다.
+# 분석자가 직접 이 파일을 열어 채운 뒤, fingerprint 기준으로 cases/와 통합(merge)됩니다.
+# 통합 절차는 rca_case.schema_v2_DRAFT.yaml 하단 참조.
+# ============================================================
+
+# case_id 없음 — 정식 case_id는 cases/로 통합(승격)되는 시점에 fingerprint 기준으로 부여
+issue_type: scg_failure
+status: unresolved   # analyzed | unresolved | reviewed | confirmed | rejected
+
+# ─────────────────────────────────────
+# handoff — 왜 이관하는지
+# ─────────────────────────────────────
+handoff:
+  reason: "PSCell 변경 직후 SCG 실패로 보이나, RF 캘리브레이션 영역 문제로 추정됨. 본 담당(L2/RRC) 범위 밖"
+  suspected_domain: "RF_Calibration"
+  suspected_owner: "RF팀"
+  handed_off_at: 2026-06-22
+
+# ─────────────────────────────────────
+# fingerprint — 이관 시점까지 확인된 범위만 기록 (미완성 허용)
+# ─────────────────────────────────────
+fingerprint:
+  signature_set:
+    - SCG_CONFIG
+    - SCG_BEAM_FAIL
+  sequence: "SCG_CONFIG→(SCG_BEAM_FAIL)"
+  sequence_status: draft   # 분석자가 이관 전이라 정규형 미확정
+
+occurrence_count: 1
+recent_occurrences:
+  - date: 2026-06-22
+    signal_file: signals_tool_generate/20260622_dump007_l1sw.txt
+    cptime_range: "203410-203588"
+    jira: L1-1301
+
+first_seen: 2026-06-22
+last_seen:  2026-06-22
+
+# ─────────────────────────────────────
+# source — 이관 시점 기준
+# ─────────────────────────────────────
+source:
+  original_log:
+    path: logs/raw/20260622_dump007.sdm
+    size_bytes: 512300000
+    checksum: "sha256:"
+  signal_file: signals_tool_generate/20260622_dump007_l1sw.txt
+
+# ─────────────────────────────────────
+# symptom — 이관 전 관찰된 범위까지만
+# ─────────────────────────────────────
+symptom:
+  module:
+    - L2_SCG
+  severity: ERROR
+  ue_id: masked_ue_007
+  description: "PSCell 변경 직후 SCG 실패, beamFail 동반 — RF 영역 의심되어 본 담당 분석 중단"
+
+# ─────────────────────────────────────
+# log_patterns — 이관 전까지 확인된 패턴만
+# ─────────────────────────────────────
+log_patterns:
+  - pattern_id: lp_scg_beamfail_pscell
+    signature: SCG_BEAM_FAIL
+    cptime_range: "203420-203500"
+    frequency: 2
+
+# ↓↓↓ 아래는 분석자(이관 받은 담당자) 입력 전까지 명시적 null ↓↓↓
+
+root_cause: null
+
+related:
+  hld: []
+  tc: []
+  api: []
+
+fix: null
+
+prevent_rule: []
+
+skill_seed: null
+
+review: null
+
+links:
+  similar_cases: []
+  supersedes: []
+  duplicates: []

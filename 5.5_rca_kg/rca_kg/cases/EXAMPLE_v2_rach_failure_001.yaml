@@ -1,0 +1,110 @@
+# ============================================================
+# 이 파일은 v2 스키마 작성 템플릿 예시입니다.
+# case_id는 더 이상 날짜 기반이 아님 — fingerprint 기준 슬러그 사용
+# ============================================================
+
+case_id: rach_msg3timeout_rach_failure_001
+issue_type: rach_failure
+status: confirmed   # analyzed | unresolved | reviewed | confirmed | rejected
+
+# ─────────────────────────────────────
+# fingerprint — 동일 원인 판정 키 (시간 불변)
+# ─────────────────────────────────────
+fingerprint:
+  signature_set:
+    - RACH_MSG1
+    - RACH_MSG2
+    - RACH_MSG3
+    - RACH_PHY_TIMER_EXPIRY
+  sequence: "RACH_MSG1→RACH_MSG2→RACH_MSG3→(RACH_PHY_TIMER_EXPIRY)"
+  sequence_status: confirmed   # 분석자가 노이즈 제거 후 정규형 확정함
+
+occurrence_count: 7
+recent_occurrences:
+  - date: 2026-06-21
+    signal_file: signals_tool_generate/20260621_dump003_l1sw.txt
+    cptime_range: "881023-881190"
+    jira: L1-1234
+  - date: 2026-06-19
+    signal_file: signals_tool_generate/20260619_dump001_l1sw.txt
+    cptime_range: "440210-440388"
+    jira: L1-1198
+  # ... 최대 5건까지만 유지, 이전 건은 occurrence_count에만 반영되고 폐기됨
+
+first_seen: 2026-05-30
+last_seen:  2026-06-21
+
+# ─────────────────────────────────────
+# source — 최초 발생 기준
+# ─────────────────────────────────────
+source:
+  original_log:
+    path: logs/raw/20260530_dump_initial.sdm
+    size_bytes: 704900000
+    checksum: "sha256:"
+  signal_file: signals_tool_generate/20260530_dump_initial_l1sw.txt
+
+# ─────────────────────────────────────
+# symptom — 최초 발생 기준
+# ─────────────────────────────────────
+symptom:
+  module:
+    - PHY_RACH
+    - MAC_RA
+  severity: ERROR
+  ue_id: masked_ue_001
+  description: "RACH procedure 실패 — Msg3 전송 후 PHY_TIMER_EXPIRY, RAR 응답 없음"
+
+# ─────────────────────────────────────
+# log_patterns — 최초 발생의 증거 (재발 건은 recent_occurrences로 경량 기록)
+# ─────────────────────────────────────
+log_patterns:
+  - pattern_id: lp_rach_msg3_timeout
+    signature: RACH_PHY_TIMER_EXPIRY   # keywords.yaml signature ID 참조, 본문 텍스트 미저장
+    cptime_range: "118420-118600"      # signal_file 내 위치 (cptime 기준)
+    frequency: 3
+
+# ─────────────────────────────────────
+# root_cause
+# ─────────────────────────────────────
+root_cause:
+  category: radio_access_timeout
+  summary: "Msg3 전송 후 RAR/응답 지연으로 RACH procedure 실패, 3회 재시도 후 최종 실패"
+  confidence: confirmed
+  evidence:
+    - lp_rach_msg3_timeout
+  code_ref: null   # TODO: 5.2 Code Analyzer 연결 확정 전까지 비워둠
+
+related:
+  hld: []
+  tc: []
+  api:
+    - xxx_RACH_REQ
+    - xxx_RACH_CNF
+
+fix:
+  summary: "RACH timeout 관련 파라미터 및 retry 조건 점검 필요"
+  commit: null
+  confirmed_at: 2026-06-21
+  confirmed_by: whpark
+
+prevent_rule:
+  - rule: "Msg3 이후 RAR timeout 3회 이상 연속 발생 시 RACH parameter 확인"
+    tc_candidate: "RACH msg3 timeout retry scenario TC 추가"
+
+skill_seed:
+  update_target: skills_seed/rach_failure_analyzer.md
+  checklist_candidate:
+    - "Msg1~Msg4 단계 중 최초 실패 지점 확인"
+    - "RAR timeout 반복 횟수 확인"
+
+review:
+  status: confirmed
+  reviewer: whpark
+  reviewed_at: 2026-06-21
+  comment: ""
+
+links:
+  similar_cases: []
+  supersedes: []
+  duplicates: []

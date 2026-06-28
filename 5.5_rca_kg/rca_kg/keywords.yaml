@@ -1,0 +1,660 @@
+# ============================================================
+# RCA Keywords / Signature Registry v0.1
+# 파일: rca_kg/keywords.yaml
+#
+# Concept:
+#   이 파일은 단순 keyword list가 아니라 RCA Signature Registry 이다.
+#
+#   - keyword:
+#       로그에 실제로 찍히는 문자열 또는 regex 후보.
+#       예: "PHY_TIMER_EXPIRY", "RAR", "Msg3", "SCG-Config"
+#
+#   - signature:
+#       RCA 분석에서 쓰는 표준화된 의미 ID.
+#       fingerprint.signature_set 과 log_patterns[].signature 는 반드시 이 ID를 참조한다.
+#       예: RACH_PHY_TIMER_EXPIRY, RACH_MSG3, SCG_BEAM_FAIL
+#
+#   - alias:
+#       하나의 signature로 정규화할 수 있는 원문 표현 목록.
+#       예: RACH_RAR_TIMEOUT 의 alias 로 "RAR timeout", "msg2 timeout" 등을 둘 수 있다.
+#
+#   - fingerprint policy:
+#       너무 넓은 단어(RACH, SCG, RLC, HARQ)는 signal 추출에는 유용하지만
+#       동일 원인 판정 fingerprint에는 부적합하다.
+#       그래서 use_for.fingerprint=false 로 둔다.
+#
+#   - status policy:
+#       confirmed: 실제 로그 또는 현장 확인으로 검증된 signature
+#       candidate: 후보. 실 로그 검증 전이거나 노이즈 위험이 남아 있음
+#       rejected: 사용해봤으나 노이즈가 커서 제외
+#       deprecated: 과거에는 사용했으나 현재 설계에서 제외
+#
+#   - R3 범위:
+#       keywords.yaml SSOT를 만드는 단계다.
+#       scripts/*.ps1 자동 생성, L1SW manifest fragment 생성, 실 로그 E2E 검증은 R4/R5에서 진행한다.
+# ============================================================
+
+version: 0.1
+
+metadata:
+  created_at: 2026-06-22
+  created_by: GPT
+  source_package: RCA_standalone
+  schema_ref: rca_kg/schema/keywords.schema.yaml
+  related_case_schema: rca_kg/schema/rca_case.schema.yaml
+  note: "R3 keywords.yaml SSOT initial draft. 실 로그 검증 전 후보가 다수 포함되어 있다."
+
+policy:
+  active_issue_types:
+    - rach_failure
+    - scg_failure
+    - tx_abnormal
+    - l2_max_retransmission
+  excluded_issue_types:
+    crash:
+      owner: L1SW Log Analyzer
+      policy: "5.5 RCA KG에서는 신규 crash case를 생성하지 않는다. 필요한 경우 L1SW 산출물 경로만 참조한다."
+  matching_key:
+    case_recurrence: "fingerprint.signature_set + fingerprint.sequence"
+    module_set: "매칭 키에서 제외. symptom.module은 참고 정보로만 사용한다."
+  sequence_time_base: cptime
+  generic_keyword_policy: "RACH/SCG/RLC/HARQ 같은 넓은 키워드는 context 또는 prefilter 용도로만 사용하고 fingerprint 기본 후보에서는 제외한다."
+
+status_definitions:
+  confirmed: "실제 로그 또는 현장 확인으로 검증된 signature. fingerprint 기본 후보가 될 수 있다."
+  candidate: "후보 signature. log_patterns에는 기록 가능하나 fingerprint 포함 시 sequence_status=draft 유지 권장."
+  rejected: "노이즈가 커서 현재 사용하지 않는 signature. 기록 보존용."
+  deprecated: "과거 사용했으나 현재 설계에서 제외된 signature."
+
+role_definitions:
+  start_event: "절차 시작을 나타내는 signature"
+  progress_event: "절차 진행 단계를 나타내는 signature"
+  failure_event: "실패 또는 timeout 등 장애 핵심 이벤트"
+  timer_event: "타이머 시작/만료/복구 관련 이벤트"
+  context: "문맥 필터링에는 유용하지만 원인 fingerprint로는 넓은 signature"
+  recovery_event: "fallback, release, retry 등 복구 또는 후속 절차"
+
+noise_risk_definitions:
+  low: "오탐 가능성이 낮음"
+  medium: "상황에 따라 오탐 가능성이 있음"
+  high: "너무 넓거나 다른 이슈에도 자주 등장할 수 있음"
+
+issue_types:
+  rach_failure:
+    label: RACH Failure
+    description: "Random Access Channel 절차 실패. Msg1~Msg4, RAR, preamble, RA-RNTI, timeout 계열 signature를 사용한다."
+    signatures:
+      RACH_PHY_TIMER_EXPIRY:
+        status: confirmed
+        role: failure_event
+        aliases:
+          - PHY_TIMER_EXPIRY
+        regex: "PHY_TIMER_EXPIRY"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: low
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+          - rca_kg/skills_seed/rach_failure_analyzer.md
+        note: "현재 패키지에서 확인됨으로 표시된 유일한 RACH 핵심 signature."
+
+      RACH_GENERIC:
+        status: candidate
+        role: context
+        aliases:
+          - RACH
+        regex: "RACH"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: false
+        noise_risk: high
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+          - rca_kg/skills_seed/rach_failure_analyzer.md
+        note: "너무 넓은 키워드라 fingerprint에는 기본 사용하지 않는다."
+
+      RACH_PREAMBLE:
+        status: candidate
+        role: progress_event
+        aliases:
+          - preamble
+        regex: "preamble"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+          - rca_kg/skills_seed/rach_failure_analyzer.md
+        note: "RACH attempt 시작 또는 preamble collision 판단 후보."
+
+      RACH_RAR:
+        status: candidate
+        role: progress_event
+        aliases:
+          - RAR
+        regex: "RAR"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+        note: "RAR 수신/미수신 판단 후보. RAR timeout과 구분 필요."
+
+      RACH_RAR_TIMEOUT:
+        status: candidate
+        role: failure_event
+        aliases:
+          - RAR timeout
+          - msg2 timeout
+        regex: "RAR timeout|msg2 timeout"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/rach_failure_analyzer.md
+        note: "Msg2/RAR 응답 없음 계열. 실제 로그 표현 확인 필요."
+
+      RACH_MSG1:
+        status: candidate
+        role: start_event
+        aliases:
+          - Msg1
+        regex: "Msg1"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+        note: "RACH 절차 시작 단계 후보."
+
+      RACH_MSG2:
+        status: candidate
+        role: progress_event
+        aliases:
+          - Msg2
+        regex: "Msg2"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+        note: "RAR/Msg2 단계 후보."
+
+      RACH_MSG3:
+        status: candidate
+        role: progress_event
+        aliases:
+          - Msg3
+        regex: "Msg3"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+        note: "Msg3 전송 단계 후보. EXAMPLE_v2 case의 sequence에 등장."
+
+      RACH_MSG4:
+        status: candidate
+        role: progress_event
+        aliases:
+          - Msg4
+        regex: "Msg4"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+        note: "Contention resolution 단계 후보."
+
+      RACH_FAIL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - rach_fail
+        regex: "rach_fail"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+          - rca_kg/skills_seed/rach_failure_analyzer.md
+        note: "실제 로그 표기 확인 필요."
+
+      RACH_RA_RNTI:
+        status: candidate
+        role: context
+        aliases:
+          - RA-RNTI
+        regex: "RA-RNTI"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/rach_failure_prefilter.ps1
+          - rca_kg/skills_seed/rach_failure_analyzer.md
+        note: "RACH 문맥 식별에는 유용하나 원인 signature로는 보조적이다."
+
+  scg_failure:
+    label: SCG Failure
+    description: "SCG add/modify, PSCell, RLF, beam failure, T310/T311 관련 signature를 사용한다. 현재 대부분 candidate 상태다."
+    signatures:
+      SCG_FAIL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - scgFail
+        regex: "scgFail"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "실제 로그 표기 검증 필요."
+
+      SCG_GENERIC:
+        status: candidate
+        role: context
+        aliases:
+          - SCG
+        regex: "SCG"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: false
+        noise_risk: high
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "너무 넓은 키워드라 fingerprint에는 기본 사용하지 않는다."
+
+      SCG_PSCELL:
+        status: candidate
+        role: context
+        aliases:
+          - PSCell
+        regex: "PSCell"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "PSCell 관련 문맥 signature. 단독 원인 signature로는 부족할 수 있음."
+
+      SCG_B1_EVENT:
+        status: candidate
+        role: progress_event
+        aliases:
+          - B1Event
+        regex: "B1Event"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "Measurement event 후보. 실제 표현 확인 필요."
+
+      SCG_B2_EVENT:
+        status: candidate
+        role: progress_event
+        aliases:
+          - B2Event
+        regex: "B2Event"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "Measurement event 후보. 실제 표현 확인 필요."
+
+      SCG_MEAS_REPORT:
+        status: candidate
+        role: progress_event
+        aliases:
+          - measReport
+        regex: "measReport"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "측정보고 흐름 확인 후보."
+
+      SCG_RLF:
+        status: candidate
+        role: failure_event
+        aliases:
+          - RLF
+        regex: "RLF"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "Radio Link Failure 후보. SCG 전용인지 문맥 확인 필요."
+
+      SCG_T310:
+        status: candidate
+        role: timer_event
+        aliases:
+          - T310
+        regex: "T310"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "RLF 타이머 후보."
+
+      SCG_T311:
+        status: candidate
+        role: timer_event
+        aliases:
+          - T311
+        regex: "T311"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "RLF recovery 타이머 후보."
+
+      SCG_BEAM_FAIL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - beamFail
+        regex: "beamFail"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "EXAMPLE_unresolved에 등장. 실제 로그 검증 후 confirmed 후보."
+
+      SCG_DUAL_CONN:
+        status: candidate
+        role: context
+        aliases:
+          - dualConn
+        regex: "dualConn"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: false
+        noise_risk: high
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "Dual connectivity 문맥. fingerprint 기본 사용 금지."
+
+      SCG_CONFIG:
+        status: candidate
+        role: progress_event
+        aliases:
+          - SCG-Config
+        regex: "SCG-Config"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - scripts/scg_failure_prefilter.ps1
+          - rca_kg/skills_seed/scg_failure_analyzer.md
+        note: "SCG configuration 적용 흐름 후보. EXAMPLE_unresolved sequence에 등장."
+
+  tx_abnormal:
+    label: TX Abnormal
+    description: "UL grant, HARQ, TX fail 계열 signature를 사용한다. 현재 모두 candidate 상태다."
+    signatures:
+      TX_ABNORMAL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - TX abnormal
+        regex: "TX abnormal"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/tx_abnormal_analyzer.md
+        note: "실제 로그 표기 확인 필요."
+
+      TX_FAIL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - tx fail
+        regex: "tx fail"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/tx_abnormal_analyzer.md
+        note: "TX 실패 일반 후보."
+
+      TX_UL_GRANT:
+        status: candidate
+        role: progress_event
+        aliases:
+          - ul grant
+        regex: "ul grant"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/tx_abnormal_analyzer.md
+        note: "UL grant 미수신/지연 분석 후보."
+
+      TX_HARQ_CONTEXT:
+        status: candidate
+        role: context
+        aliases:
+          - harq
+          - HARQ
+        regex: "harq|HARQ"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: false
+        noise_risk: high
+        source_files:
+          - rca_kg/skills_seed/tx_abnormal_analyzer.md
+        note: "HARQ는 여러 이슈에 등장하므로 단독 fingerprint 사용 금지."
+
+      TX_UL_FAIL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - UL_FAIL
+        regex: "UL_FAIL"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/tx_abnormal_analyzer.md
+        note: "UL failure 후보."
+
+  l2_max_retransmission:
+    label: L2 Max Retransmission
+    description: "RLC/HARQ 재전송 한계 도달 관련 signature를 사용한다. 현재 모두 candidate 상태다."
+    signatures:
+      L2_MAX_RETRANSMISSION:
+        status: candidate
+        role: failure_event
+        aliases:
+          - max retransmission
+        regex: "max retransmission"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/l2_max_retransmission_analyzer.md
+        note: "RLC maximum retransmission 핵심 후보."
+
+      L2_RLC_CONTEXT:
+        status: candidate
+        role: context
+        aliases:
+          - RLC
+        regex: "RLC"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: false
+        noise_risk: high
+        source_files:
+          - rca_kg/skills_seed/l2_max_retransmission_analyzer.md
+        note: "RLC는 너무 넓은 문맥 signature라 fingerprint 기본 사용 금지."
+
+      L2_HARQ_CONTEXT:
+        status: candidate
+        role: context
+        aliases:
+          - HARQ
+        regex: "HARQ"
+        use_for:
+          fingerprint: false
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: false
+        noise_risk: high
+        source_files:
+          - rca_kg/skills_seed/l2_max_retransmission_analyzer.md
+        note: "HARQ는 TX abnormal과도 겹치므로 fingerprint 기본 사용 금지."
+
+      L2_RETX:
+        status: candidate
+        role: progress_event
+        aliases:
+          - retx
+        regex: "retx"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/l2_max_retransmission_analyzer.md
+        note: "재전송 흐름 후보."
+
+      L2_MAX_RETX:
+        status: candidate
+        role: failure_event
+        aliases:
+          - MAX_RETX
+        regex: "MAX_RETX"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/l2_max_retransmission_analyzer.md
+        note: "최대 재전송 도달 후보."
+
+      L2_RLC_FAIL:
+        status: candidate
+        role: failure_event
+        aliases:
+          - rlc_fail
+        regex: "rlc_fail"
+        use_for:
+          fingerprint: true
+          log_pattern: true
+          prefilter: true
+          l1sw_manifest_fragment: true
+        noise_risk: medium
+        source_files:
+          - rca_kg/skills_seed/l2_max_retransmission_analyzer.md
+        note: "RLC failure 후보. 실제 로그 표현 확인 필요."

@@ -1,0 +1,103 @@
+# ============================================================
+# RCA Taxonomy — rca_kg/schema/taxonomy.yaml
+# 역할: issue_type / root_cause_categories / confidence 기준 정의
+#
+# v2-A 정합성 반영 (2026-06-22):
+#   - crash 는 5.5 RCA KG 분석 대상에서 제거
+#   - crash/dump 분석은 L1SW Log Analyzer 전담
+#   - null_pointer_crash / assertion_failure 는 active root_cause_categories 에서 제거
+#   - v0.14 사용자 편의 정합성(2026-06-25 01:38 KST): skills_seed category와 taxonomy applies_to 정합화
+# ============================================================
+
+# ─────────────────────────────────────
+# Issue Type 목록 — 5.5 RCA KG active 대상
+# ─────────────────────────────────────
+issue_types:
+  rach_failure:
+    label: RACH Failure
+    description: Random Access Channel 절차 실패 (msg1~msg4 중 단계 실패)
+  scg_failure:
+    label: SCG Failure
+    description: Secondary Cell Group 추가/설정 실패 또는 RLF 발생
+  tx_abnormal:
+    label: TX Abnormal
+    description: 상향링크 송신 이상, UL grant 이상, HARQ fail 연속
+  l2_max_retransmission:
+    label: L2 Max Retransmission
+    description: RLC/HARQ 최대 재전송 한계 도달
+
+# ─────────────────────────────────────
+# Root Cause Categories — active issue_type 기준
+# ─────────────────────────────────────
+root_cause_categories:
+  radio_access_timeout:
+    label: Radio Access Timeout
+    applies_to: [rach_failure, scg_failure, l2_max_retransmission]
+    description: RAR/msg2 응답 없음, preamble timeout, PSCell 접속 실패, 무선 환경 열화로 인한 접속/재전송 실패
+  nr_reconfig_timeout:
+    label: NR Reconfig Timeout
+    applies_to: [scg_failure]
+    description: SCG 추가/수정 중 RRC 재설정 타임아웃
+  preamble_collision:
+    label: Preamble Collision
+    applies_to: [rach_failure]
+    description: 동일 preamble 충돌 또는 RA contention 관련 실패
+  scheduler_grant_missing:
+    label: Scheduler Grant Missing
+    applies_to: [tx_abnormal, rach_failure]
+    description: UL grant 미수신 또는 지연
+  rlc_max_retransmission:
+    label: RLC Max Retransmission
+    applies_to: [l2_max_retransmission]
+    description: RLC 계층 최대 재전송 횟수 초과 후 RLF 트리거
+  harq_retx_exceeded:
+    label: HARQ Retransmission Exceeded
+    applies_to: [l2_max_retransmission, tx_abnormal]
+    description: HARQ 재전송 한계 초과
+  api_contract_mismatch:
+    label: API Contract Mismatch
+    applies_to: [rach_failure, scg_failure, tx_abnormal]
+    description: 계층간 API/IPC 파라미터 불일치
+  config_parameter_mismatch:
+    label: Config Parameter Mismatch
+    applies_to: [rach_failure, scg_failure, tx_abnormal, l2_max_retransmission]
+    description: 설정값 오류로 인한 타이머/카운터 이상
+  unknown:
+    label: Unknown
+    applies_to: [rach_failure, scg_failure, tx_abnormal, l2_max_retransmission]
+    description: 분석 불충분 또는 원인 미특정
+
+# ─────────────────────────────────────
+# Deprecated / External 영역
+# ─────────────────────────────────────
+deprecated_external_issue_types:
+  crash:
+    label: Crash / Assert / Fatal
+    owner: L1SW Log Analyzer
+    policy: 5.5 RCA KG 에서는 신규 case 로 생성하지 않고, 필요한 경우 L1SW 산출물 경로만 참조한다.
+
+# ─────────────────────────────────────
+# Confidence 기준
+# ─────────────────────────────────────
+confidence_levels:
+  low:
+    label: Low
+    criteria: 단서(log pattern)만 있음. 재현 미확인. 원인 추정 단계.
+  medium:
+    label: Medium
+    criteria: log 근거 확보. 원인 특정 가능. 수정 미적용 또는 재현 미검증.
+  high:
+    label: High
+    criteria: 수정 적용 후 동일 증상 미발생 확인. 또는 재현 테스트 통과.
+  confirmed:
+    label: Confirmed
+    criteria: TC 추가 완료 또는 동료/팀 리뷰 완료. Jira Resolved 상태.
+
+# ─────────────────────────────────────
+# Review Status 기준
+# ─────────────────────────────────────
+review_status:
+  draft:     작성 직후, 미검토 상태
+  reviewed:  담당자 1인 이상 검토 완료
+  confirmed: Root Cause 및 Fix 방향 확정
+  rejected:  분석 오류, 중복, 또는 재분석 필요

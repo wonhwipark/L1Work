@@ -1,0 +1,88 @@
+# ============================================================
+# Keywords Schema v0.1 — rca_kg/schema/keywords.schema.yaml
+# 역할: rca_kg/keywords.yaml 필드 구조와 허용 값 정의
+#
+# 이 파일은 엄격한 JSON Schema가 아니라 사람이 읽고 Claude/Roo가 참조하는 문서형 schema다.
+# ============================================================
+
+version:
+  type: number
+  required: true
+  example: 0.1
+
+metadata:
+  type: map
+  required: true
+  fields:
+    created_at: { type: string, format: YYYY-MM-DD }
+    created_by: { type: string }
+    source_package: { type: string }
+    schema_ref: { type: string }
+    related_case_schema: { type: string }
+    note: { type: string, optional: true }
+
+policy:
+  type: map
+  required: true
+  fields:
+    active_issue_types:
+      type: list[string]
+      values:
+        - rach_failure
+        - scg_failure
+        - tx_abnormal
+        - l2_max_retransmission
+    excluded_issue_types:
+      type: map
+      note: "crash는 L1SW Log Analyzer 전담으로 분리"
+    matching_key:
+      type: map
+      fields:
+        case_recurrence: { type: string, expected: "fingerprint.signature_set + fingerprint.sequence" }
+        module_set: { type: string, note: "fingerprint 매칭 키에서 제외" }
+    sequence_time_base:
+      type: enum
+      values: [cptime]
+    generic_keyword_policy:
+      type: string
+
+signature:
+  type: map
+  key_format: "<ISSUE_PREFIX>_<MEANINGFUL_EVENT>"
+  example: RACH_PHY_TIMER_EXPIRY
+  required_fields:
+    status:
+      type: enum
+      values: [confirmed, candidate, rejected, deprecated]
+    role:
+      type: enum
+      values: [start_event, progress_event, failure_event, timer_event, context, recovery_event]
+    aliases:
+      type: list[string]
+      note: "로그 원문 표현 또는 표현 후보"
+    regex:
+      type: string
+      note: "현재는 단순 regex 문자열. R4에서 L1SW manifest fragment 또는 prefilter 생성 입력으로 사용 가능"
+    use_for:
+      type: map
+      fields:
+        fingerprint: { type: boolean }
+        log_pattern: { type: boolean }
+        prefilter: { type: boolean }
+        l1sw_manifest_fragment: { type: boolean }
+    noise_risk:
+      type: enum
+      values: [low, medium, high]
+    source_files:
+      type: list[string]
+    note:
+      type: string
+      optional: true
+
+rules:
+  - "fingerprint.signature_set 과 log_patterns[].signature 는 keywords.yaml의 signature ID를 참조한다."
+  - "RACH/SCG/RLC/HARQ 같은 generic keyword는 기본적으로 use_for.fingerprint=false로 둔다."
+  - "candidate signature를 fingerprint에 포함할 경우 case의 fingerprint.sequence_status는 draft로 유지한다."
+  - "confirmed signature만 자동 fingerprint 후보로 승격하는 것을 권장한다."
+  - "crash/dump signature는 active issue_types에 넣지 않는다."
+  - "실 로그 검증 결과는 status 변경과 note/source_files 보강으로 반영한다."
