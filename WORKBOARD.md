@@ -1,31 +1,42 @@
-# L1Work Workboard
+당신은 스킬 검증가다. 목적: issue-analyzer v0.3.1의 내부 환경 E2E 검증.
+각 항목을 순서대로 수행하고 PASS/FAIL/미확인 판정표를 만든다.
+FAIL이어도 중단하지 말고 다음 항목으로 진행한다 (원인 1줄 기록).
 
-## 트랙 상태표
-| 트랙 | 폴더 | 이름 | 현재 상태 | 비고 |
-|---|---|---|---|---|
-| 5.0 | `5.0_common_framework/` | 공통 자동화 프레임워크 | draft | 공통 구조와 운영 규칙 기준 |
-| 5.1 | `5.1_jira_feedback_loop/` | Jira 피드백 루프 | draft | Jira 기반 피드백 자동화 |
-| 5.2 | `5.2_code_analyzer/` | Code Analyzer | staging-source-ready | standalone 산출물 존재 |
-| 5.3 | `5.3_confluence_collection/` | Confluence 수집 | draft | child page 및 weekly report 수집 |
-| 5.4 | `5.4_hld_code_consistency/` | HLD-Code 일관성 점검 | draft | HLD와 코드 일관성 점검 |
-| 5.5 | `5.5_rca_kg/` | RCA Knowledge Graph | staging-source-ready | standalone 및 KG 참조 존재 |
-| 5.6 | `5.6_onboarding_knowledge_pack/` | Onboarding Knowledge Pack | draft | 온보딩 지식팩 |
+사전 조건 (아니면 여기서 멈추고 보고):
+- ~/.claude/skills/issue-analyzer/ 설치됨 (v0.3.1)
+- issue-analyzer/manifest/ 에 fragment json이 _meta.json 외 1개 이상
+- sdm-parser 스킬 경로 존재
+- 검증용 실로그 .sdm 1개 준비 (사용자에게 경로 질문)
 
-## 상태 정의
-- `draft`: 원천 확인 및 상세 요구사항 정리 단계입니다.
-- `staging-source-ready`: 기존 원천과 산출물을 staging 후보로 정리할 수 있는 단계입니다.
-- `staging`: release 후보를 `release/staging/`에 구성한 단계입니다.
-- `current`: 검증 완료 후 현재 기준본으로 승격된 단계입니다.
-- `archive`: 이전 기준본 또는 폐기된 후보를 보관하는 단계입니다.
+V0 — 설치 검증
+| 항목 | 확인 방법 |
+- manifest fragment 개수와 파일명 나열
+- %USERPROFILE%\issue_analyzer\ 하위 records/, code_map/ 생성 여부 (없으면 생성 후 PASS)
 
-## 2026-06-28 KST 작업 메모
-- 5.x 트랙의 `prompt/` 폴더를 점검하고, L1Work 이전 목적의 복제/정렬본을 채웠습니다.
-- 5.2와 5.5는 standalone prompt와 루트 prompt를 함께 보존하는 방식으로 정리했습니다.
-- 5.2와 5.5에 누락된 표준 구조를 보완했습니다.
+V1 — 트랙 1 (코드맵 등록)
+- 5.2 output에서 file_group 1개 골라 등록 실행
+- 판정: code_map에 bundle 미러 복사됨 / index.yaml에 1줄 append /
+  _index.md·NEXT_STEP_5.2.md는 복사 안 됨 / msg_symbol 필드가
+  structure json에 존재하는지 (5.2 v0.9.8 재추출본일 때만 해당)
 
-<!-- master-distribution-20260629:start -->
-## 2026-06-29 KST 작업 메모 - master 분배
-- 모든 5.x 트랙에 `master/` 폴더와 `master_v0.40_section_5.x.md` 발췌본을 생성했습니다.
-- 기준 원본 `master/L1_AI_Automation_Roadmap_v0.40.md`는 수정하지 않았습니다.
-- 5.3 트랙은 master 상의 `5.3-pre`와 `5.3 Weekly Report Collection`을 단일 5.3 트랙 발췌본에 함께 포함했습니다.
-<!-- master-distribution-20260629:end -->
+V2 — S1(추출) 단독 검증
+- 실로그 .sdm으로 Step A(sdm-parser) → Step B(ia_extract.py) 실행
+- 판정: <stem>_l1sw.txt 생성 / Step B stdout 마지막 줄 = 절대 경로 /
+  --modules 1개 지정 재실행 시 라인 수 감소 /
+  존재하지 않는 시간 범위(--time-from 01:00:00 --time-to 01:00:01)로
+  재실행 → 빈 파일 + exit 0 을 "정상(매칭 0건)"으로 처리하는지 /
+  2-pass: Step A 재실행 없이 _full.txt에 Step B만 재실행되는지
+
+V3 — 트랙 2 E2E 1회 완주
+- "원인분석 시작"으로 S0(시작 질문)부터 S5(보고·기록)까지 실로그 1건 완주
+- 판정: 모든 원인 후보에 [A/B/C] 등급 존재 / 근거 없는 후보가
+  "미확인 항목"으로 분리됐는지 / case 파일 30라인 이하 /
+  records/index.yaml 1줄 append / 보고서에 재현 조건 포함
+
+V4 — 루프 가드
+- S0 질문 후 답하지 않고 관찰: 스스로 번호 선택해 진행하면 FAIL
+- 좁히기 2회째 요구 시 사용자 승인을 묻는지
+
+결과 보고 형식:
+| V# | 항목 | 판정 | 비고(FAIL 원인 1줄) |
+마지막 줄에 종합: PASS n / FAIL n / 미확인 n
