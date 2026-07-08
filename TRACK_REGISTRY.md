@@ -1,41 +1,55 @@
-# Track Registry
+당신은 스킬 구현가다. 목적: issue-analyzer manifest 보강 스크립트
+manifest_augment.py 를 구현한다 (v0.4). 설계는 이미 승인됐다.
+아래 확정 사항을 어기지 말 것. 이 제약 밖의 창의적 변형 금지.
 
-| 트랙 번호 | 폴더 | 원천 prompt / 참조 | 현재 상태 | 비고 |
-|---|---|---|---|---|
-| 5.0 | `5.0_common_framework/` | `prompt/5_0_common_automation_framework.md` | draft | 공통 프레임워크 |
-| 5.1 | `5.1_jira_feedback_loop/` | `prompt/5_1_jira_feedback_loop_py_package_prompt.md` | draft | Jira 피드백 루프 |
-| 5.2 | `5.2_code_analyzer/` | `prompt/5_2_code_analyzer_py_package_prompt.md`<br>`prompt/5_2_code_analyzer_track_a_prompt.md`<br>`prompt/5_2_code_analyzer_track_b_prompt.md`<br>`CodeAnalyzer_standalone/README.md` | staging-source-ready | legacy source 포함 |
-| 5.3 | `5.3_confluence_collection/` | `prompt/5_3_pre_confluence_child_page_collection_prompt.md`<br>`prompt/5_3_weekly_report_collection_py_package_prompt.md` | draft | Confluence 수집 |
-| 5.4 | `5.4_hld_code_consistency/` | `prompt/5_4_hld_code_consistency_check_py_package_prompt.md` | draft | 일관성 점검 |
-| 5.5 | `5.5_rca_kg/` | `prompt/5_5_rca_knowledge_graph_py_package_prompt.md`<br>`RCA_standalone/README.md`<br>`rca_kg/indexes/index.md` | staging-source-ready | KG refs 포함 |
-| 5.6 | `5.6_onboarding_knowledge_pack/` | `prompt/5_6_onboarding_knowledge_pack_py_package_prompt.md` | draft | 온보딩 지식팩 |
+[설계 확정 — 변경 금지]
+Q1. regex 생성: full msg_symbol 전체를 그대로 사용. 축약형 생성 금지.
+    변환은 정규식 특수문자 escape + 앞뒤 \[ \] 래핑만.
+    (예: L1C_L1C_..._IND → \[L1C_L1C_..._IND\])
+Q2. fragment 귀속: msg_symbol 첫 키워드 기반 분류.
+    L1C_L1C_*→channel / L1C_L2_*→front / L1C_PHY_*→channel /
+    RSM_*→common / NR_*·LTE_*→proc / MEAS_*→meas
+    위 어디에도 안 맞으면 대폴백 = common.json (고정).
+Q3. 중복 판정: 문자열 비교만. 정규식 동치 판정 금지.
+    - 정확 일치(동일 regex 존재) → 제외
+    - 앞부분 포함(기존 regex가 신규를 문자열로 포함) → 제외
+    - 그 외 → 신규 후보 유지
+Q4. 승인 UI: numbered list 제시 후 사용자 입력 검증.
+    - 유효: 존재하는 번호의 조합 / 공백(=전체 기각)
+    - 무효: 범위 밖 번호·중복 번호·비정수 → 재입력 요청
+    - 미선택 항목 = 기각
+Q5. 기존 중복 자동 조회: 각 fragment.json을 읽어 기존 regex 목록을
+    추출하고 Q3 규칙으로 신규 후보와 대조. 수동 조회 금지.
 
-## 관리 규칙
-- 신규 원천이 추가되면 해당 트랙의 `source_refs.md`와 이 문서를 함께 갱신합니다.
-- L1Work 이전/상세화 목적의 prompt는 각 트랙의 `prompt/` 아래에 원본 파일명 그대로 복제/정렬본으로 보관할 수 있습니다.
-- 원본 `prompt/`, `CodeAnalyzer_standalone/`, `RCA_standalone/` 파일은 삭제/이동/수정하지 않습니다.
-- 상태값은 `WORKBOARD.md`와 일치해야 합니다.
+[불변 원칙 — 위반 금지]
+- regex를 임의 생성하지 않는다. 5.2 msg_symbol 근거 있는 것만 후보.
+- _meta.json 수정 금지. output_suffix "_l1sw" 변경 금지.
+- 기존 l1sw 유래 regex 삭제/변경 금지. append만.
+- python (not python3). ASCII-only 소스.
 
-## 2026-06-28 KST prompt 정렬 상태
-| 트랙 | L1Work prompt 상태 | 비고 |
-|---|---|---|
-| 5.0 | 채움 완료 | 루트 5.0 prompt 복사 |
-| 5.1 | 채움 완료 | 기존 L1Work 복제본 확인, 루트 원천 `prompt/5_1_jira_feedback_loop_py_package_prompt.md`는 현재 작업공간에 없음 |
-| 5.2 | 채움 완료 | standalone prompt 및 루트 5.2 prompt 3종 포함 |
-| 5.3 | 채움 완료 | 루트 5.3 prompt 2종 포함 |
-| 5.4 | 채움 완료 | 루트 5.4 prompt 포함 |
-| 5.5 | 채움 완료 | standalone prompt/deepdive 및 루트 5.5 prompt 2종 포함 |
-| 5.6 | 채움 완료 | 루트 5.6 prompt 포함 |
+[입력 계약 — 프롬프트1에서 확정됨]
+- 5.2 structure.json 위치: {code_map}/{file_group}/structure_<ts>_focused.json
+- 대상: ipc[] 배열 중 role이 "input" 또는 "output" 인 항목의 msg_symbol
+- v0.9.8 미만(msg_symbol 필드 없음): SKIP + 경고 후 계속
 
-<!-- master-distribution-20260629:start -->
-## 2026-06-29 KST master 분배 상태
-| 트랙 | master 발췌본 | 상태 | 경계 검토 |
-|---|---|---|---|
-| 5.0 | `5.0_common_framework/master/master_v0.40_section_5.0.md` | 분배 완료 | 명확함 |
-| 5.1 | `5.1_jira_feedback_loop/master/master_v0.40_section_5.1.md` | 분배 완료 | 명확함 |
-| 5.2 | `5.2_code_analyzer/master/master_v0.40_section_5.2.md` | 분배 완료 | 명확함; 기존 `reference/master_v0.40_section_5_2.md` 및 standalone 참조 기록 |
-| 5.3 | `5.3_confluence_collection/master/master_v0.40_section_5.3.md` | 분배 완료 | 명확함; 5.3-pre와 5.3 Weekly Report를 함께 포함 |
-| 5.4 | `5.4_hld_code_consistency/master/master_v0.40_section_5.4.md` | 분배 완료 | 명확함 |
-| 5.5 | `5.5_rca_kg/master/master_v0.40_section_5.5.md` | 분배 완료 | 명확함; 기존 RCA 보조 참조 기록 |
-| 5.6 | `5.6_onboarding_knowledge_pack/master/master_v0.40_section_5.6.md` | 분배 완료 | 명확함 |
-<!-- master-distribution-20260629:end -->
+구현 요구사항:
+1. manifest_augment.py 단일 파일.
+   인자: --code-map <경로> --manifest <issue-analyzer/manifest 경로>
+   옵션: --dry-run (append 없이 후보 리스트만 출력)
+2. 실행 흐름:
+   (a) code_map 하위 structure_*_focused.json 전부 스캔
+   (b) role input/output msg_symbol 수집
+   (c) Q2로 fragment 귀속 분류
+   (d) Q5로 기존 fragment.json 읽어 Q3 중복 제거
+   (e) Q4 승인 UI: numbered 표 출력 → 사용자 입력 대기
+   (f) 채택분만 해당 fragment.json에 append
+   (g) manifest/_preserve.md 에 이력 기록
+       (일자 / 소스 code_map 버전 / file_group / 채택 개수)
+3. _preserve.md 없으면 생성, 있으면 append.
+4. 모든 파일 쓰기 전 백업(.bak) 생성.
+
+먼저 전체 코드를 제시하고, 그 아래에:
+- 사용법 5줄 (실제 명령어 예시)
+- 이 스크립트가 건드리는 파일 목록
+- 한계/주의 3줄
+을 붙인다. 구현 후 사용자 검토를 받는다 (바로 배포 금지).
