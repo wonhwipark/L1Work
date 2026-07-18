@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HLD 기반 코드 분석·비교·구현 업무 절차</title>
+<style>
+:root{
+  --ink:#1D2939; --sub:#475467; --line:#D0D5DD; --soft:#F9FAFB;
+  --blue:#2F6BBD; --blue-bg:#E8F1FF;
+  --violet:#6E4EB3; --violet-bg:#F7F4FF;
+  --amber:#C67616; --amber-bg:#FFF2DF;
+  --red:#B83A44; --red-bg:#FDEBEC;
+  --green:#2D8A4E; --green-bg:#E7F7ED;
+}
+*{box-sizing:border-box;}
+body{font-family:'Malgun Gothic','Noto Sans KR',Arial,sans-serif;line-height:1.7;
+  color:var(--ink);max-width:1080px;margin:0 auto;padding:24px 20px 80px;}
+h1{font-size:30px;margin:0 0 6px;}
+h2{font-size:22px;margin:44px 0 14px;padding:10px 14px;background:var(--blue-bg);
+  border-left:7px solid var(--blue);scroll-margin-top:12px;}
+h3{font-size:18px;margin:28px 0 10px;padding:6px 10px;background:var(--violet-bg);
+  border-left:5px solid var(--violet);}
+h4{font-size:16px;margin:20px 0 8px;color:var(--sub);}
+p{margin:8px 0;}
+ul,ol{margin:8px 0 8px 4px;padding-left:22px;}
+li{margin:4px 0;}
+code{background:#F2F4F7;border:1px solid var(--line);border-radius:3px;
+  padding:1px 5px;font-size:0.92em;}
+pre{background:#F7F7F8;border:1px solid var(--line);padding:12px 14px;
+  white-space:pre-wrap;word-break:break-word;font-size:14px;line-height:1.55;}
+pre code{background:none;border:none;padding:0;}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:14.5px;}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+th{background:var(--blue-bg);}
+figure{margin:16px 0;padding:12px;border:1px solid var(--line);background:#fff;}
+figcaption{font-size:13px;color:var(--sub);margin-top:8px;text-align:center;}
+.callout{margin:14px 0;padding:12px 14px;border-left:6px solid;font-size:15px;}
+.c-goal{background:var(--blue-bg);border-color:var(--blue);}
+.c-warn{background:var(--amber-bg);border-color:var(--amber);}
+.c-stop{background:var(--red-bg);border-color:var(--red);}
+.c-ok{background:var(--green-bg);border-color:var(--green);}
+.c-tip{background:var(--violet-bg);border-color:var(--violet);}
+.meta{color:var(--sub);font-size:15px;margin:0 0 4px;}
+.toc{background:var(--soft);border:1px solid var(--line);padding:16px 20px;margin:20px 0;}
+.toc ol{columns:2;column-gap:36px;margin:6px 0 0;}
+.toc a{color:var(--blue);text-decoration:none;}
+.toc a:hover{text-decoration:underline;}
+.pipe{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0;}
+.pipe .st{border:2px solid #98A2B3;background:var(--soft);padding:8px 14px;
+  text-align:center;min-width:120px;flex:1;}
+.pipe .st small{display:block;color:var(--sub);font-size:12.5px;line-height:1.4;}
+.pipe .ar{color:#667085;font-size:20px;}
+.check{list-style:none;padding-left:2px;}
+.check li::before{content:"\2610\00a0\00a0";}
+.badge{display:inline-block;padding:0 8px;border-radius:10px;font-size:12.5px;
+  font-weight:700;border:1px solid;}
+.b-auto{color:var(--green);border-color:var(--green);background:var(--green-bg);}
+.b-gate{color:var(--red);border-color:var(--red);background:var(--red-bg);}
+.top{font-size:13px;} .top a{color:var(--sub);text-decoration:none;}
+@media (max-width:760px){ .toc ol{columns:1;} h1{font-size:24px;} }
+@media print{ .top{display:none;} h2{break-after:avoid;} figure{break-inside:avoid;} }
+</style>
+</head>
+<body>
+<h1>HLD 기반 코드 분석·비교·구현 업무 절차</h1>
+<p class="meta"><strong>CodeAnalyzer v0.10.2 &middot; hld-code-compare v0.8.1 &middot; hld-code-implement v0.4.0</strong></p>
+<p class="meta">L1_CHANNEL 파트원 발표 및 실무 참고용 &middot; 문서 버전 v1.1 / 절 번호는 MD 가이드와 동일</p>
+
+<div class="callout c-goal"><strong>목표: 이미 확보한 코드 Fact를 재사용해 HLD와 코드를 근거 기반으로 비교하고,
+확인된 Gap만 승인 후 안전하게 구현한다.</strong></div>
+
+<div class="callout c-tip"><strong>처음 읽는 분께:</strong>
+1절(왜 필요한가) &rarr; 2절(도구 역할) &rarr; 3절(전체 흐름 그림) &rarr; 6.2절(실제 예시) 순서로 먼저 읽으면
+전체 구조가 잡힙니다. 모르는 용어는 <a href="#glossary">부록 용어 정리</a>를 참고하세요.</div>
+<nav class="toc" id="toc"><strong>목차</strong>
+<ol>
+<li><a href="#s1">이 절차를 왜 사용하는가</a></li>
+<li><a href="#s2">세 도구의 역할</a></li>
+<li><a href="#s3">전체 업무 흐름</a></li>
+<li><a href="#s4">시작 전에 준비할 것</a></li>
+<li><a href="#s5">CodeAnalyzer 결과 사용 방법</a></li>
+<li><a href="#s6">HLD-Code Compare 절차</a></li>
+<li><a href="#s7">NOT_ANALYZED 처리</a></li>
+<li><a href="#s8">Compare 결과물 읽는 방법</a></li>
+<li><a href="#s9">HLD-Code Implement 절차</a></li>
+<li><a href="#s10">빌드·UT·리뷰 오류와 재개</a></li>
+<li><a href="#s11">구현 중 새 Gap 발견</a></li>
+<li><a href="#s12">구현 결과물</a></li>
+<li><a href="#s13">파트원 표준 사용 시나리오</a></li>
+<li><a href="#s14">파트 운영 권장 규칙</a></li>
+<li><a href="#s15">자주 묻는 질문</a></li>
+<li><a href="#s16">20~30분 발표 진행안</a></li>
+<li><a href="#s17">Confluence Draw.io 사용 방법</a></li>
+<li><a href="#glossary">부록. 용어 정리</a></li>
+</ol>
+</nav>
+<h2 id="s1">1. 이 절차를 왜 사용하는가</h2>
+<p>HLD와 실제 코드가 시간이 지나면서 달라지면 다음 문제가 발생한다.</p>
+<ul>
+<li>HLD에는 있지만 코드에 구현되지 않은 요구사항이 생김</li>
+<li>코드는 바뀌었지만 HLD에 반영되지 않음</li>
+<li>코드의 조건, 상태 전이, 메시지 방향이 설계와 달라짐</li>
+<li>근거가 부족한 상태에서 AI가 차이를 추정해 잘못 수정할 수 있음</li>
+<li>같은 코드를 매번 전체 분석하면서 시간과 토큰을 낭비함</li>
+</ul>
+<p>이 절차의 목적은 단순하다.</p>
+<div class="callout c-goal"><strong>이미 확보한 코드 Fact를 재사용해 HLD와 코드를 근거 기반으로 비교하고,
+확인된 Gap만 승인 후 안전하게 구현한다.</strong></div>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s2">2. 세 도구의 역할</h2>
+<table>
+<tr><th style="width:22%">도구</th><th>쉬운 설명</th><th>하는 일</th><th>하지 않는 일</th></tr>
+<tr><td><strong>CodeAnalyzer v0.10.2</strong></td><td>코드를 읽어 사실을 정리</td>
+<td>API, 호출 관계, 메시지, 상태, 조건, 흐름을 Fact로 생성</td><td>HLD와의 최종 Gap 판정, 코드 수정</td></tr>
+<tr><td><strong>hld-code-compare v0.8.1</strong></td><td>설계와 코드가 맞는지 검사</td>
+<td>HLD 요구사항과 코드 Fact를 비교해 Gap과 근거를 기록</td><td>코드 수정</td></tr>
+<tr><td><strong>hld-code-implement v0.4.0</strong></td><td>확인된 Gap을 안전하게 반영</td>
+<td>승인된 GAP-id를 수정하고 Diff, 이력, Shelved CL을 생성</td><td>근거 부족 Gap의 임의 구현</td></tr>
+</table>
+<p>한 줄로 정리하면 다음과 같다.</p>
+<div class="pipe">
+<div class="st"><strong>CodeAnalyzer</strong><small>코드를 Fact로 정리</small></div><div class="ar">&rarr;</div>
+<div class="st"><strong>Compare</strong><small>HLD와 코드 차이 판단</small></div><div class="ar">&rarr;</div>
+<div class="st"><strong>Implement</strong><small>승인된 차이만 수정</small></div>
+</div>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s3">3. 전체 업무 흐름</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 680" style="width:100%;height:auto;display:block;">
+
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3"
+              orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#667085"/>
+      </marker>
+      <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.12"/>
+      </filter>
+    </defs>
+    
+<rect x="0" y="0" width="1220" height="680" fill="#FFFFFF"/>
+<text x="610.0" y="34" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="24" font-weight="700" fill="#101828">HLD 기반 코드 분석·비교·구현 전체 흐름</text>
+<path d="M135.0,182 L365.0,100" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M365.0,182 L602.5,100" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M602.5,182 L827.5,88" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M827.5,193 L1060.0,55" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="918.75" y="104.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="943.75" y="118.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">아니오</text>
+<path d="M955,96 L925,70 L730,70 L705,100" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="806.25" y="98.5" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="831.25" y="112.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">재판정</text>
+<path d="M827.5,193 L1060.0,175" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="918.75" y="164.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="943.75" y="178.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">예</text>
+<path d="M1060.0,257 L835.0,280" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M835.0,385 L602.5,300" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="693.75" y="322.5" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="718.75" y="336.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">아니오</text>
+<path d="M835.0,385 L1060.0,300" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="922.5" y="322.5" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="947.5" y="336.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">예</text>
+<path d="M1060.0,382 L1060.0,430" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1060.0,512 L852.5,550" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="40" y="100" width="190" height="82" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="135.0" y="137.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">1. HLD 준비</text>
+<text x="135.0" y="155.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">목표 설계와 범위 확인</text>
+<rect x="270" y="100" width="190" height="82" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="365.0" y="137.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">2. CodeAnalyzer</text>
+<text x="365.0" y="155.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">기존 Fact 우선 재사용</text>
+<rect x="500" y="100" width="205" height="82" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="602.5" y="128.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">3. HLD-Code</text>
+<text x="602.5" y="146.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">Compare</text>
+<text x="602.5" y="164.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">설계와 코드 근거 대조</text>
+<polygon points="827.5,88 900,140.5 827.5,193 755,140.5" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="827.5" y="136.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">근거가</text>
+<text x="827.5" y="154.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">충분한가?</text>
+<rect x="955" y="55" width="210" height="82" rx="12" fill="#FDEBEC" stroke="#B83A44" stroke-width="2" filter="url(#shadow)"/>
+<text x="1060.0" y="83.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">NOT_ANALYZED /</text>
+<text x="1060.0" y="101.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">PARTIAL</text>
+<text x="1060.0" y="119.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">부족 범위만 추가 Probe</text>
+<rect x="955" y="175" width="210" height="82" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="1060.0" y="212.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">Gap 판정</text>
+<text x="1060.0" y="230.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">미구현 · 불일치 · 문서누락</text>
+<polygon points="835.0,280 910,332.5 835.0,385 760,332.5" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="835.0" y="328.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">implement_allowed</text>
+<text x="835.0" y="346.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">= true ?</text>
+<rect x="500" y="300" width="205" height="82" rx="12" fill="#F2F4F7" stroke="#667085" stroke-width="2" filter="url(#shadow)"/>
+<text x="602.5" y="337.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">검토 또는 HLD 보완</text>
+<text x="602.5" y="355.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">코드 수정 차단</text>
+<rect x="955" y="300" width="210" height="82" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="1060.0" y="328.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">4. HLD-Code</text>
+<text x="1060.0" y="346.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">Implement</text>
+<text x="1060.0" y="364.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">G1 승인 후 코드 수정</text>
+<rect x="955" y="430" width="210" height="82" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="1060.0" y="467.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">5. G2 Diff 승인</text>
+<text x="1060.0" y="485.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">빌드·UT·리뷰</text>
+<rect x="730" y="550" width="245" height="82" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="852.5" y="578.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">6. 최종 산출물</text>
+<text x="852.5" y="596.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">run.diff · Shelved</text>
+<text x="852.5" y="614.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">CL · 보고</text>
+<text x="610.0" y="662" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" fill="#667085">분석 단계는 자동 진행하며, 코드·문서 write는 승인 게이트를 통과한 뒤 수행합니다.</text>
+</svg>
+<figcaption>그림 1. 전체 업무 흐름 — 근거가 부족하면 probe 루프로 되돌아가고,
+implement_allowed=true인 Gap만 구현으로 진행한다. (Confluence: diagrams/01_overall_workflow.drawio)</figcaption>
+</figure>
+<h3>핵심 흐름</h3>
+<ol>
+<li>목표 HLD와 비교 범위를 준비한다.</li>
+<li>CodeAnalyzer의 기존 결과를 우선 재사용한다.</li>
+<li>Compare가 설계와 코드 근거를 대조한다.</li>
+<li>근거가 부족하면 전체 재분석 대신 부족한 범위만 추가 분석한다.</li>
+<li>확인된 Gap 중 <code>implement_allowed=true</code>인 항목만 구현기로 전달한다.</li>
+<li>구현기는 G1과 G2 승인 후 코드를 수정하고 결과를 Shelve한다.</li>
+</ol>
+<h3>자동 진행과 승인 질문의 차이</h3>
+<table>
+<tr><th>작업</th><th style="width:34%">기본 동작</th></tr>
+<tr><td>HLD 읽기, 기존 Fact 탐색, 유효성 검사, Gap 판정, 리포트 생성</td>
+<td><span class="badge b-auto">자동</span> 추가 질문 없이 완료</td></tr>
+<tr><td>부족 Fact에 대한 bounded probe</td><td><span class="badge b-auto">자동</span> 추가 질문 없이 수행</td></tr>
+<tr><td>Confluence 발행, quick 결과의 precise 승격</td><td><span class="badge b-gate">승인</span> write 작업</td></tr>
+<tr><td>코드 수정 범위 확정</td><td><span class="badge b-gate">승인</span> G1</td></tr>
+<tr><td>실제 Diff 반영 확정</td><td><span class="badge b-gate">승인</span> G2</td></tr>
+<tr><td>HLD HTML fragment 반영</td><td><span class="badge b-gate">승인</span> D2</td></tr>
+</table>
+<div class="callout c-warn">저사양 모델 지원은 "모든 승인을 없앤다"는 의미가 아니다.
+<strong>읽기·판정은 자동화하고, 코드와 문서를 바꾸는 지점만 사람이 승인한다.</strong></div>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s4">4. 시작 전에 준비할 것</h2>
+<h3>4.1 필수 입력</h3>
+<ul>
+<li>목표 설계를 담은 HLD</li>
+<li>현재 작업 중인 P4 working branch</li>
+<li>비교할 기능, API, 파일 또는 HLD 절</li>
+<li>기존 CodeAnalyzer 산출물</li>
+<li>현재 브랜치와 연결되는 <code>code_analysis_manifest.json</code> v2</li>
+</ul>
+<h3>4.2 HLD의 종류</h3>
+<h4>공식 HLD가 있는 경우</h4>
+<p>공식 HLD를 <strong>목표 설계</strong>로 사용한다.</p>
+<h4>공식 HLD가 없는 경우</h4>
+<p>CodeAnalyzer가 생성한 <code>hld_&lt;stem&gt;.md</code>를 <strong>현상 HLD</strong>로 사용할 수 있다.
+현상 HLD는 현재 코드가 어떻게 되어 있는지 정리한 문서다. 사용자가 수정하거나 목표 설계로 승격하기 전에는
+"반드시 이렇게 구현해야 한다"는 공식 설계로 단정하지 않는다.</p>
+<h3>4.3 범위 지정 예</h3>
+<pre>TxManager 전체 HLD와 현재 작업 브랜치 코드를 비교해줘.</pre>
+<pre>HLD의 "Tx Switch Confirmation 처리" 절만 현재 코드와 비교해줘.</pre>
+<p>범위를 명시하지 않으면 Compare는 HLD 전체를 기본 범위로 사용하고, 가정한 값을 결과에 기록한다.</p>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s5">5. CodeAnalyzer 결과를 어떻게 사용하는가</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 610" style="width:100%;height:auto;display:block;">
+
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3"
+              orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#667085"/>
+      </marker>
+      <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.12"/>
+      </filter>
+    </defs>
+    
+<rect x="0" y="0" width="1200" height="610" fill="#FFFFFF"/>
+<text x="600.0" y="34" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="24" font-weight="700" fill="#101828">HLD-Code Compare 판정 흐름</text>
+<path d="M157.5,195 L447.5,110" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M447.5,195 L737.5,110" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M737.5,195 L995.0,95" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M995.0,210 L995,245 L447,245 L447.5,285" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="696.25" y="227.5" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="721.25" y="241.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">예</text>
+<path d="M995.0,210 L980.0,290" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="962.5" y="230.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="987.5" y="244.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">아니오</text>
+<path d="M980.0,375 L697.5,285" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M697.5,385 L447.5,285" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="547.5" y="315.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="572.5" y="329.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">예</text>
+<path d="M697.5,385 L985.0,455" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="816.25" y="400.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="841.25" y="414.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">아니오</text>
+<path d="M985.0,540 L455.0,455" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M447.5,370 L455.0,455" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M455.0,540 L150.0,455" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="40" y="110" width="235" height="85" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="157.5" y="130.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">HLD + 현재 브랜치</text>
+<text x="157.5" y="148.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">+</text>
+<text x="157.5" y="166.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">code_analysis_manifest.json</text>
+<text x="157.5" y="184.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">v2</text>
+<rect x="330" y="110" width="235" height="85" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="447.5" y="130.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">REUSE_FIRST</text>
+<text x="447.5" y="148.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">기존 structure /</text>
+<text x="447.5" y="166.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">flow / fact_patch</text>
+<text x="447.5" y="184.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">탐색</text>
+<rect x="620" y="110" width="235" height="85" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="737.5" y="139.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">VALIDITY_CHECK</text>
+<text x="737.5" y="157.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">범위·Baseline·생성시각</text>
+<text x="737.5" y="175.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">확인</text>
+<polygon points="995.0,95 1070,152.5 995.0,210 920,152.5" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="995.0" y="148.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">필요한 Fact가</text>
+<text x="995.0" y="166.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">있는가?</text>
+<rect x="850" y="290" width="260" height="85" rx="12" fill="#FDEBEC" stroke="#B83A44" stroke-width="2" filter="url(#shadow)"/>
+<text x="980.0" y="310.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">부족 Fact만 bounded</text>
+<text x="980.0" y="328.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">probe</text>
+<text x="980.0" y="346.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">허용 primitive · 최대</text>
+<text x="980.0" y="364.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">6개</text>
+<polygon points="697.5,285 775,335.0 697.5,385 620,335.0" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="697.5" y="340.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">Fact 확인됨?</text>
+<rect x="330" y="285" width="235" height="85" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="447.5" y="323.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">Precise Compare</text>
+<text x="447.5" y="341.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">HLD 요구사항 ↔ 코드 근거</text>
+<rect x="850" y="455" width="270" height="85" rx="12" fill="#FDEBEC" stroke="#B83A44" stroke-width="2" filter="url(#shadow)"/>
+<text x="985.0" y="475.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">NOT_ANALYZED /</text>
+<text x="985.0" y="493.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">BASELINE_MISMATCH</text>
+<text x="985.0" y="511.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">원인이 아닌</text>
+<text x="985.0" y="529.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">limitation으로 기록</text>
+<rect x="330" y="455" width="250" height="85" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="455.0" y="475.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">gap_writer.py</text>
+<text x="455.0" y="493.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">계약</text>
+<text x="455.0" y="511.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">검증·ID·implement_allowed</text>
+<text x="455.0" y="529.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">결정</text>
+<rect x="40" y="455" width="220" height="85" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="150.0" y="493.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">gap_report.yaml</text>
+<text x="150.0" y="511.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">+ gap_summary.md</text>
+<text x="600.0" y="592" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" fill="#667085">전체 CodeAnalyzer 재실행 대신 기존 Fact 재사용과 부족 범위 Probe를 우선합니다.</text>
+</svg>
+<figcaption>그림 2. Compare 판정 흐름 — 기존 결과 재사용을 우선하고, 부족한 Fact만 bounded probe로 보강한다.
+(Confluence: diagrams/02_compare_decision_flow.drawio)</figcaption>
+</figure>
+<p>Compare의 CodeAnalyzer 연동 순서는 고정되어 있다.</p>
+<pre>REUSE_FIRST
+&rarr; VALIDITY_CHECK
+&rarr; GAP_DETECT
+&rarr; CURRENT_RUN_FACT_USE</pre>
+<h3>5.1 REUSE_FIRST</h3>
+<p>기존 <code>code_analysis_manifest.json</code> v2와 연결된 다음 결과를 먼저 찾는다.</p>
+<ul>
+<li><code>structure_*_focused.json</code></li>
+<li>flow 분석 결과</li>
+<li>기존 <code>fact_patch</code></li>
+<li>API, 호출자·피호출자, 메시지, 상태, callback 근거</li>
+</ul>
+<p>기존 결과가 유효하면 원본 코드를 넓게 다시 읽지 않는다.</p>
+<h3>5.2 VALIDITY_CHECK</h3>
+<ul>
+<li>현재 working branch와 baseline이 맞는가</li>
+<li>요청한 파일·API·기능 범위가 분석되어 있는가</li>
+<li>필요한 Fact가 실제 결과에 들어 있는가</li>
+<li>참조 파일이 존재하고 손상되지 않았는가</li>
+</ul>
+<h3>5.3 부족한 Fact만 추가 Probe</h3>
+<p>필요한 Fact가 없을 때도 전체 CodeAnalyzer workflow를 자동 재실행하지 않는다.
+허용된 결정형 Probe만 필요한 범위에 수행한다.</p>
+<pre>symbol / dispatch / field / timeout / callback / callers / callees</pre>
+<p>기본 제한은 최대 6개 Probe다. 결과는 현재 run의 <code>fact_patch</code>로 즉시 사용한다.</p>
+<h3>5.4 상태 분석에서 제외하는 것</h3>
+<p>다음 항목은 시스템 상태 Fact로 사용하지 않는다.</p>
+<ul><li>local variable</li><li>parameter</li><li>function-local static</li></ul>
+<p>함수 내부 임시 값이 시스템 상태처럼 해석되는 오류를 방지하기 위한 규칙이다.</p>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s6">6. HLD-Code Compare 절차</h2>
+<h3>6.1 Compare가 비교하는 항목</h3>
+<p>Compare는 단순 문장 유사도만 검사하지 않는다.</p>
+<ul>
+<li>API 또는 handler 존재 여부</li>
+<li>메시지 심볼과 방향</li>
+<li>호출 순서 / 조건 분기 / 상태 전이</li>
+<li>Request와 Confirmation 연결</li>
+<li>timeout과 오류 처리 / callback 또는 비동기 절차</li>
+<li>HLD 요구사항이 코드에 구현됐는지</li>
+<li>코드 동작이 HLD에 문서화됐는지</li>
+</ul>
+<h3>6.2 간단한 예</h3>
+<h4>HLD 요구사항</h4>
+<pre>Tx 요청 후 Confirmation을 수신하면 상태를 ACTIVE로 변경한다.</pre>
+<h4>실제 코드</h4>
+<pre><code>sendTxRequest();
+
+if (result == SUCCESS) {
+    txState = ACTIVE;
+}</code></pre>
+<h4>Compare가 보는 관점</h4>
+<ul>
+<li><code>sendTxRequest()</code> 직후 상태를 변경하는가</li>
+<li>실제 Confirmation handler가 존재하는가</li>
+<li>Confirmation handler에서 <code>ACTIVE</code> 전이가 확인되는가</li>
+<li><code>result == SUCCESS</code>가 요청 성공인지 Confirmation 수신인지</li>
+<li>HLD의 시점과 코드의 시점이 같은가</li>
+</ul>
+<div class="callout c-tip">근거가 충분하면 <code>불일치</code> Gap이 될 수 있다.
+Confirmation 처리 범위가 분석되지 않았다면 곧바로 원인으로 단정하지 않고
+<code>NOT_ANALYZED</code> 또는 <code>PARTIAL</code>로 남긴다.</div>
+<h3>6.3 Gap 유형</h3>
+<table>
+<tr><th>Gap 유형</th><th>의미</th><th>코드 구현 대상</th></tr>
+<tr><td><code>미구현</code></td><td>HLD 요구사항은 있으나 코드 구현을 찾지 못함</td><td>조건 충족 시 가능</td></tr>
+<tr><td><code>불일치</code></td><td>HLD와 코드의 심볼, 방향, 분기, 상태 등이 다름</td><td>조건 충족 시 가능</td></tr>
+<tr><td><code>문서누락</code></td><td>코드에는 동작이 있지만 HLD에 없음</td><td>코드 수정 금지, HLD 보완 대상</td></tr>
+</table>
+<h3>6.4 Fact 상태</h3>
+<table>
+<tr><th>상태</th><th>의미</th><th>기본 처리</th></tr>
+<tr><td><code>CONFIRMED</code></td><td>충분한 코드 Fact로 판정 가능</td><td>구현 가능 조건 검토</td></tr>
+<tr><td><code>CONFIRMED_LEGACY</code></td><td>구버전 report를 기존 규칙으로 인정</td><td>하위 호환 처리</td></tr>
+<tr><td><code>PARTIAL</code></td><td>일부 근거만 확보</td><td>코드 구현 차단</td></tr>
+<tr><td><code>NOT_ANALYZED</code></td><td>필요한 범위가 분석되지 않음</td><td>부족 범위만 추가 분석</td></tr>
+<tr><td><code>BASELINE_MISMATCH</code></td><td>분석 baseline과 현재 브랜치가 다름</td><td>현재 결과로 구현 금지</td></tr>
+</table>
+<h3>6.5 implement_allowed 결정</h3>
+<p><code>implement_allowed</code>는 모델이 임의로 작성하지 않는다.
+Compare의 <code>gap_writer.py</code>가 계약에 따라 계산한다.
+<code>true</code>가 되려면 아래 조건을 <strong>모두</strong> 만족해야 한다.</p>
+<ol>
+<li><code>compare_mode=precise</code></li>
+<li>근거가 <code>structure_json</code> 또는 <code>minimal_inventory</code></li>
+<li>Gap 유형이 <code>미구현</code> 또는 <code>불일치</code></li>
+<li>미구현이면 삽입할 코드 파일이 확정됨</li>
+<li><code>fact_status=CONFIRMED</code></li>
+</ol>
+<p>그 외에는 모두 <code>false</code>다.</p>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s7">7. NOT_ANALYZED는 어떻게 처리하는가</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 510" style="width:100%;height:auto;display:block;">
+
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3"
+              orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#667085"/>
+      </marker>
+      <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.12"/>
+      </filter>
+    </defs>
+    
+<rect x="0" y="0" width="1200" height="510" fill="#FFFFFF"/>
+<text x="600.0" y="34" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="24" font-weight="700" fill="#101828">NOT_ANALYZED 후속 처리</text>
+<path d="M150.0,200 L445.0,115" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M445.0,200 L755.0,115" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M755.0,200 L1050.0,115" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1050.0,200 L1050.0,300" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1050.0,385 L752.5,285" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M752.5,395 L462.5,285" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="582.5" y="320.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="607.5" y="334.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">예</text>
+<path d="M752.5,395 L752,450 L160,450 L160.0,285" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="431.25" y="320.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="456.25" y="334.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">아니오</text>
+<rect x="40" y="115" width="220" height="85" rx="12" fill="#FDEBEC" stroke="#B83A44" stroke-width="2" filter="url(#shadow)"/>
+<text x="150.0" y="153.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">NOT_ANALYZED 발생</text>
+<text x="150.0" y="171.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">구현은 자동 차단</text>
+<rect x="320" y="115" width="250" height="85" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="445.0" y="144.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">부족 사유 분류</text>
+<text x="445.0" y="162.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">API 본문 · 호출경로 ·</text>
+<text x="445.0" y="180.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">상태전이 · Baseline</text>
+<rect x="630" y="115" width="250" height="85" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="755.0" y="153.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">필요한 파일·API·심볼만 선택</text>
+<text x="755.0" y="171.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">전체 재실행 금지</text>
+<rect x="940" y="115" width="220" height="85" rx="12" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="1050.0" y="144.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">bounded probe 실행</text>
+<text x="1050.0" y="162.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">run-local</text>
+<text x="1050.0" y="180.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">fact_patch 생성</text>
+<rect x="940" y="300" width="220" height="85" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="1050.0" y="338.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">현재 Compare에 즉시 적용</text>
+<text x="1050.0" y="356.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">공유 merge는 승인 필요</text>
+<polygon points="752.5,285 840,340.0 752.5,395 665,340.0" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="752.5" y="336.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">재판정 근거가</text>
+<text x="752.5" y="354.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">충분한가?</text>
+<rect x="340" y="285" width="245" height="85" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="462.5" y="323.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">CONFIRMED 또는 일치</text>
+<text x="462.5" y="341.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">필요 시 구현 후보 전환</text>
+<rect x="40" y="285" width="240" height="85" rx="12" fill="#F2F4F7" stroke="#667085" stroke-width="2" filter="url(#shadow)"/>
+<text x="160.0" y="314.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">PARTIAL /</text>
+<text x="160.0" y="332.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">NOT_ANALYZED 유지</text>
+<text x="160.0" y="350.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">부족 근거와 다음 조치 기록</text>
+<text x="600.0" y="492" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" fill="#667085">NOT_ANALYZED는 원인이 아니라 비교 근거 부족 상태이며, 구현 대상에서 제외됩니다.</text>
+</svg>
+<figcaption>그림 3. NOT_ANALYZED 후속 처리 — 전체 재분석이 아니라 부족 범위만 probe하고 재판정한다.
+(Confluence: diagrams/03_not_analyzed_recovery.drawio)</figcaption>
+</figure>
+<div class="callout c-stop"><code>NOT_ANALYZED</code>는 <strong>코드 문제의 원인이 아니다.</strong>
+현재 비교에 필요한 코드 Fact를 아직 확인하지 못했다는 상태다.</div>
+<h3>7.1 처리 순서</h3>
+<ol>
+<li>현재 Gap 후보와 limitation을 report에 남긴다.</li>
+<li><code>implement_allowed=false</code>로 코드 구현을 차단한다.</li>
+<li>부족한 근거가 무엇인지 확인한다.</li>
+<li>필요한 파일·API·심볼만 추가 Probe한다.</li>
+<li>생성된 run-local <code>fact_patch</code>를 현재 Compare에 즉시 사용한다.</li>
+<li>Compare를 재판정한다.</li>
+<li>충분하면 <code>CONFIRMED</code>, 정상 일치 또는 확정 Gap으로 전환한다.</li>
+<li>여전히 부족하면 <code>PARTIAL</code> 또는 <code>NOT_ANALYZED</code>를 유지하고 다음 조치를 기록한다.</li>
+</ol>
+<h3>7.2 자주 발생하는 부족 근거</h3>
+<ul>
+<li>대상 API 본문이 분석 범위에 없음</li>
+<li>Request 이후 Confirmation 호출 경로가 없음</li>
+<li>상태를 실제로 변경하는 field 근거가 없음</li>
+<li>callback 등록 위치가 없음</li>
+<li>timeout handler가 미분석</li>
+<li>현재 브랜치와 분석 baseline이 다름</li>
+<li>분석 예산 제한으로 일부 심볼이 빠짐</li>
+</ul>
+<p><code>budget_exceeded</code>도 원인이 아니라 분석 limitation이다.</p>
+<h3>7.3 사용 요청 예</h3>
+<pre>이전 비교 결과에서 NOT_ANALYZED 항목만 추가 분석하고 재판정해줘.
+전체 CodeAnalyzer는 다시 실행하지 말고 부족한 API와 호출 경로만 확인해줘.</pre>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s8">8. Compare 결과물 읽는 방법</h2>
+<p>Compare의 핵심 출력은 다음 두 파일이다.</p>
+<pre>hld_compare_output/&lt;hld_slug&gt;/
+├─ gap_report_&lt;slug&gt;_&lt;KST&gt;.yaml
+└─ gap_summary_&lt;slug&gt;_&lt;KST&gt;.md</pre>
+<table>
+<tr><th>파일</th><th>용도</th></tr>
+<tr><td><code>gap_report.yaml</code></td><td>기계용 SSOT. Implement가 읽는 정식 입력</td></tr>
+<tr><td><code>gap_summary.md</code></td><td>사람이 빠르게 검토하는 요약</td></tr>
+</table>
+<h3>반드시 기억할 규칙</h3>
+<div class="callout c-warn">Gap 선택은 <code>GAP-001</code>과 같은 <strong>GAP-id</strong>로 한다.
+표의 행 번호를 Gap 선택 키로 사용하지 않는다.</div>
+<ul>
+<li>같은 HLD를 재판정하면 최신 KST report가 유효본이다.</li>
+<li>기존 승인·구현 상태는 새 report로 승계한다.</li>
+<li>과거 report는 이력으로 보존한다.</li>
+</ul>
+<h3>결과 검토 순서</h3>
+<div class="pipe">
+<div class="st"><strong>1. fact_status</strong></div><div class="ar">&rarr;</div>
+<div class="st"><strong>2. type</strong></div><div class="ar">&rarr;</div>
+<div class="st"><strong>3. hld_ref</strong></div><div class="ar">&rarr;</div>
+<div class="st"><strong>4. code_ref</strong></div><div class="ar">&rarr;</div>
+<div class="st"><strong>5. limitation</strong></div><div class="ar">&rarr;</div>
+<div class="st"><strong>6. implement_allowed</strong></div><div class="ar">&rarr;</div>
+<div class="st"><strong>7. status / fix_unit 이력</strong></div>
+</div>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s9">9. HLD-Code Implement 절차</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" style="width:100%;height:auto;display:block;">
+
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3"
+              orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#667085"/>
+      </marker>
+      <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+        <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.12"/>
+      </filter>
+    </defs>
+    
+<rect x="0" y="0" width="1280" height="720" fill="#FFFFFF"/>
+<text x="640.0" y="34" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="24" font-weight="700" fill="#101828">HLD-Code Implement 승인·재작업 흐름</text>
+<path d="M142.5,175 L400.0,95" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M400.0,175 L657.5,95" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M657.5,175 L895.0,85" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M895.0,185 L1135.0,95" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1135.0,175 L1135.0,260" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M1135.0,340 L895.0,250" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M895.0,350 L650.0,260" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="747.5" y="285.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="772.5" y="299.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">거부</text>
+<path d="M650.0,340 L650,205 L1135,205 L1135.0,95" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="867.5" y="197.5" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="892.5" y="211.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">재수정</text>
+<path d="M895.0,350 L1135.0,425" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="990.0" y="367.5" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="1015.0" y="381.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">승인</text>
+<path d="M1135.0,505 L865.0,425" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M865.0,505 L610.0,415" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<path d="M610.0,515 L355.0,425" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="457.5" y="450.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="482.5" y="464.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">예</text>
+<path d="M355.0,505 L355,540 L1135,540 L1135.0,95" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="720.0" y="280.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="745.0" y="294.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">재진입</text>
+<path d="M610.0,515 L895.0,585" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="727.5" y="530.0" width="50" height="20" rx="5" fill="#FFFFFF"/>
+<text x="752.5" y="544.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" font-weight="700" fill="#475467">아니오</text>
+<rect x="40" y="95" width="205" height="80" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="142.5" y="131.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">gap_report 탐색</text>
+<text x="142.5" y="149.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">최신 report 자동 채택</text>
+<rect x="290" y="95" width="220" height="80" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="400.0" y="131.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">3단 후보</text>
+<text x="400.0" y="149.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">코드 구현 · 문서 보완 · 검토</text>
+<rect x="555" y="95" width="205" height="80" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="657.5" y="131.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">GAP-id 선택</text>
+<text x="657.5" y="149.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">행 번호 사용 금지</text>
+<rect x="805" y="85" width="180" height="100" rx="12" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="895.0" y="131.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">G1 승인</text>
+<text x="895.0" y="149.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">변경 계획·봉인 파일 범위</text>
+<rect x="1025" y="95" width="220" height="80" rx="12" fill="#F0EAFE" stroke="#6E4EB3" stroke-width="2" filter="url(#shadow)"/>
+<text x="1135.0" y="122.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">seal-run →</text>
+<text x="1135.0" y="140.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">start-gap</text>
+<text x="1135.0" y="158.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">선택 FU 범위만 코드 수정</text>
+<rect x="1025" y="260" width="220" height="80" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="1135.0" y="296.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">Gap-only diff 생성</text>
+<text x="1135.0" y="314.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">SHA-256로 검토본 고정</text>
+<polygon points="895.0,250 985,300.0 895.0,350 805,300.0" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="895.0" y="305.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">G2 승인?</text>
+<rect x="535" y="260" width="230" height="80" rx="12" fill="#FDEBEC" stroke="#B83A44" stroke-width="2" filter="url(#shadow)"/>
+<text x="650.0" y="296.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">거부 시 정확한 rollback</text>
+<text x="650.0" y="314.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">이전 승인 변경은 보존</text>
+<rect x="1025" y="425" width="220" height="80" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="1135.0" y="452.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">승인 시 FU done</text>
+<text x="1135.0" y="470.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">impl_record·impl_log</text>
+<text x="1135.0" y="488.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">갱신</text>
+<rect x="760" y="425" width="210" height="80" rx="12" fill="#E8F1FF" stroke="#2F6BBD" stroke-width="2" filter="url(#shadow)"/>
+<text x="865.0" y="470.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">빌드·UT·리뷰 결과 확인</text>
+<polygon points="610.0,415 705,465.0 610.0,515 515,465.0" fill="#FFF2DF" stroke="#C67616" stroke-width="2" filter="url(#shadow)"/>
+<text x="610.0" y="470.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">오류 또는 새 Gap?</text>
+<rect x="245" y="425" width="220" height="80" rx="12" fill="#FDEBEC" stroke="#B83A44" stroke-width="2" filter="url(#shadow)"/>
+<text x="355.0" y="452.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">add-rework /</text>
+<text x="355.0" y="470.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">add-late-gap</text>
+<text x="355.0" y="488.0" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">완료 FU를 되감지 않음</text>
+<rect x="760" y="585" width="270" height="85" rx="12" fill="#E7F7ED" stroke="#2D8A4E" stroke-width="2" filter="url(#shadow)"/>
+<text x="895.0" y="614.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">finalize-run</text>
+<text x="895.0" y="632.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">run.diff · Shelved</text>
+<text x="895.0" y="650.5" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="15" font-weight="600" fill="#101828">CL · cl_handoff</text>
+<text x="640.0" y="702" text-anchor="middle" font-family="'Malgun Gothic','NanumGothic','Noto Sans KR',sans-serif" font-size="13" fill="#667085">G1은 run 범위 승인, G2는 Gap별 실제 Diff 승인입니다.</text>
+</svg>
+<figcaption>그림 4. Implement 승인·재작업 흐름 — G2 거부 시 snapshot rollback, 오류·신규 Gap은 correction FU /
+Late Gap으로 순환한다. (Confluence: diagrams/04_implement_and_late_gap.drawio)</figcaption>
+</figure>
+<p>Implement는 Compare가 만든 <code>gap_report.yaml</code>에서 승인된 Gap을 처리한다.</p>
+<h3>9.1 3단 후보</h3>
+<table>
+<tr><th>후보</th><th>조건</th><th>가능한 작업</th></tr>
+<tr><td>코드 구현 후보</td><td><code>implement_allowed=true</code>, Fact 확인</td><td>코드 수정</td></tr>
+<tr><td>문서 보완 후보</td><td><code>type=문서누락</code></td><td>HLD HTML fragment 수정</td></tr>
+<tr><td>검토 후보</td><td>quick fallback, 근거 부족, 삽입 위치 미확정</td><td>코드 수정 불가</td></tr>
+</table>
+<h3>9.2 GAP-id 선택</h3>
+<pre>GAP-003 구현해줘.</pre>
+<p>다음 표현은 사용하지 않는다.</p>
+<pre>3번 Gap 구현해줘.</pre>
+<p>report와 요약표에서 행 순서는 달라질 수 있지만 GAP-id는 동일하기 때문이다.</p>
+<h3>9.3 G1 승인: 무엇을 바꿀지 승인</h3>
+<p>Implement는 먼저 변경 계획과 파일 범위를 계산한다.</p>
+<pre>[계획] GAP-003 / GAP-003-FU-01
+- 근거: HLD "Tx Switch CNF 처리"
+- 대상: src/tx/TxSwitchMngr.cpp :: handleTxSwitchCnf
+- 변경: Confirmation 이후 상태 전이 및 dispatch 연결
+- 봉인 파일: TxSwitchMngr.cpp, TxSwitchMngr.h</pre>
+<p>사용자가 G1을 승인하면 해당 파일을 봉인하고 baseline을 저장한다.</p>
+<div class="callout c-goal">G1은 <strong>코드 write를 시작해도 되는지</strong> 승인하는 단계다.</div>
+<h3>9.4 Gap 구현</h3>
+<ul>
+<li>선택된 fix unit 범위만 수정한다.</li>
+<li>G1 범위 밖 파일이 필요하면 조용히 확장하지 않는다. 새로운 run 또는 새 G1 승인이 필요하다.</li>
+<li>범위 밖 리팩토링을 수행하지 않는다.</li>
+</ul>
+<h3>9.5 G2 승인: 실제 Diff 승인</h3>
+<p>코드 수정 후 Implement는 Gap-only Diff와 SHA-256을 생성한다. 사용자가 승인하면 다음 작업을 한 번에 처리한다.</p>
+<ul>
+<li>fix unit을 <code>done</code>으로 변경 / Gap status 재계산</li>
+<li><code>impl_record</code> 생성 / <code>impl_log.md</code> 갱신</li>
+<li>승인된 파일 hash 기록</li>
+</ul>
+<p>Diff가 검토 이후 달라졌다면 기존 승인을 적용하지 않고 다시 G2 승인을 요청한다.</p>
+<h3>9.6 G2 거부</h3>
+<p>G2를 거부하면 Gap 시작 직전 snapshot으로 정확히 rollback한다.</p>
+<ul>
+<li>이전에 승인된 다른 Gap 변경은 보존</li>
+<li>파일 전체 revert로 다른 작업을 지우지 않음</li>
+<li>수정 대상 Gap만 재작업 가능 상태로 복귀</li>
+</ul>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s10">10. 빌드·UT·리뷰 오류와 재개</h2>
+<p>빌드·UT는 자동 실행하지 않는다. 사용자가 실행한 결과를 바탕으로 오류를 분석하고 재작업한다.</p>
+<h3>현재 FU 진행 중 오류</h3>
+<p>같은 fix unit에서 수정하고 새 G2 Diff를 생성한다.</p>
+<h3>이미 승인된 FU 이후 오류</h3>
+<p>완료된 FU를 되감지 않고 correction FU를 추가한다.</p>
+<pre>add-rework
+&rarr; 새 correction FU
+&rarr; 기존 G1 범위 내에서 재수정
+&rarr; 새 G2 승인</pre>
+<p>두 번 이상 해결되지 않거나 외부 의존성이 있으면 <code>blocked</code> 또는 <code>부분수정</code> 상태로 남겨
+다음 세션에서 재개할 수 있다.</p>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s11">11. 구현 중 새로운 Gap을 발견한 경우</h2>
+<p>Implement 도중 다음 문제가 발견될 수 있다.</p>
+<ul>
+<li>HLD에 없는 필수 예외 처리</li>
+<li>선행 구현 누락</li>
+<li>빌드 오류가 드러낸 설계 누락</li>
+<li>기존 HLD와 실제 필수 동작의 충돌</li>
+<li>사용자가 추가로 요청한 변경</li>
+</ul>
+<p>이 경우 현재 Gap에 임의로 섞지 않고 <code>implementation_discovered</code> <strong>Late Gap</strong>으로 등록한다.</p>
+<h3>처리 원칙</h3>
+<ul>
+<li>append-only로 새 GAP-id를 생성</li>
+<li>실제 빌드·의존성·사용자 지시를 Fact 근거로 기록</li>
+<li>HLD 보완 필요 여부를 <code>hld_amend</code>로 관리</li>
+<li>새 설계 판단이 필요하면 즉시 구현하지 않고 HLD를 보완한 뒤 Compare를 재실행</li>
+<li>HLD 반영 완료 전에는 재판정에서 유령 Gap 억제 상태를 유지</li>
+</ul>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s12">12. 구현 결과물</h2>
+<p>기본 출력 위치는 현재 P4 working branch root 기준이다.</p>
+<pre>&lt;working_branch_root&gt;/output/hld-code-implement/
+├─ NEXT_STEP_5.4a.md
+└─ &lt;gap_report_stem&gt;/
+   ├─ run_manifest.yaml
+   ├─ impl_log.md
+   ├─ run.diff
+   ├─ cl_handoff.json
+   └─ hld/
+      └─ hld_update_manifest.yaml</pre>
+<table>
+<tr><th>파일</th><th>역할</th></tr>
+<tr><td><code>run_manifest.yaml</code></td><td>선택 Gap, FU, G1 파일 범위, G2 hash, 최종 상태</td></tr>
+<tr><td><code>impl_log.md</code></td><td>사람이 보는 구현 진행 이력</td></tr>
+<tr><td><code>run.diff</code></td><td>G1 baseline 대비 최종 코드 Diff</td></tr>
+<tr><td><code>cl_handoff.json</code></td><td>Shelved CL 후속 검증·인계 정보</td></tr>
+<tr><td><code>hld_update_manifest.yaml</code></td><td>HLD HTML fragment 반영 이력</td></tr>
+</table>
+<h3>P4 처리</h3>
+<ul>
+<li>code Gap 여러 개를 하나의 run으로 처리 가능 / run 하나는 code CL 하나</li>
+<li>최종 단계에서 <code>p4 reopen</code> 후 shelve</li>
+<li>자동 submit은 하지 않음</li>
+</ul>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s13">13. 파트원 표준 사용 시나리오</h2>
+<h3>시나리오 A: HLD 전체 비교</h3>
+<pre>/hld-code-compare
+
+TxManager HLD와 현재 working branch 코드를 비교해줘.
+CodeAnalyzer v0.10.2 기존 결과를 우선 재사용하고,
+추가 질문 없이 gap_report와 gap_summary까지 생성해줘.</pre>
+<h3>시나리오 B: 특정 절만 비교</h3>
+<pre>/hld-code-compare
+
+HLD의 "Tx Switch Confirmation 처리" 절만 비교해줘.
+요청·Confirmation 연결, 상태 전이, timeout 처리를 확인해줘.</pre>
+<h3>시나리오 C: NOT_ANALYZED만 보강</h3>
+<pre>이전 HLD 비교 결과의 NOT_ANALYZED 항목만 추가 분석해줘.
+전체 분석은 다시 하지 말고 부족한 API와 호출 경로만 Probe한 뒤 재판정해줘.</pre>
+<h3>시나리오 D: 코드 Gap 구현</h3>
+<pre>/hld-code-implement
+
+최신 gap_report에서 GAP-003을 구현해줘.
+구현 계획과 G1 범위를 먼저 제시하고,
+승인 후 수정한 다음 Gap-only Diff로 G2 검토를 진행해줘.</pre>
+<h3>시나리오 E: 여러 Gap을 한 run으로 구현</h3>
+<pre>GAP-003과 GAP-005를 같은 run으로 구현해줘.
+공유 파일을 표시하고 G1 봉인 범위를 먼저 보여줘.</pre>
+<h3>시나리오 F: 빌드 오류 재개</h3>
+<pre>이전 GAP-003 구현 후 발생한 빌드 오류를 이어서 수정해줘.
+완료 FU는 되감지 말고 correction FU로 처리해줘.
+
+오류:
+&lt;빌드 오류 붙여넣기&gt;</pre>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s14">14. 파트 운영 권장 규칙</h2>
+<h3>반드시 지킬 것</h3>
+<ol>
+<li>공식 HLD와 현상 HLD를 구분한다.</li>
+<li>Compare 전에 현재 working branch가 맞는지 확인한다.</li>
+<li>Gap은 GAP-id로 지칭한다.</li>
+<li><code>NOT_ANALYZED</code>를 문제 원인으로 말하지 않는다.</li>
+<li><code>implement_allowed=false</code>인 항목은 코드로 수정하지 않는다.</li>
+<li>G1 범위 밖 변경이 필요하면 새 승인을 받는다.</li>
+<li>G2 Diff를 확인하지 않고 완료 처리하지 않는다.</li>
+<li>구현 중 새 문제는 Late Gap 또는 correction FU로 기록한다.</li>
+<li>자동 submit하지 않고 Shelve 후 검토한다.</li>
+<li>Confluence는 보기용이며 로컬 <code>gap_report.yaml</code>이 SSOT다.</li>
+</ol>
+<h3>권장 리뷰 체크리스트</h3>
+<ul class="check">
+<li>HLD가 목표 설계인가</li>
+<li>비교 범위가 맞는가</li>
+<li>CodeAnalyzer baseline이 현재 브랜치와 일치하는가</li>
+<li>Fact 상태가 <code>CONFIRMED</code>인가</li>
+<li>HLD와 코드 근거가 모두 구체적인가</li>
+<li>Gap 유형이 적절한가</li>
+<li><code>implement_allowed</code>가 계약상 맞는가</li>
+<li>G1 파일 범위가 최소인가</li>
+<li>G2 Diff가 HLD 요구사항만 반영하는가</li>
+<li>빌드·UT·리뷰 결과가 기록됐는가</li>
+<li>HLD 보완이 필요한 Late Gap이 남아 있지 않은가</li>
+</ul>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s15">15. 자주 묻는 질문</h2>
+<h3>Q1. 저사양 모델에서도 사용할 수 있는가?</h3>
+<p>가능하다. Compare는 순서와 상태 판단을 Python 도구가 강제하고, 기존 Fact 재사용과 bounded probe를 사용한다. Implement도 <code>hci_flow.py</code>가 실행 순서를 관리한다. 다만 코드·문서 write 승인은 모델 성능과 무관하게 유지한다.</p>
+<h3>Q2. CodeAnalyzer 결과가 없으면 비교할 수 없는가?</h3>
+<p>기존 inventory가 없으면 quick symbol scan으로 탐지할 수 있다. 다만 이 결과는 근거가 약하므로 <code>implement_allowed=false</code>다. 사람이 hit를 확인해 minimal inventory로 승격하면 precise 재판정이 가능하다.</p>
+<h3>Q3. NOT_ANALYZED가 나오면 전체 분석을 다시 해야 하는가?</h3>
+<p>아니다. 필요한 파일·API·심볼만 Probe하는 것이 기본이다. 전체 workflow 자동 재실행은 금지한다.</p>
+<h3>Q4. 문서누락도 코드 구현기로 넘기는가?</h3>
+<p>Implement가 처리할 수는 있지만 <code>target=document</code>로만 처리한다. 코드 수정은 금지한다.</p>
+<h3>Q5. HLD HTML을 수정할 때 Markdown으로 전체 변환하는가?</h3>
+<p>아니다. 원본 Confluence HTML을 보존하고 승인된 fragment를 유일한 heading anchor에 삽입한다. 전체 HTML&harr;Markdown 왕복 변환을 하지 않는다.</p>
+<h3>Q6. 여러 Gap을 동시에 구현할 수 있는가?</h3>
+<p>가능하다. 하나의 run에서 여러 Gap을 선택할 수 있으며, 공유 파일을 표시하고 run 단위 G1 승인을 받는다.</p>
+<h3>Q7. 구현 완료 후 바로 submit하는가?</h3>
+<p>아니다. 최종 Diff와 handoff를 만들고 Shelve까지만 수행한다.</p>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s16">16. 20~30분 발표 진행안</h2>
+<table>
+<tr><th style="width:10%">시간</th><th>발표 내용</th><th>핵심 메시지</th></tr>
+<tr><td>2분</td><td>문제와 목적</td><td>HLD와 코드 드리프트를 근거 기반으로 관리</td></tr>
+<tr><td>3분</td><td>세 도구 역할</td><td>분석 &rarr; 비교 &rarr; 구현의 책임 분리</td></tr>
+<tr><td>4분</td><td>전체 흐름</td><td>읽기는 자동, write는 승인</td></tr>
+<tr><td>4분</td><td>Compare 상세</td><td>재사용 우선, 부족 Fact만 Probe</td></tr>
+<tr><td>3분</td><td>Gap·Fact 상태</td><td>NOT_ANALYZED는 원인이 아님</td></tr>
+<tr><td>5분</td><td>Implement 상세</td><td>GAP-id, G1, G2, 정확한 rollback</td></tr>
+<tr><td>3분</td><td>오류·Late Gap</td><td>완료 이력을 지우지 않고 재개</td></tr>
+<tr><td>2분</td><td>실제 요청 예</td><td>파트원이 바로 사용할 문구</td></tr>
+<tr><td>2분</td><td>운영 규칙 정리</td><td>SSOT, 승인, Shelve 원칙</td></tr>
+</table>
+<h3>발표 마지막 한 장</h3>
+<div class="callout c-ok"><ol style="margin:0;">
+<li>기존 CodeAnalyzer Fact를 먼저 재사용한다.</li>
+<li>근거가 없으면 Gap을 확정하지 않는다.</li>
+<li>NOT_ANALYZED는 부족 범위만 추가 분석한다.</li>
+<li>implement_allowed=true인 GAP-id만 구현한다.</li>
+<li>G1은 범위 승인, G2는 실제 Diff 승인이다.</li>
+<li>구현 이력은 보존하고, 최종 결과는 Shelve한다.</li>
+</ol></div>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="s17">17. Confluence에서 Draw.io 사용 방법</h2>
+<p>이 패키지의 <code>diagrams/*.drawio</code> 파일을 사용한다.</p>
+<ol>
+<li>Confluence 페이지를 편집한다.</li>
+<li>다이어그램 위치에서 <code>/draw.io</code> 매크로를 추가한다.</li>
+<li>새 다이어그램 또는 파일 가져오기를 선택한다.</li>
+<li>아래 파일을 순서대로 불러온다.</li>
+</ol>
+<table>
+<tr><th>문서 위치</th><th>Draw.io 파일</th></tr>
+<tr><td>3절 전체 업무 흐름 (그림 1)</td><td><code>01_overall_workflow.drawio</code></td></tr>
+<tr><td>5절 Compare 상세 (그림 2)</td><td><code>02_compare_decision_flow.drawio</code></td></tr>
+<tr><td>7절 NOT_ANALYZED 처리 (그림 3)</td><td><code>03_not_analyzed_recovery.drawio</code></td></tr>
+<tr><td>9절 Implement 상세 (그림 4)</td><td><code>04_implement_and_late_gap.drawio</code></td></tr>
+</table>
+<p>이 HTML 문서에는 매크로가 없어도 내용을 읽을 수 있도록 동일 SVG가 inline으로 포함되어 있다.
+Draw.io 매크로 삽입 후 해당 그림은 필요에 따라 교체하거나 삭제할 수 있다.</p>
+<p style="color:var(--sub);font-size:13px;">주의: REST 자동 업로드 시에는 사내 Confluence에서 사람이 만든
+Draw.io 매크로 페이지의 storage format과 첨부 구조를 먼저 확인한 뒤 템플릿으로 사용한다.
+Cloud/Server/Data Center 및 앱 버전 차이를 고려해 임의 매크로 XML을 하드코딩하지 않는다.</p>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+<h2 id="glossary">부록. 용어 정리</h2>
+<table>
+<tr><th style="width:22%">용어</th><th>의미</th></tr>
+<tr><td>Fact</td><td>코드에서 확인된 구조·흐름·상태·심볼 근거</td></tr>
+<tr><td>Gap</td><td>HLD와 코드 사이의 확인된 차이</td></tr>
+<tr><td>GAP-id</td><td>Gap의 유일한 선택 키. 예: <code>GAP-003</code></td></tr>
+<tr><td>fix unit / FU</td><td>하나의 Gap을 구현하기 위한 세부 작업 단위</td></tr>
+<tr><td>G1</td><td>run의 변경 계획과 파일 범위 승인</td></tr>
+<tr><td>G2</td><td>Gap별 실제 Diff 승인</td></tr>
+<tr><td>D2</td><td>HLD HTML fragment 반영 승인</td></tr>
+<tr><td>baseline</td><td>분석 또는 구현 비교의 기준 코드 상태</td></tr>
+<tr><td>fact_patch</td><td>부족한 Fact만 추가 분석한 현재 run용 보강 결과</td></tr>
+<tr><td>Late Gap</td><td>구현 중 새로 확인된 Gap</td></tr>
+<tr><td>SSOT</td><td>상태 판단의 단일 기준 파일</td></tr>
+</table>
+<p class="top"><a href="#toc">&#8593; 목차로</a></p>
+</body>
+</html>
