@@ -1,9 +1,0 @@
-{
-  "//": "corp.settings.json — 사내 게이트웨이 전용 프로파일. AWS_*/CLAUDE_CODE_USE_BEDROCK 는 의도적으로 없음. apply_card.ps1 이 transplant_card.yaml 로부터 자동 채움.",
-  "env": {
-    "ANTHROPIC_BASE_URL": "https://REPLACE_GATEWAY_HOST",
-    "ANTHROPIC_AUTH_TOKEN": "${CORP_ANTHROPIC_TOKEN}",
-    "ANTHROPIC_MODEL": "REPLACE_GATEWAY_MODEL_OR_EMPTY",
-    "CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS": "1"
-  }
-}
