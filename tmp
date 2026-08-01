@@ -1,328 +1,133 @@
-"slte-knowledge-manager" 통합 구현 컨텍스트 조회 Action 추가 요청
-
-1. 작업 대상
-
-첨부한 최신 버전의 "slte-knowledge-manager"를 기준으로 수정해 주세요.
-
-- 대상 스킬: "slte-knowledge-manager"
-- 기준 버전: 첨부 ZIP
-- 신규 Action: "query-implementation-context"
-- 주요 사용 스킬: 향후 생성할 "code-fix"
-- 기존 Action과 출력 형식의 하위 호환성은 유지해 주세요.
-
----
-
-2. 작업 배경
-
-향후 "code-fix" 스킬은 사용자의 자연어 코드 수정요청을 접수한 뒤 다음 정보를 결합하여 구현 워크플로우를 작성할 예정입니다.
-
-1. "code-analyzer"가 확인한 현재 브랜치의 실제 코드 정보
-   
-   - 관련 파일/API/클래스/구조체
-   - 호출 관계와 도달성
-   - 실제 build option 및 macro 사용
-   - 영향 범위
-
-2. "slte-knowledge-manager"가 관리하는 승인 지식
-   
-   - build option의 의미와 활성 조건
-   - derived option/macro/API 관계
-   - L1 기본 컨셉과 책임
-   - runtime 사용 여부
-   - branch/scenario별 예외
-   - invariant, failure mode, guide
-   - 담당 폴더 및 수정 범위 정책
-
-현재는 필요한 정보를 여러 Action으로 나누어 조회해야 하므로, 저사양 모델에서 호출 누락·순서 오류·결과 병합 오류가 발생할 수 있습니다.
-
-따라서 구현 전 필요한 지식을 한 번에 조회할 수 있는 결정형 통합 Action을 추가하려고 합니다.
-
----
-
-3. 신규 Action
-
-query-implementation-context
-
-이 Action은 새로운 지식을 추론하거나 자동 승인하는 기능이 아닙니다.
-
-기존에 승인·저장된 지식을 대상으로 다음 기존 조회 기능을 Python 파이프라인에서 결정적으로 조합해 하나의 구현 컨텍스트로 출력해야 합니다.
-
-- 일반 knowledge query
-- L1 domain context query
-- inventory context 조회
-- build option/derived relation 조회
-- replacement/legacy/runtime usage 조회
-- ownership scope 및 guide 조회
-- exception 및 knowledge gap 조회
-
-저사양 모델이 개별 Action을 직접 조합하지 않도록 통합 조회와 결과 병합은 Python이 담당해야 합니다.
-
----
-
-4. 입력 방식
-
-JSON 파일 입력을 기본으로 지원해 주세요.
-
-skillsilent run slte-knowledge-manager query-implementation-context -- `
-  --request output/code-fix/<request_id>/knowledge_query_request.json `
-  --out output/code-fix/<request_id>/knowledge_context.json
-
-입력 예시:
-
-{
-  "schema_version": "1.0",
-  "consumer": "CODE_FIX",
-  "request_id": "CF-20260801-001",
-  "terms": [
-    "txpathmap",
-    "tx_swap_rq"
-  ],
-  "paths": [
-    "SMPF/L1/TxMngr.cpp"
-  ],
-  "components": [
-    "SMPF"
-  ],
-  "classes": [
-    "TxMngr"
-  ],
-  "structures": [
-    "TxPathMap"
-  ],
-  "symbols": [
-    "activateTx"
-  ],
-  "build_options": [
-    "PROJECT_OPT_LTE"
-  ],
-  "macros": [
-    "ENABLE_LTE"
-  ],
-  "responsibility_ids": [
-    "TX.ACTIVATION_SEQ"
-  ],
-  "branch": "1900",
-  "scenario": "SLTE"
-}
-
-모든 selector는 optional로 지원하되, 최소 하나 이상의 검색 selector가 없으면 명확한 오류를 반환해 주세요.
-
-배열 값의 중복 제거, 경로 separator 정규화, 대소문자 정책 적용 등은 Python에서 결정적으로 처리해 주세요.
-
----
-
-5. 필수 출력
-
-기본 출력은 JSON이며, 사람이 확인할 수 있는 Markdown 요약도 함께 생성해 주세요.
-
-output/code-fix/<request_id>/
-├── knowledge_query_request.json
-├── knowledge_context.json
-└── knowledge_context.md
-
-"knowledge_context.json"에는 최소 다음 항목이 포함되어야 합니다.
-
-{
-  "schema_version": "1.0",
-  "consumer": "CODE_FIX",
-  "request_id": "CF-20260801-001",
-  "query_status": "COMPLETE",
-  "knowledge_version": 17,
-  "context_digest": "sha256:...",
-  "matched_selectors": {},
-  "approved_rules": [],
-  "l1_domain_context": {
-    "responsibilities": [],
-    "dataflows": [],
-    "invariants": [],
-    "failure_modes": [],
-    "basic_behaviors": []
-  },
-  "build_option_semantics": [],
-  "derived_relations": [],
-  "runtime_path_coverage": [],
-  "inventory_context": [],
-  "replacement_context": [],
-  "ownership_scope": [],
-  "guides": [],
-  "known_exceptions": [],
-  "required_checks": [],
-  "knowledge_gaps": [],
-  "conflicts": [],
-  "source_refs": []
-}
-
-상태값
-
-"query_status"는 최소 다음 값을 지원해 주세요.
-
-COMPLETE
-PARTIAL
-NO_MATCH
-CONFLICT
-INVALID_REQUEST
-
-근거 추적
-
-각 rule/context 항목에는 가능한 경우 다음 정보를 유지해 주세요.
-
-- rule ID 또는 knowledge ID
-- approval status
-- source document/link
-- branch/scenario 적용 범위
-- matched selector
-- relevance reason
-- updated timestamp 또는 knowledge version
-
-"context_digest"는 정규화된 최종 컨텍스트를 기준으로 생성해, 이후 "code-fix" 구현 워크플로우가 어떤 지식 버전을 사용했는지 재현 가능해야 합니다.
-
----
-
-6. 지식 충돌 및 누락 정책
-
-이 Action은 지식을 임의 생성하거나 충돌을 자동 해소하면 안 됩니다.
-
-승인된 지식이 있는 경우
-
-- "approved_rules" 및 관련 컨텍스트에 포함
-- branch/scenario 적용 여부를 명확히 표시
-
-부분 지식만 있는 경우
-
-- "query_status=PARTIAL"
-- 부족한 항목을 "knowledge_gaps"에 기록
-
-서로 충돌하는 지식이 있는 경우
-
-- "query_status=CONFLICT"
-- 충돌 항목을 "conflicts"에 모두 기록
-- 임의로 하나를 선택하지 않음
-
-지식이 없는 경우
-
-- "query_status=NO_MATCH"
-- 정상 종료하되 "knowledge_gaps"에 조회 조건을 기록
-- 후보 지식 자동 등록·자동 승인은 금지
-
-현재 코드에서 옵션이 실제 활성화되었는지, API가 실제 호출되는지, runtime 도달성이 있는지는 이 Action이 확정하지 않습니다. 해당 사실은 "code-analyzer"가 확인해야 합니다.
-
-Knowledge Manager는 다음만 제공해야 합니다.
-
-- 옵션과 macro의 승인된 의미
-- 기본 동작과 책임
-- runtime/legacy/replacement 정책
-- branch/scenario 예외
-- 구현 시 확인해야 할 조건
-
----
-
-7. 기존 Action과의 관계
-
-기존 Action은 삭제하거나 의미를 변경하지 말아 주세요.
-
-"query-implementation-context"는 기존 조회 결과를 호출·병합하는 상위 convenience Action으로 구현해 주세요.
-
-가능하면 내부 공통 모듈을 재사용하여 다음 문제가 발생하지 않도록 해 주세요.
-
-- 기존 Action과 신규 Action의 필터링 결과 불일치
-- branch/scenario 판정 규칙 중복
-- knowledge status 해석 중복
-- 출력 스키마별 서로 다른 정렬 결과
-
-출력 배열은 안정적인 기준으로 정렬해 같은 입력과 같은 Knowledge 상태에서는 동일한 결과와 digest가 생성되어야 합니다.
-
----
-
-8. 저사양 모델 고려사항
-
-다음 사항을 반드시 반영해 주세요.
-
-1. 조회·정규화·중복 제거·정렬·병합·digest 계산은 Python에서 수행
-2. 모델이 여러 Action의 출력 JSON을 직접 합치지 않도록 구성
-3. 한 번의 Action 호출로 최종 컨텍스트 생성
-4. 대용량 원문 전체를 출력하지 않고 구현에 필요한 요약과 source reference 중심으로 출력
-5. 결과 크기 제한과 truncation 정책 제공
-6. 중간 실패 시 부분 결과와 실패 위치 기록
-7. 동일 request 재실행 및 resume 지원
-8. Windows/Linux 경로 호환
-9. "skillsilent" 실행 계약 및 기존 Silent 정책 유지
-10. Tool Call 태그나 내부 명령을 사용자 출력에 노출하지 않음
-
----
-
-9. 권장 CLI 옵션
-
-최소 다음 옵션을 검토해 주세요.
-
---request <json>
---out <json>
---markdown-out <md>
---max-items <n>
---include-source-refs
---resume
---force
-
-기본 동작은 사용자에게 복잡한 옵션 입력을 요구하지 않아야 합니다.
-
-"--request"와 "--out"만으로 정상 동작하도록 하고, Markdown 출력 경로는 "--out" 기준으로 자동 결정해 주세요.
-
----
-
-10. 검증 항목
-
-다음 테스트를 추가해 주세요.
-
-1. path/component/class/symbol 기반 통합 조회
-2. build option과 derived macro/API 관계 조회
-3. branch/scenario별 예외 필터링
-4. runtime 미사용 및 replacement 지식 조회
-5. responsibility ID 기반 L1 context 조회
-6. 승인 지식과 draft 지식의 구분
-7. 부분 일치 시 "PARTIAL"
-8. 미일치 시 "NO_MATCH"
-9. 충돌 시 "CONFLICT"
-10. 동일 입력의 deterministic output/digest
-11. Windows/Linux 경로 정규화
-12. 중단 후 resume
-13. 기존 query Action 결과와 정합성
-14. 기존 테스트 전체 회귀 통과
-15. 저사양 모델에서 단일 Action 호출로 완료 가능
-
-자체 점검 스크립트와 테스트 결과도 함께 제공해 주세요.
-
----
-
-11. 문서 수정
-
-다음 문서를 함께 업데이트해 주세요.
-
-- "SKILL.md"
-- CLI/action 목록
-- 입력·출력 스키마 설명
-- "code-fix" 연동 예시
-- Windows/Linux 실행 예시
-- 상태값과 충돌·누락 정책
-- 저사양 모델 권장 사용법
-
-사용자 예시 요청:
-
-이 수정요청과 관련된 구현 지식을 조회해줘.
-대상 브랜치는 1900이고, SMPF/L1의 TxMngr와 PROJECT_OPT_LTE 옵션을 기준으로 확인해줘.
-
-스킬이 내부적으로 "knowledge_query_request.json"을 만들고 신규 Action을 호출할 수 있도록 문서화해 주세요.
-
----
-
-12. 결과물
-
-수정 완료 후 다음을 제공해 주세요.
-
-1. 수정된 "slte-knowledge-manager" ZIP
-2. 변경사항 요약
-3. 추가·변경된 파일 목록
-4. 신규 Action 실행 예시
-5. 테스트 및 self-check 결과
-6. 기존 버전과의 하위 호환성 확인 결과
-7. 저사양 모델에서 발생 가능한 제한사항
-
-버전은 기존 규칙에 맞게 증가시키고, 파일명 마지막에 "_KST"는 붙이지 말아 주세요.
+"skill-updater"와 "autotask-builder" 스킬을 사용하여 GitHub 스킬 자동 업데이트 작업을 현재 PC에 등록해줘.
+
+입력값
+
+- GitHub 저장소: "OWNER/REPOSITORY"
+- Git ref: "main"
+- ZIP 위치: 저장소 root
+- 탐색 방식: "auto"
+- 업데이트 대상: 현재 사용자 스킬 폴더에 설치된 모든 스킬
+- 제외 대상: "skill-updater" 자신
+- 실행 주기: 4시간마다, 매 실행 시각의 7분 ("7 */4 * * *")
+- 프록시 방식: "env"
+- 직접 연결 fallback: 금지
+- 설치 및 다운로드 위치: 현재 사용자 홈 기준 기본 경로 사용
+
+처리 원칙
+
+1. 운영체제를 자동 판별하고 Windows/Linux의 실제 스킬 설치 경로를 찾아라. 사용자에게 Python 경로, 스킬 경로 또는 task YAML 경로를 직접 입력하게 하지 마라.
+2. 설치된 "skill-updater"와 "autotask-builder"의 "SKILL.md"를 먼저 읽고 실제 제공 명령과 스키마만 사용하라.
+3. 기존 "skill-updater.json", "task_skill_update.yaml", "skill-updater.env" 또는 동일한 "skill_update" 예약 작업이 있으면 중복 등록하지 말고 기존 설정을 검증·보완하라.
+4. 기존 파일 수정 전 날짜시간이 포함된 ".bak" 파일을 생성하라.
+5. 시스템 예약 작업을 실제 등록하는 단계에서만 사용자 승인 1회를 요청하고, 경로 확인·설정 생성·검증·시험 실행은 추가 질문 없이 진행하라.
+6. GitHub 토큰과 프록시 인증정보를 화면이나 보고서에 출력하지 마라. Private repository인 경우에만 "GITHUB_TOKEN" 환경변수 사용을 안내하라.
+
+skill-updater 설정
+
+"skill-updater init"을 비대화형으로 실행하여 다음 파일을 생성하거나 보완하라.
+
+- "skill-updater.json"
+- "task_skill_update.yaml"
+- "skill-updater.env"
+
+다음 설정을 적용하라.
+
+- "source.mode=auto"
+- "source.allow_root_zip_discovery=true"
+- "targets=all"을 사용하되 "skill-updater" 자신은 제외
+- 각 대상은 "enabled=true"
+- 각 대상은 "auto_apply=true"
+- 각 대상은 "allow_downgrade=false"
+- "network.proxy_mode=env"
+- "network.allow_direct_fallback=false"
+- SHA-256 또는 Git blob 무결성 검증 활성화
+- ZIP 경로 안전성 및 내부 스킬명·버전 검증 활성화
+- self-check 활성화
+- 업데이트 전 기존 설치본 전체 백업
+- self-check 또는 후처리 실패 시 자동 롤백
+- 업데이트 후 skillsilent 재등록과 doctor 실행
+- 보존 충돌 정책은 "abort"
+- 로컬에서 추가하거나 수정한 사용자 자료 보존
+- 다운로드 파일과 백업은 스킬별 최근 3개 유지
+
+최소 보존 대상:
+
+- "knowledge/**"
+- "knowledge-source/**"
+- "sam-knowledge-source/**"
+- "user-data/**"
+- "userdata/**"
+- "local/**"
+- ".local/**"
+- "config/local/**"
+- "*.local.*"
+- "except_id.md"
+
+보존 제외 대상:
+
+- "output/**"
+- "_state/**"
+- "__pycache__/**"
+- "*.pyc"
+- "*.pyo"
+- ".git/**"
+
+ZIP 파일명의 하이픈과 언더스코어 차이는 기본 정규화 기능을 사용하라. 실제 파일명 접두사가 설치 스킬명과 다른 경우에만 해당 대상의 "asset_prefixes"를 추가하라.
+
+프록시 처리
+
+1. 현재 프로세스의 "HTTPS_PROXY", "HTTP_PROXY", "SKILL_UPDATER_PROXY"를 확인하라.
+2. 유효한 프록시가 있으면 예약 작업이 읽을 수 있도록 "skill-updater.env"에 반영하라.
+3. 기존 env 파일에 활성 값이 있으면 덮어쓰지 마라.
+4. ".claude/settings.json"에만 프록시가 있고 Windows Task Scheduler 또는 Linux systemd에서 상속되지 않는 경우 해당 값을 "skill-updater.env"에 복사하라.
+5. 사내 CA가 설정되어 있으면 "SKILL_UPDATER_CA_BUNDLE"을 유지하라.
+6. "autotask check"가 프록시 상속 문제로 실패하면 "--fix"로 env 파일을 보완한 후 재검증하라.
+7. 프록시 주소는 최종 보고서에서 마스킹하라.
+
+검증 및 등록 순서
+
+다음 순서를 생략하지 마라.
+
+1. "skill-updater validate --config <설정 파일 절대경로>"
+2. "skill-updater inventory --config <설정 파일 절대경로>"
+3. "skill-updater check --config <설정 파일 절대경로>"
+4. "autotask doctor"
+5. "autotask check --fix <task YAML 절대경로>"
+6. "autotask run <task YAML 절대경로>"로 예약 등록 전 1회 시험 실행
+7. 시험 실행 종료코드와 "update_result.json", "update_report.md" 생성 여부 확인
+8. 모든 검증과 시험 실행이 성공한 경우에만 사용자에게 예약 작업 등록 승인 1회 요청
+9. 승인 후 "autotask deploy <task YAML 절대경로> --yes"
+10. "autotask status"와 운영체제 예약 작업 상태 확인
+
+Windows에서는 Task Scheduler를 사용하고 Linux에서는 systemd user timer를 사용하라.
+
+Windows 예약 작업은 1분마다 공통 러너를 실행하고 러너가 YAML의 5필드 cron을 판정하는 기존 구조를 유지하라. 동일한 "skill_update" ID의 작업을 중복 생성하지 마라.
+
+실패 처리
+
+- "ERROR", "OPEN_QUESTION", "TODO:"가 하나라도 남으면 배포하지 마라.
+- 네트워크, 프록시, 경로, 권한 또는 스키마 오류는 가능한 범위에서 자동 교정한 뒤 한 번 재검증하라.
+- 시험 업데이트 중 설치 실패가 발생하면 자동 롤백 결과까지 확인하라.
+- 프록시 연결 실패 시 임의의 직접 연결로 우회하지 마라.
+- 해결되지 않은 경우 실패 단계, 원인, 관련 로그 경로와 교정 명령만 간단히 보고하라.
+
+최종 보고
+
+다음 항목을 표로 요약하라.
+
+- 운영체제
+- GitHub 저장소와 ref
+- 업데이트 대상 스킬 수와 목록
+- "skill-updater.json" 절대경로
+- "task_skill_update.yaml" 절대경로
+- "skill-updater.env" 절대경로
+- 적용한 cron
+- 다음 실행 예정 시각
+- 프록시 전달 방식
+- 설정 검증 결과
+- 시험 실행 결과
+- 예약 작업 등록 상태
+- 로그와 업데이트 보고서 위치
+- 수동 1회 실행 명령
+- 최근 상태 확인 명령
+- 스킬별 롤백 명령 예시
