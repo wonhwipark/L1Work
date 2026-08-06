@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Legacy NR Tx 시나리오 기반 SLTE TxMngr UT 작성 방안</title>
+<style>
+body{font-family:Arial,'Malgun Gothic','Apple SD Gothic Neo',sans-serif;line-height:1.65;color:#172B4D;max-width:1100px;margin:32px auto;padding:0 24px 64px;background:#fff}
+h1,h2,h3,h4{color:#172B4D;line-height:1.3;margin-top:1.5em}
+h1{border-bottom:3px solid #DFE1E6;padding-bottom:12px}
+h2{border-bottom:1px solid #DFE1E6;padding-bottom:8px}
+p{margin:.7em 0} ul{padding-left:28px} li{margin:.3em 0}
+table{width:100%;border-collapse:collapse;margin:16px 0 24px}
+th,td{border:1px solid #C1C7D0;padding:9px 11px;vertical-align:top;text-align:left}
+th{background:#F4F5F7;font-weight:700}
+pre{background:#F4F5F7;border:1px solid #DFE1E6;border-radius:4px;padding:14px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-family:Consolas,'Courier New',monospace;font-size:.95em}
+code{font-family:Consolas,'Courier New',monospace;background:#F4F5F7;padding:1px 4px;border-radius:3px}
+pre code{background:transparent;padding:0}
+blockquote{margin:16px 0;padding:10px 16px;border-left:4px solid #4C9AFF;background:#DEEBFF}
+.note{margin:16px 0;padding:12px 16px;border-left:4px solid #00B8D9;background:#E6FCFF}
+.warning{margin:16px 0;padding:12px 16px;border-left:4px solid #FFAB00;background:#FFFAE6}
+.small{color:#5E6C84;font-size:.92em}
+</style>
+</head>
+<body>
+<h1>Legacy NR Tx 시나리오 기반 SLTE TxMngr UT 작성 방안</h1><div class="note"><strong>문서 목적</strong><br>Legacy 1900의 NR Tx 동작을 근거로 SLTE TxMngr용 Contract UT를 작성하기 위한 방향, 진행 절차, 스킬 연동 구조 및 향후 스킬 업데이트 필요사항을 파트원과 협의하기 위해 정리한다.</div><h2>1. 추진 배경</h2><p>SLTE 기반 NR Tx 기능을 새로 구현할 때는 Legacy 1900 코드의 동작을 참고해야 한다.</p><p>하지만 Legacy 코드를 그대로 SLTE로 복사하는 방식은 적절하지 않다. Legacy와 SLTE는 다음 항목이 다를 수 있기 때문이다.</p><ul><li>모듈 구조</li><li>클래스와 API 이름</li><li>메시지 전달 방식</li><li>상태 정보 저장 위치</li><li>HAL 연동 방식</li><li>UT Framework와 Mock 구성 방식</li></ul><p>따라서 Legacy에서는 <strong>기능이 어떤 순서와 조건으로 동작하는지</strong>만 추출하고, 실제 구현과 UT는 <strong>SLTE 구조에 맞게 다시 Mapping</strong>하는 방식이 필요하다.</p><p>이번 검토 대상 Feature는 다음과 같다.</p><blockquote>DCI-based BWP ID switching에 의한 PCell UL Rank 변경</blockquote><p>현재 MSC가 없을 가능성이 있으므로, Legacy SDM 로그와 Legacy 코드를 함께 사용하여 실제 동작 흐름을 확인한다.</p><h2>2. 최종 목표</h2><p>이번 작업의 목표는 Legacy 전체 동작을 재현하는 Full UT를 만드는 것이 아니다.</p><blockquote>Legacy 시나리오 흐름을 기준으로 Tx 관련 API 경계의 입력과 출력을 정의하고, 이를 SLTE TxMngr의 API 및 모듈에 Mapping하여 SLTE용 UT를 작성한다.</blockquote><p>UT에서는 TxMngr 내부 구현 과정을 세부적으로 검증하지 않는다.</p><pre><code>입력 메시지 또는 Event 주입
+→ SLTE TxMngr 동작
+→ 외부 API 호출 여부 확인
+→ 전달된 Message 또는 CMD 주요 필드 비교</code></pre><p>예를 들어 TxMngr 내부의 private helper 함수가 몇 번 호출됐는지는 검증하지 않는다.</p><ul><li>SCC로 어떤 메시지가 전송됐는가</li><li>UL Rank Update API에 어떤 값이 전달됐는가</li><li>HAL로 어떤 CMD가 전송됐는가</li></ul><h2>3. 이번 작업에서 제외할 범위</h2><ul><li>Legacy용 UT 작성</li><li>Legacy 내부 구현 구조를 SLTE에 그대로 복제</li><li>NR Tx 전체 기능에 대한 Full UT</li><li>모든 예외와 복구 절차 검증</li><li>Transaction 전체 End-to-End 통합 시험</li><li>Production 코드의 자동 구현</li><li>Legacy와 SLTE의 함수 이름을 단순 1:1로 연결</li></ul><p>Legacy는 <strong>동작의 정답을 확인하는 자료</strong>로만 사용한다.</p><p>실제 UT 대상과 구현 구조는 SLTE TxMngr를 기준으로 한다.</p><h2>4. 대상 시나리오</h2><pre><code>BWP ID Switching Event 수신
+        │
+        ▼
+       BCH
+        │ PATH_CONFIG_REQ
+        ▼
+       SCC
+        │ PATH_CONFIG_CNF
+        ▼
+ BCH Message Handler
+        │ PCell UL Rank Update
+        ▼
+   UL Rank 변경 확인
+        │ Rank가 실제로 변경된 경우
+        ▼
+    BCH → HAL CMD</code></pre><p>이를 세 개의 UT 검증 구간으로 나눈다.</p><table><thead><tr><th>검증 구간</th><th>입력</th><th>출력</th></tr></thead><tbody><tr><td>1</td><td>BWP ID Switching Event</td><td>SCC <code>PATH_CONFIG_REQ</code></td></tr><tr><td>2</td><td>SCC <code>PATH_CONFIG_CNF</code></td><td>PCell UL Rank Update API</td></tr><tr><td>3</td><td>PCell UL Rank 변경</td><td>HAL CMD</td></tr></tbody></table><p>세 구간을 하나의 긴 UT로 만들지 않고 각각 독립된 UT로 만드는 것을 기본으로 한다. 이렇게 해야 UT가 실패했을 때 문제가 발생한 위치를 쉽게 구분할 수 있다.</p><h2>5. 전체 진행 절차</h2><h3>5.1 Legacy 시나리오 흐름 확인</h3><pre><code>BWP ID Switching Event
+→ PATH_CONFIG_REQ
+→ PATH_CONFIG_CNF
+→ UL Rank Update
+→ HAL CMD</code></pre><ul><li>Event 발생 시점</li><li>PCell 여부</li><li>Target BWP ID</li><li>BWP별 Rank 정보</li><li>PATH_CONFIG_REQ 전송</li><li>PATH_CONFIG_CNF 수신</li><li>UL Rank 변경 전후 값</li><li>HAL CMD 전송</li><li>성공 또는 실패 결과</li></ul><p>SDM 로그에 필요한 정보가 부족하면 로그 출력 문자열을 Legacy 코드에서 검색하여 관련 함수와 API를 찾는다.</p><p><strong>산출물:</strong> <code>legacy_scenario_flow.md</code></p><h3>5.2 Legacy API 경계의 UT 검증 포인트 정의</h3><p>Legacy 함수 이름을 그대로 UT 기준으로 사용하지 않는다. 각 단계에서 외부에서 관찰할 수 있는 입력과 출력으로 검증 포인트를 정의한다.</p><h4>VP-01: PATH_CONFIG_REQ 전송</h4><table><thead><tr><th>항목</th><th>내용</th></tr></thead><tbody><tr><td>Trigger</td><td>BCH가 Target BWP ID를 포함한 BWP ID switching event를 수신</td></tr><tr><td>입력</td><td>PCell ID, Current BWP ID, Target BWP ID, Target BWP의 UL Rank, Current UL Rank</td></tr><tr><td>기대 출력</td><td>SCC로 <code>PATH_CONFIG_REQ</code> 전송</td></tr><tr><td>검증 필드</td><td>Message ID, Cell ID, Target BWP ID, UL Rank</td></tr><tr><td>제외 필드</td><td>Timestamp, Reserved, Padding, Runtime 자동 생성 값</td></tr></tbody></table><h4>VP-02: PATH_CONFIG_CNF 이후 UL Rank Update</h4><table><thead><tr><th>항목</th><th>내용</th></tr></thead><tbody><tr><td>Trigger</td><td>BCH가 성공한 <code>PATH_CONFIG_CNF</code> 수신</td></tr><tr><td>입력</td><td>Result, PCell ID, Target BWP ID, Confirmed UL Rank</td></tr><tr><td>기대 출력</td><td>PCell UL Rank Update 기능 호출</td></tr><tr><td>검증 항목</td><td>호출 여부, PCell ID, BWP ID, UL Rank</td></tr></tbody></table><h4>VP-03: UL Rank 변경 후 HAL CMD 전송</h4><table><thead><tr><th>항목</th><th>내용</th></tr></thead><tbody><tr><td>Trigger</td><td>PCell UL Rank가 기존 값과 다른 값으로 갱신</td></tr><tr><td>입력</td><td>Previous Rank, Updated Rank, Target BWP ID, PCell ID</td></tr><tr><td>기대 출력</td><td>BCH 또는 TxMngr가 HAL로 Rank 변경 CMD 전송</td></tr><tr><td>검증 필드</td><td>HAL CMD ID, Cell ID, Target BWP ID, Updated UL Rank</td></tr></tbody></table><h3>5.3 Legacy 검증 포인트를 SLTE TxMngr에 Mapping</h3><p>Legacy 함수와 SLTE 함수를 이름으로 연결하지 않고, <strong>책임을 기준으로 Mapping</strong>한다.</p><pre><code>Legacy 책임:
+Target BWP의 Rank를 포함한 PATH_CONFIG_REQ 전송
+
+SLTE 책임:
+동일한 입력을 받아 SCC 연동 메시지를 생성하고 전송하는 TxMngr API</code></pre><table><thead><tr><th>검증 ID</th><th>시나리오 책임</th><th>Legacy 근거</th><th>SLTE 대상</th><th>UT 입력 방식</th><th>UT 출력 검증</th></tr></thead><tbody><tr><td>VP-01</td><td>BWP switching 후 PATH_CONFIG_REQ 전송</td><td>BCH event handler</td><td>TxMngr BWP switching entry</td><td>Event/API 호출</td><td>SCC Mock 메시지 비교</td></tr><tr><td>VP-02</td><td>PATH_CONFIG_CNF 이후 Rank 갱신</td><td>BCH CNF handler</td><td>TxMngr CNF handler</td><td>CNF 메시지 주입</td><td>Rank Update API 호출 인자</td></tr><tr><td>VP-03</td><td>Rank 변경 후 HAL CMD 전송</td><td>BCH HAL send 경로</td><td>TxMngr 또는 HAL Adapter</td><td>Rank 변경 입력</td><td>HAL Mock CMD 비교</td></tr></tbody></table><h4>직관적 Mapping 예시: SLTE TxMngr가 Legacy BCH 역할을 직접 담당하는 경우</h4><p>아래 예시는 Legacy의 BCH 모듈을 SLTE에서도 그대로 만들자는 의미가 아니다. Legacy BCH가 담당하던 <strong>책임</strong>을 SLTE에서는 TxMngr가 직접 수행하는 경우를 보여준다.</p><pre><code>Legacy 흐름
+
+BWP Switching Event
+    ↓
+Legacy BCH event handler
+    ↓
+PATH_CONFIG_REQ 생성 및 SCC 전송
+    ↓
+PATH_CONFIG_CNF 수신
+    ↓
+Legacy BCH CNF handler
+    ↓
+UL Rank Update
+    ↓
+HAL CMD 전송
+
+
+SLTE Mapping 예시
+
+BWP Switching Event
+    ↓
+TxMngr::handleBwpSwitch(...)
+    ↓
+TxMngr 또는 SCC Adapter가 PATH_CONFIG_REQ 전송
+    ↓
+TxMngr::handlePathConfigCnf(...)
+    ↓
+TxMngr가 PCell UL Rank 상태 갱신
+    ↓
+TxMngr 또는 HAL Adapter가 HAL CMD 전송</code></pre><table><thead><tr><th>Legacy 책임</th><th>Legacy 위치 예시</th><th>SLTE Mapping 예시</th><th>UT 검증 방법</th></tr></thead><tbody><tr><td>BWP switching event 처리</td><td>Legacy BCH event handler</td><td><code>TxMngr::handleBwpSwitch()</code></td><td>Event를 TxMngr에 주입한 뒤 SCC로 전송된 <code>PATH_CONFIG_REQ</code> 비교</td></tr><tr><td>PATH_CONFIG_CNF 처리</td><td>Legacy BCH CNF handler</td><td><code>TxMngr::handlePathConfigCnf()</code></td><td>CNF를 TxMngr에 주입한 뒤 UL Rank Update API 호출 인자 확인</td></tr><tr><td>Rank 변경 후 HAL 전송</td><td>Legacy BCH HAL send 경로</td><td><code>TxMngr</code> 또는 <code>HalAdapter::sendTxConfig()</code></td><td>Rank 변경 입력 후 HAL Mock에 전달된 CMD 필드 비교</td></tr></tbody></table><div class="warning"><strong>중요:</strong> Legacy의 BCH 클래스나 함수명을 SLTE에 그대로 복제하는 것이 아니라, Legacy BCH가 담당했던 시나리오 책임을 SLTE TxMngr의 기존 또는 신규 API에 배치하는 것이다.</div><p>SLTE에 대응 API가 아직 없으면 억지로 기존 API에 연결하지 않고 <code>MISSING</code> 또는 <code>PARTIAL</code>로 기록한다. 이 항목이 파트원의 실제 구현 대상이 된다.</p><table><thead><tr><th>상태</th><th>의미</th></tr></thead><tbody><tr><td><code>MAPPED</code></td><td>SLTE에 대응 API 또는 모듈이 존재</td></tr><tr><td><code>PARTIAL</code></td><td>일부 기능만 존재하고 추가 구현 필요</td></tr><tr><td><code>MISSING</code></td><td>대응 기능이 없어 새 구현 필요</td></tr><tr><td><code>NOT_APPLICABLE</code></td><td>SLTE 구조상 별도 Mapping이 필요하지 않음</td></tr><tr><td><code>NEED_REVIEW</code></td><td>담당자와 설계 협의 필요</td></tr></tbody></table><h3>5.4 현재 SLTE UT 구조 확인</h3><ul><li>TxMngr Fixture와 SetUp/TearDown 방식</li><li>BWP switching Event 또는 메시지 주입 방법</li><li>SCC 송신 API Mock/캡처 방법</li><li>PATH_CONFIG_CNF 주입 방법</li><li>UL Rank Update API Mock 방법</li><li>HAL CMD 송신 API Mock 방법</li><li>jomock 사용 방식</li><li>Message 구조체 비교 helper</li><li>유사 Test Case</li><li>UT Build 및 실행 방법</li></ul><p>Jomock은 TxMngr의 <strong>외부 Dependency</strong>를 제어하고 검증하는 용도로 사용한다.</p><ul><li>SCC Message Sender</li><li>HAL Command Sender</li><li>Rank Configuration Provider</li><li>Tx Context 또는 Rank Update Interface</li><li>외부 DB 조회 결과</li></ul><p>반대로 <code>buildPathConfigReq()</code>, <code>getMappedRank()</code>, <code>updateInternalState()</code> 같은 내부 helper는 가급적 Mock하지 않는다.</p><h3>5.5 실제 SLTE UT 구조를 학습한 뒤 UT Specification 작성</h3><div class="warning"><strong>중요:</strong> <code>TEST_F(...)</code>는 설명용 예시일 뿐 실제 생성 형식이 아니다. 대상 SLTE TxMngr UT 폴더에서 Test 선언, Fixture, Jomock, input 주입, output 비교 문법을 먼저 학습하고 승인된 형식만 사용한다.</div><pre><code>&lt;ACTUAL_TEST_DECLARATION_FROM_APPROVED_UT_PROFILE&gt;(
+    &lt;ACTUAL_FIXTURE_OR_SUITE&gt;,
+    &lt;CASE_NAME_FOR_VP_01&gt;)
+{
+    &lt;ACTUAL_INPUT_INJECTION_PATTERN&gt;
+    &lt;ACTUAL_JOMOCK_OR_EXTERNAL_API_EXPECTATION&gt;
+    &lt;ACTUAL_MESSAGE_FIELD_COMPARATOR&gt;
+}
+
+VP-01: BWP switching input → PATH_CONFIG_REQ output 검증
+VP-02: PATH_CONFIG_CNF input → PCell UL Rank Update API 검증
+VP-03: UL Rank changed input → HAL CMD output 검증</code></pre><p>실제 선언 token과 문법은 <code>ut_structure_profile.json</code> 및 승인된 Knowledge Manager UT profile을 기준으로 채운다. 프로파일에 없는 <code>TEST_F</code>, Fixture, Mock, Assertion 문법은 사용하지 않는다.</p><h3>5.6 Negative UT 결정</h3><p>Negative UT는 추정으로 작성하지 않고 Legacy SDM 또는 코드에서 동작이 확인된 경우에만 추가한다. Test 선언 형식은 Positive UT와 동일하게 승인된 실제 UT 프로파일에서 가져온다.</p><pre><code>&lt;ACTUAL_TEST_DECLARATION_FROM_APPROVED_UT_PROFILE&gt;(...FailedCnf...)
+→ PATH_CONFIG_CNF 실패 시 Rank Update API 미호출 검증
+
+&lt;ACTUAL_TEST_DECLARATION_FROM_APPROVED_UT_PROFILE&gt;(...RankUnchanged...)
+→ Rank 동일 시 HAL CMD 미전송 검증
+
+&lt;ACTUAL_TEST_DECLARATION_FROM_APPROVED_UT_PROFILE&gt;(...InvalidBwp...)
+→ Invalid BWP 처리 검증</code></pre><h3>5.7 파트원 전달 산출물</h3><pre><code>legacy_scenario_flow.md
+ut_verification_points.md
+slte_txmngr_mapping.md
+slte_gap_report.md
+slte_ut_spec.md
+slte_ut_patch.diff 또는 Shelved CL
+ut_execution_result.md</code></pre><h2>6. 스킬별 역할</h2><table><thead><tr><th>스킬</th><th>주요 역할</th><th>학습·분석 대상</th></tr></thead><tbody><tr><td><code>sdm-parser</code></td><td>Legacy SDM 구조화</td><td>CP Time, Cell, Message ID, BWP ID, UL Rank, REQ/CNF, HAL CMD</td></tr><tr><td><code>code-analyzer</code></td><td>Legacy/SLTE/UT 코드 분석</td><td>Scenario, API Contract, TxMngr Mapping, Fixture, Jomock, Build</td></tr><tr><td><code>slte-knowledge-manager</code></td><td>Feature별 지식 연결과 Gap 관리</td><td>Scenario, Verification Point, Mapping, UT Pattern</td></tr><tr><td><code>code-fix</code></td><td>승인된 Spec 기반 승인된 실제 UT 형식 기반 SLTE Contract UT 생성</td><td>UT 코드, Mock, Comparator, Build, Patch</td></tr><tr><td><code>issue-analyzer</code></td><td>복잡한 SDM의 정상/실패 구간 분리</td><td>Feature 관련 핵심 로그</td></tr><tr><td><code>skillsilent</code></td><td>사내 환경의 무인 실행 지원</td><td>Read/Write 정책, Silent, Resume</td></tr></tbody></table><h3>6.1 sdm-parser</h3><p>Legacy SDM 원본 로그를 시간과 Transaction 기준으로 구조화한다. 기능 의미를 최종 판단하지 않는다.</p><pre><code>transaction_index.json
+runtime_event.json
+parsed_sdm.txt 또는 json</code></pre><h3>6.2 code-analyzer</h3><ul><li>Legacy 로그 문자열과 코드 위치 연결</li><li>BWP switching Event handler와 PATH_CONFIG_REQ/CNF 흐름 분석</li><li>UL Rank Update 및 HAL CMD 경로 분석</li><li>SLTE TxMngr 대응 모듈/API 탐색</li><li>SLTE UT 실제 Test 선언, Fixture, Jomock, Message Injection, Comparator, Build 분석</li></ul><h3>6.3 slte-knowledge-manager</h3><p>분석 결과를 Feature 단위로 연결하고 후보 지식, Mapping, Gap을 관리한다.</p><pre><code>FEATURE_SCENARIO
+API_CONTRACT
+MESSAGE_FLOW
+RUNTIME_EVIDENCE
+SLTE_MODULE_MAPPING
+SLTE_API_MAPPING
+FIELD_MAPPING
+IMPLEMENTATION_GAP
+UT_VERIFICATION_POINT
+UT_FIXTURE
+JOMOCK_PATTERN
+MESSAGE_COMPARATOR
+UT_BUILD_CONTRACT</code></pre><p>SDM만 보고 Feature를 단정하거나 Legacy 함수명과 SLTE 함수명을 이름만으로 자동 연결해서는 안 된다.</p><h3>6.4 code-fix</h3><p>승인된 UT Verification Point와 SLTE Mapping을 기준으로 실제 UT 코드를 생성한다.</p><pre><code>Allowed:
+&lt;SLTE NR Tx UT folder&gt;/**
+
+Denied:
+&lt;SLTE NR Tx production source&gt;/**</code></pre><p>기본 실행에서는 Production 코드를 수정하지 않는다.</p><h2>7. 권장 스킬 연동 순서</h2><pre><code>Legacy SDM
+   ↓
+sdm-parser
+   ↓
+code-analyzer
+- Legacy 로그와 코드 연결
+- Scenario 및 API Contract 추출
+   ↓
+slte-knowledge-manager
+- Legacy Scenario 지식 관리
+- UT 검증 포인트 생성
+   ↓
+code-analyzer
+- SLTE TxMngr 코드 분석
+- SLTE UT 폴더 분석
+   ↓
+slte-knowledge-manager
+- Legacy 검증 포인트와 SLTE Mapping 관리
+- MAPPED / PARTIAL / MISSING Gap 기록
+   ↓
+code-fix
+- 승인된 실제 UT 형식 기반 SLTE Contract UT 생성
+- Jomock 구성
+- UT 폴더만 Patch 생성
+   ↓
+파트원
+- SLTE TxMngr Feature 구현
+   ↓
+신규 UT PASS + 기존 NR Tx UT Regression PASS
+   ↓
+slte-knowledge-manager
+- 최종 As-built Mapping 업데이트</code></pre><h2>8. 파트원과 사전에 협의할 항목</h2><table><thead><tr><th>구분</th><th>협의 항목</th></tr></thead><tbody><tr><td>기능 범위</td><td>PCell 한정 여부, UL Rank 변경 범위, Trigger Event, REQ/CNF 필수 필드, HAL CMD 전송 조건</td></tr><tr><td>UT 범위</td><td>3개 독립 UT, Negative UT 범위, E2E 추가 여부, 전체 구조체 또는 관련 필드 비교</td></tr><tr><td>SLTE 설계</td><td>TxMngr가 BCH 책임을 직접 담당하는지, SCC Adapter 분리 여부, Rank 저장 위치, HAL Builder/Sender 분리</td></tr><tr><td>업무 분담</td><td>Legacy 분석, SLTE Mapping, UT/Jomock 검토, Production 구현, UT Review 담당</td></tr></tbody></table><h2>9. 성공 기준</h2><ul><li>Legacy 시나리오 순서가 SDM과 코드 근거로 확인됨</li><li>VP-01~VP-03의 입력과 출력이 정의됨</li><li>각 검증 포인트의 SLTE TxMngr 대응 위치가 확인됨</li><li>MAPPED / PARTIAL / MISSING 상태가 구분됨</li><li>SCC, Rank Update, HAL 경계가 Jomock으로 검증됨</li><li>내부 private helper에 과도하게 결합하지 않음</li><li>신규 UT PASS</li><li>기존 NR Tx UT Regression PASS</li><li>최종 As-built Mapping이 지식매니저에 업데이트됨</li></ul><h2>10. 스킬 업데이트 필요사항</h2><div class="warning">아래는 파트원과 방향을 합의한 후 별도로 진행할 스킬 개선 항목이다.</div><h3>10.1 code-analyzer</h3><pre><code>scenario-contract-analyze
+log-code-correlate
+ut-structure-analyze</code></pre><ul><li>Legacy Scenario Flow와 API Input/Output 추출</li><li>SDM 로그 문자열과 코드 파일/함수/라인 연결</li><li>SLTE TxMngr Mapping 후보 생성</li><li>실제 Test 선언, Fixture, Jomock, Message Injection, Comparator, Build 분석</li></ul><h3>10.2 slte-knowledge-manager</h3><pre><code>learn-runtime-log
+prepare-ut-verification
+map-ut-verification-to-slte
+learn-ut-structure</code></pre><ul><li>SDM과 Legacy 코드 결과를 연결해 Runtime Evidence와 API Contract 후보 생성</li><li>Scenario 단계별 UT Verification Point 생성</li><li>검증 포인트와 SLTE 모듈/API Mapping</li><li>MAPPED / PARTIAL / MISSING 및 Field Mapping 관리</li><li>UT Fixture/Jomock/Comparator/Build 지식 저장</li></ul><h3>10.3 code-fix</h3><pre><code>create-contract-ut</code></pre><ul><li>승인된 Verification Point와 SLTE Mapping 입력</li><li>기존 Fixture와 Jomock Pattern 재사용</li><li>API 경계의 입력·출력 비교 UT 생성</li><li>UT 폴더만 수정</li><li>Production 코드 수정 금지</li><li>Patch/Shelved CL 및 Compile/Test 결과 생성</li></ul><h3>10.4 sdm-parser</h3><p>UE/Stack/Cell, CP Time, Message ID, BWP ID, UL Rank, PATH_CONFIG_REQ/CNF, HAL CMD, 성공/실패 Terminal을 현재 Parser가 구조화하지 못하는 경우에만 보완한다.</p><h3>10.5 issue-analyzer</h3><p>필수 변경은 아니다. SDM에서 Feature 관련 정상 구간을 자동 추출할 필요가 있을 때 <code>extract-feature-runtime-evidence</code> 기능을 검토한다.</p><h3>10.6 skillsilent</h3><p>Core 변경보다 수정되는 각 스킬의 신규 Action을 다음 파일에 등록하는 것이 우선이다.</p><pre><code>skillsilent/policy.json
+skillsilent/contract.json
+skillsilent/manifest.json</code></pre><h3>10.7 직접 수정이 필요하지 않은 스킬</h3><ul><li><code>skill-updater</code></li><li><code>autotask-builder</code></li><li><code>job-list</code></li></ul><p>야간 무인 분석이나 반복 Regression 자동화를 도입할 때 별도 연동할 수 있다.</p><h2>11. 최종 제안</h2><blockquote>Legacy SDM과 코드는 시나리오 및 기대 동작의 근거로 사용한다.<br>Legacy 시나리오에서 API 경계별 UT 검증 포인트를 정의한다.<br>검증 포인트를 SLTE TxMngr의 책임과 API에 Mapping한다.<br>현재 SLTE UT Fixture와 Jomock Pattern을 사용해 입력을 주입하고 외부 출력을 비교하는 Contract UT를 작성한다.<br>파트원은 UT와 Mapping 문서를 기준으로 SLTE TxMngr를 구현하고 신규 UT와 기존 Regression을 통과시킨다.</blockquote><p><strong>Legacy UT는 작성하지 않는다.</strong></p><p><strong>Legacy 구현 구조를 SLTE에 복제하지 않는다.</strong></p><pre><code>Legacy Scenario Contract
++ SLTE TxMngr Architecture
++ SLTE UT Framework</code></pre><p class="small">문서 생성일: 2026-08-07</p>
+</body>
+</html>
