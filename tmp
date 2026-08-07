@@ -1,133 +1,52 @@
-"skill-updater"와 "autotask-builder" 스킬을 사용하여 GitHub 스킬 자동 업데이트 작업을 현재 PC에 등록해줘.
+[MCD 지표 확인 요청 — 코드 수정 금지, 읽기 전용]
 
-입력값
+목표: 아래 MCD SAM 결과를 "확인/분석"만 해줘. 개선·수정·코드변경·shelve·Jira생성은 하지 마.
+import-artifact와 inventory 같은 읽기 전용 action만 사용해.
 
-- GitHub 저장소: "OWNER/REPOSITORY"
-- Git ref: "main"
-- ZIP 위치: 저장소 root
-- 탐색 방식: "auto"
-- 업데이트 대상: 현재 사용자 스킬 폴더에 설치된 모든 스킬
-- 제외 대상: "skill-updater" 자신
-- 실행 주기: 4시간마다, 매 실행 시각의 7분 ("7 */4 * * *")
-- 프록시 방식: "env"
-- 직접 연결 fallback: 금지
-- 설치 및 다운로드 위치: 현재 사용자 홈 기준 기본 경로 사용
+입력:
+- branch-root: <브랜치 루트 경로>
+- MCD CSV(또는 build link): <경로 또는 URL>
 
-처리 원칙
+CSV를 읽은 뒤, 아래 5개 질문에 각각 번호로만 답하고, 그 근거(실제 파싱 결과/열 이름/샘플 값)를 한 줄씩 붙여줘.
+추측하지 마. CSV를 실제로 읽어서 확인한 것만 답하고, 확인 불가하면 "9) 확인 불가"로 답해.
 
-1. 운영체제를 자동 판별하고 Windows/Linux의 실제 스킬 설치 경로를 찾아라. 사용자에게 Python 경로, 스킬 경로 또는 task YAML 경로를 직접 입력하게 하지 마라.
-2. 설치된 "skill-updater"와 "autotask-builder"의 "SKILL.md"를 먼저 읽고 실제 제공 명령과 스키마만 사용하라.
-3. 기존 "skill-updater.json", "task_skill_update.yaml", "skill-updater.env" 또는 동일한 "skill_update" 예약 작업이 있으면 중복 등록하지 말고 기존 설정을 검증·보완하라.
-4. 기존 파일 수정 전 날짜시간이 포함된 ".bak" 파일을 생성하라.
-5. 시스템 예약 작업을 실제 등록하는 단계에서만 사용자 승인 1회를 요청하고, 경로 확인·설정 생성·검증·시험 실행은 추가 질문 없이 진행하라.
-6. GitHub 토큰과 프록시 인증정보를 화면이나 보고서에 출력하지 마라. Private repository인 경우에만 "GITHUB_TOKEN" 환경변수 사용을 안내하라.
+────────────────────────────
+Q1. cycle_id로 순환을 묶으면 몇 개 그룹이 나오고, 같은 cycle_id의 여러 행이 하나의 순환으로 병합되는가?
+  1) 병합됨 — cycle_id별로 순환 그룹이 하나로 묶여서 나온다
+  2) 병합 안 됨 — 같은 cycle_id인데 행마다 따로 Work Unit이 생긴다
+  3) cycle_id 열 자체를 못 읽는다
+  9) 확인 불가
+  → 근거: (순환 그룹 개수 = ?, 예시 cycle_id = ?)
 
-skill-updater 설정
+Q2. 하나의 cycle_id(예: 가장 작은 값) 그룹의 from/to 파일들이 속한 폴더 범위는?
+  1) 딱 두 폴더 사이만 오간다 (예: FolderA ↔ FolderB)
+  2) 세 개 이상 여러 폴더에 걸쳐 있다 (예: A→B→C→A)
+  3) 같은 폴더 안의 파일들이다
+  9) 확인 불가
+  → 근거: (그 cycle_id의 from/to 폴더 목록 = ?)
 
-"skill-updater init"을 비대화형으로 실행하여 다음 파일을 생성하거나 보완하라.
+Q3. from/to 열의 값은 무엇 단위인가?
+  1) .hpp 헤더 파일 경로
+  2) .cpp 소스 파일 경로
+  3) 폴더/모듈 이름 (파일 아님)
+  4) 클래스/심볼 이름
+  9) 확인 불가
+  → 근거: (from 샘플 값 = ?, to 샘플 값 = ?)
 
-- "skill-updater.json"
-- "task_skill_update.yaml"
-- "skill-updater.env"
+Q4. threshold 없이 MCD 분석이 진행되는가, 아니면 threshold를 요구하며 멈추는가?
+  1) threshold 없이 Violation 열(Y/N)만으로 대상이 선별되어 끝까지 진행된다
+  2) threshold를 요구하며 USER_INPUT_REQUIRED로 멈춘다
+  3) threshold 관련 없이 다른 이유로 멈춘다 (사유 명시)
+  9) 확인 불가
+  → 근거: (진행 상태 / 멈춘 코드 = ?)
 
-다음 설정을 적용하라.
+Q5. 각 순환 행에 붙은 숫자(number/count) 열은 무엇을 세는 값으로 보이는가?
+  1) 그 순환에 참여하는 edge(의존 화살표) 개수
+  2) 그 노드의 의존 개수 (fan-in 또는 fan-out)
+  3) 순환의 크기(참여 파일 수)
+  4) 숫자 열이 없거나 의미 불명
+  9) 확인 불가
+  → 근거: (열 이름 = ?, 샘플 값 = ?)
+────────────────────────────
 
-- "source.mode=auto"
-- "source.allow_root_zip_discovery=true"
-- "targets=all"을 사용하되 "skill-updater" 자신은 제외
-- 각 대상은 "enabled=true"
-- 각 대상은 "auto_apply=true"
-- 각 대상은 "allow_downgrade=false"
-- "network.proxy_mode=env"
-- "network.allow_direct_fallback=false"
-- SHA-256 또는 Git blob 무결성 검증 활성화
-- ZIP 경로 안전성 및 내부 스킬명·버전 검증 활성화
-- self-check 활성화
-- 업데이트 전 기존 설치본 전체 백업
-- self-check 또는 후처리 실패 시 자동 롤백
-- 업데이트 후 skillsilent 재등록과 doctor 실행
-- 보존 충돌 정책은 "abort"
-- 로컬에서 추가하거나 수정한 사용자 자료 보존
-- 다운로드 파일과 백업은 스킬별 최근 3개 유지
-
-최소 보존 대상:
-
-- "knowledge/**"
-- "knowledge-source/**"
-- "sam-knowledge-source/**"
-- "user-data/**"
-- "userdata/**"
-- "local/**"
-- ".local/**"
-- "config/local/**"
-- "*.local.*"
-- "except_id.md"
-
-보존 제외 대상:
-
-- "output/**"
-- "_state/**"
-- "__pycache__/**"
-- "*.pyc"
-- "*.pyo"
-- ".git/**"
-
-ZIP 파일명의 하이픈과 언더스코어 차이는 기본 정규화 기능을 사용하라. 실제 파일명 접두사가 설치 스킬명과 다른 경우에만 해당 대상의 "asset_prefixes"를 추가하라.
-
-프록시 처리
-
-1. 현재 프로세스의 "HTTPS_PROXY", "HTTP_PROXY", "SKILL_UPDATER_PROXY"를 확인하라.
-2. 유효한 프록시가 있으면 예약 작업이 읽을 수 있도록 "skill-updater.env"에 반영하라.
-3. 기존 env 파일에 활성 값이 있으면 덮어쓰지 마라.
-4. ".claude/settings.json"에만 프록시가 있고 Windows Task Scheduler 또는 Linux systemd에서 상속되지 않는 경우 해당 값을 "skill-updater.env"에 복사하라.
-5. 사내 CA가 설정되어 있으면 "SKILL_UPDATER_CA_BUNDLE"을 유지하라.
-6. "autotask check"가 프록시 상속 문제로 실패하면 "--fix"로 env 파일을 보완한 후 재검증하라.
-7. 프록시 주소는 최종 보고서에서 마스킹하라.
-
-검증 및 등록 순서
-
-다음 순서를 생략하지 마라.
-
-1. "skill-updater validate --config <설정 파일 절대경로>"
-2. "skill-updater inventory --config <설정 파일 절대경로>"
-3. "skill-updater check --config <설정 파일 절대경로>"
-4. "autotask doctor"
-5. "autotask check --fix <task YAML 절대경로>"
-6. "autotask run <task YAML 절대경로>"로 예약 등록 전 1회 시험 실행
-7. 시험 실행 종료코드와 "update_result.json", "update_report.md" 생성 여부 확인
-8. 모든 검증과 시험 실행이 성공한 경우에만 사용자에게 예약 작업 등록 승인 1회 요청
-9. 승인 후 "autotask deploy <task YAML 절대경로> --yes"
-10. "autotask status"와 운영체제 예약 작업 상태 확인
-
-Windows에서는 Task Scheduler를 사용하고 Linux에서는 systemd user timer를 사용하라.
-
-Windows 예약 작업은 1분마다 공통 러너를 실행하고 러너가 YAML의 5필드 cron을 판정하는 기존 구조를 유지하라. 동일한 "skill_update" ID의 작업을 중복 생성하지 마라.
-
-실패 처리
-
-- "ERROR", "OPEN_QUESTION", "TODO:"가 하나라도 남으면 배포하지 마라.
-- 네트워크, 프록시, 경로, 권한 또는 스키마 오류는 가능한 범위에서 자동 교정한 뒤 한 번 재검증하라.
-- 시험 업데이트 중 설치 실패가 발생하면 자동 롤백 결과까지 확인하라.
-- 프록시 연결 실패 시 임의의 직접 연결로 우회하지 마라.
-- 해결되지 않은 경우 실패 단계, 원인, 관련 로그 경로와 교정 명령만 간단히 보고하라.
-
-최종 보고
-
-다음 항목을 표로 요약하라.
-
-- 운영체제
-- GitHub 저장소와 ref
-- 업데이트 대상 스킬 수와 목록
-- "skill-updater.json" 절대경로
-- "task_skill_update.yaml" 절대경로
-- "skill-updater.env" 절대경로
-- 적용한 cron
-- 다음 실행 예정 시각
-- 프록시 전달 방식
-- 설정 검증 결과
-- 시험 실행 결과
-- 예약 작업 등록 상태
-- 로그와 업데이트 보고서 위치
-- 수동 1회 실행 명령
-- 최근 상태 확인 명령
-- 스킬별 롤백 명령 예시
+마지막으로, 위 확인 과정에서 MCD를 처리할 때 sam-fixer가 겪은 문제나 지원 안 되는 부분(에러, 멈춤, 빈 결과, 열 매핑 실패 등)이 있으면 그대로 나열해줘. 없으면 "문제 없음"이라고 답해.
