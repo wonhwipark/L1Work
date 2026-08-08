@@ -1,52 +1,185 @@
-[MCD 지표 확인 요청 — 코드 수정 금지, 읽기 전용]
+Job-list v0.2.0 야간 수행 Post-Check
 
-목표: 아래 MCD SAM 결과를 "확인/분석"만 해줘. 개선·수정·코드변경·shelve·Jira생성은 하지 마.
-import-artifact와 inventory 같은 읽기 전용 action만 사용해.
+현재 사내 PC에서 오늘 새벽 수행된 "job-list v0.2.0"의 실제 실행 결과를 점검해줘.
 
-입력:
-- branch-root: <브랜치 루트 경로>
-- MCD CSV(또는 build link): <경로 또는 URL>
+이번 작업은 검증 전용이다.
 
-CSV를 읽은 뒤, 아래 5개 질문에 각각 번호로만 답하고, 그 근거(실제 파싱 결과/열 이름/샘플 값)를 한 줄씩 붙여줘.
-추측하지 마. CSV를 실제로 읽어서 확인한 것만 답하고, 확인 불가하면 "9) 확인 불가"로 답해.
+절대로 다음 작업을 수행하지 마:
 
-────────────────────────────
-Q1. cycle_id로 순환을 묶으면 몇 개 그룹이 나오고, 같은 cycle_id의 여러 행이 하나의 순환으로 병합되는가?
-  1) 병합됨 — cycle_id별로 순환 그룹이 하나로 묶여서 나온다
-  2) 병합 안 됨 — 같은 cycle_id인데 행마다 따로 Work Unit이 생긴다
-  3) cycle_id 열 자체를 못 읽는다
-  9) 확인 불가
-  → 근거: (순환 그룹 개수 = ?, 예시 cycle_id = ?)
+- job-list 재실행
+- job-list v0.2.1 실행
+- Skill 파일 수정
+- migration 재실행
+- Activation
+- 기존 경로 삭제/이동/rename
+- GitHub push
+- skillsilent 수정/업데이트
+- skill-updater 수정/업데이트
 
-Q2. 하나의 cycle_id(예: 가장 작은 값) 그룹의 from/to 파일들이 속한 폴더 범위는?
-  1) 딱 두 폴더 사이만 오간다 (예: FolderA ↔ FolderB)
-  2) 세 개 이상 여러 폴더에 걸쳐 있다 (예: A→B→C→A)
-  3) 같은 폴더 안의 파일들이다
-  9) 확인 불가
-  → 근거: (그 cycle_id의 from/to 폴더 목록 = ?)
+1. 설치 버전 확인
 
-Q3. from/to 열의 값은 무엇 단위인가?
-  1) .hpp 헤더 파일 경로
-  2) .cpp 소스 파일 경로
-  3) 폴더/모듈 이름 (파일 아님)
-  4) 클래스/심볼 이름
-  9) 확인 불가
-  → 근거: (from 샘플 값 = ?, to 샘플 값 = ?)
+현재 실제 설치된 job-list 버전을 확인해줘.
 
-Q4. threshold 없이 MCD 분석이 진행되는가, 아니면 threshold를 요구하며 멈추는가?
-  1) threshold 없이 Violation 열(Y/N)만으로 대상이 선별되어 끝까지 진행된다
-  2) threshold를 요구하며 USER_INPUT_REQUIRED로 멈춘다
-  3) threshold 관련 없이 다른 이유로 멈춘다 (사유 명시)
-  9) 확인 불가
-  → 근거: (진행 상태 / 멈춘 코드 = ?)
+기대값:
 
-Q5. 각 순환 행에 붙은 숫자(number/count) 열은 무엇을 세는 값으로 보이는가?
-  1) 그 순환에 참여하는 edge(의존 화살표) 개수
-  2) 그 노드의 의존 개수 (fan-in 또는 fan-out)
-  3) 순환의 크기(참여 파일 수)
-  4) 숫자 열이 없거나 의미 불명
-  9) 확인 불가
-  → 근거: (열 이름 = ?, 샘플 값 = ?)
-────────────────────────────
+job-list = v0.2.0
 
-마지막으로, 위 확인 과정에서 MCD를 처리할 때 sam-fixer가 겪은 문제나 지원 안 되는 부분(에러, 멈춤, 빈 결과, 열 매핑 실패 등)이 있으면 그대로 나열해줘. 없으면 "문제 없음"이라고 답해.
+다르면 실제 설치 버전을 보고하고 FAIL로 판단해줘.
+
+2. 최근 실행 결과 탐색
+
+다음 위치를 우선 확인해줘.
+
+~/.claude/main/job-list/output/
+~/.claude/main/job-list/output/actions/
+~/.claude/main/job-list/output/runs/
+~/.claude/main/job-list/history/
+
+특히 가능하면 다음을 확인해줘.
+
+last_run.json
+job_history.jsonl
+migration_* report JSON
+run summary JSON
+
+오늘 새벽 가장 최근 실행 결과를 기준으로 판단해줘.
+
+3. 반드시 확인할 항목
+
+A. updater → job_sync → job-list 실행 여부
+
+단순히 job-list v0.2.0이 설치된 것만으로 PASS 처리하지 마.
+
+실제로:
+
+skill-updater
+→ job_sync
+→ skillsilent
+→ job-list run
+
+까지 도달했는지 확인해줘.
+
+가능한 로그/실행 기록을 근거로 판단해줘.
+
+B. Migration 수행 결과
+
+다음을 확인해줘.
+
+MIGRATION = PASS/SUCCESS
+
+"FAILED", "FAILED_SAFE", "BLOCKED", 실행 흔적 없음이면 PASS가 아니다.
+
+C. COPY 결과
+
+새 target이 실제 생성됐는지 확인해줘.
+
+현재 목표 Skill implementation root:
+
+~/l1sw-skills/private-skills/<skill>/
+
+Knowledge target이 포함된 경우:
+
+~/l1sw-knowledge/
+
+단, 이번 검증에서 새 파일을 추가하거나 수정하지 마.
+
+D. VERIFY 결과
+
+source와 target에 대해 다음을 확인해줘.
+
+file count
+manifest
+SHA256/checksum
+
+최종적으로 다음이 확인되어야 한다.
+
+MANIFEST_MATCH = true
+
+단순히 target 폴더가 존재한다는 이유로 PASS 처리하지 마.
+
+E. 기존 Source 보호 여부
+
+기존 source가 변경되지 않았는지 확인해줘.
+
+기대:
+
+SOURCE_CHANGED = false
+
+삭제, rename, move, content 변경이 확인되면 CRITICAL로 판단해줘.
+
+F. Activation 여부
+
+v0.2.0에서는 Activation이 발생하면 안 된다.
+
+기대:
+
+ACTIVATION_PERFORMED = false
+
+기존 Skill runtime이 기존 방식으로 유지되어 있어야 한다.
+
+4. FAILED_SAFE 확인
+
+Migration 중 실패가 있었다면 기존 source가 온전히 보존됐는지 확인해줘.
+
+실패했지만 source가 보존됐다면:
+
+FINAL = FAILED_SAFE
+
+로 구분해줘.
+
+FAILED_SAFE를 PASS로 판단하지 마.
+
+5. 최종 PASS 조건
+
+아래가 모두 만족되어야 한다.
+
+JOB_LIST_VERSION = 0.2.0
+JOB_SYNC = PASS
+MIGRATION = PASS
+COPY = PASS
+VERIFY = PASS
+MANIFEST_MATCH = true
+SOURCE_CHANGED = false
+ACTIVATION_PERFORMED = false
+
+모두 만족하면:
+
+JOB_LIST_V0_2_0_POST_CHECK = PASS
+NEXT_STEP = V0_2_1_COMPATIBILITY_CHECK
+
+하나라도 만족하지 않으면:
+
+JOB_LIST_V0_2_0_POST_CHECK = FAIL
+NEXT_STEP = STOP_AND_ANALYZE
+
+기존 source 변경 같은 안전 위반이 있으면:
+
+JOB_LIST_V0_2_0_POST_CHECK = CRITICAL
+NEXT_STEP = STOP_AND_REVIEW
+
+6. 최종 출력
+
+마지막에 반드시 아래 형식으로 출력해줘.
+
+JOB_LIST_VERSION = <version>
+JOB_SYNC = <PASS|FAIL|UNKNOWN>
+MIGRATION = <PASS|FAIL|FAILED_SAFE|NOT_RUN|UNKNOWN>
+COPY = <PASS|FAIL|UNKNOWN>
+VERIFY = <PASS|FAIL|UNKNOWN>
+MANIFEST_MATCH = <true|false|unknown>
+SOURCE_CHANGED = <true|false|unknown>
+ACTIVATION_PERFORMED = <true|false|unknown>
+
+JOB_LIST_V0_2_0_POST_CHECK = <PASS|FAIL|CRITICAL>
+NEXT_STEP = <V0_2_1_COMPATIBILITY_CHECK|STOP_AND_ANALYZE|STOP_AND_REVIEW>
+
+추가로 문제가 있다면:
+
+- 어느 단계에서 실패했는지
+- 확인한 로그/결과 파일
+- 핵심 오류 메시지
+- 기존 source가 안전한지
+
+를 짧게 정리해줘.
+
+추가 질문하지 말고 현재 PC에서 확인 가능한 자료로 끝까지 점검해줘.
