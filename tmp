@@ -1,140 +1,86 @@
-Job-list v0.2.0 야간 수행 Post-Check
+skill-updater 1회 실행 + job-list v0.2.0 Post-Check
 
-현재 사내 PC에서 오늘 새벽 수행된 "job-list v0.2.0"의 실제 실행 결과를 점검해줘.
+현재 원격 "automation/job-list.json" 준비 및 검증은 완료되었고 이전 단계 결과는 "1 = SUCCESS"였다.
 
-이번 작업은 검증 전용이다.
+이제 현재 사내 PC에서 "skill-updater v0.5.11"을 수동으로 정확히 1회 실행하고, 그 실행에서 "job-list v0.2.0" Phase 2-A가 정상 수행됐는지 끝까지 확인해줘.
 
-절대로 다음 작업을 수행하지 마:
+현재 기준
 
-- job-list 재실행
-- job-list v0.2.1 실행
-- Skill 파일 수정
-- migration 재실행
-- Activation
-- 기존 경로 삭제/이동/rename
-- GitHub push
-- skillsilent 수정/업데이트
-- skill-updater 수정/업데이트
-
-1. 설치 버전 확인
-
-현재 실제 설치된 job-list 버전을 확인해줘.
-
-기대값:
-
+skill-updater = v0.5.11
+skillsilent = v0.2.36
 job-list = v0.2.0
 
-다르면 실제 설치 버전을 보고하고 FAIL로 판단해줘.
+현재 원격 queue:
 
-2. 최근 실행 결과 탐색
+automation/job-list.json
 
-다음 위치를 우선 확인해줘.
+은 준비 완료 상태다.
 
-~/.claude/main/job-list/output/
-~/.claude/main/job-list/output/actions/
-~/.claude/main/job-list/output/runs/
-~/.claude/main/job-list/history/
+이번 작업에서 허용
 
-특히 가능하면 다음을 확인해줘.
-
-last_run.json
-job_history.jsonl
-migration_* report JSON
-run summary JSON
-
-오늘 새벽 가장 최근 실행 결과를 기준으로 판단해줘.
-
-3. 반드시 확인할 항목
-
-A. updater → job_sync → job-list 실행 여부
-
-단순히 job-list v0.2.0이 설치된 것만으로 PASS 처리하지 마.
-
-실제로:
-
-skill-updater
+skill-updater v0.5.11 수동 1회 실행
 → job_sync
 → skillsilent
 → job-list run
+→ Phase 2-A COPY + VERIFY
+→ 결과 확인
 
-까지 도달했는지 확인해줘.
+이번 작업에서 금지
 
-가능한 로그/실행 기록을 근거로 판단해줘.
+skill-updater 두 번 이상 실행
+job-list v0.2.1 실행
+Activation
+Skill rename
+기존 source 삭제
+기존 source move
+기존 source rename
+legacy cleanup
+skillsilent 수정/업데이트
+skill-updater 수정/업데이트
+Knowledge migration
+추가 GitHub 변경
 
-B. Migration 수행 결과
+---
 
-다음을 확인해줘.
+1. Updater 실행
 
-MIGRATION = PASS/SUCCESS
+현재 설치된 "skill-updater v0.5.11"을 기존 사내 정상 실행 방식으로 정확히 한 번만 실행해.
 
-"FAILED", "FAILED_SAFE", "BLOCKED", 실행 흔적 없음이면 PASS가 아니다.
+추가 질문 없이 unattended/yes 성격의 기존 지원 방식이 있으면 해당 정상 인터페이스를 사용해.
 
-C. COPY 결과
+임의 명령이나 새로운 실행 방법을 만들지 마.
 
-새 target이 실제 생성됐는지 확인해줘.
+---
 
-현재 목표 Skill implementation root:
+2. 실행 흐름 확인
 
-~/l1sw-skills/private-skills/<skill>/
+이번 실행에서 다음 흐름이 실제로 이어졌는지 확인해.
 
-Knowledge target이 포함된 경우:
+skill-updater
+→ job_sync
+→ remote automation/job-list.json fetch
+→ local queue merge
+→ skillsilent v0.2.36
+→ job-list run
+→ built-in safe-migration
 
-~/l1sw-knowledge/
+각 단계의 로그 또는 결과 파일을 근거로 확인해.
 
-단, 이번 검증에서 새 파일을 추가하거나 수정하지 마.
+---
 
-D. VERIFY 결과
+3. job-list v0.2.0 Phase 2-A 확인
 
-source와 target에 대해 다음을 확인해줘.
+다음을 확인해.
 
-file count
-manifest
-SHA256/checksum
+MIGRATION
+COPY
+VERIFY
+MANIFEST/SHA256
+SOURCE SAFETY
+ACTIVATION 여부
 
-최종적으로 다음이 확인되어야 한다.
+정상 기준:
 
-MANIFEST_MATCH = true
-
-단순히 target 폴더가 존재한다는 이유로 PASS 처리하지 마.
-
-E. 기존 Source 보호 여부
-
-기존 source가 변경되지 않았는지 확인해줘.
-
-기대:
-
-SOURCE_CHANGED = false
-
-삭제, rename, move, content 변경이 확인되면 CRITICAL로 판단해줘.
-
-F. Activation 여부
-
-v0.2.0에서는 Activation이 발생하면 안 된다.
-
-기대:
-
-ACTIVATION_PERFORMED = false
-
-기존 Skill runtime이 기존 방식으로 유지되어 있어야 한다.
-
-4. FAILED_SAFE 확인
-
-Migration 중 실패가 있었다면 기존 source가 온전히 보존됐는지 확인해줘.
-
-실패했지만 source가 보존됐다면:
-
-FINAL = FAILED_SAFE
-
-로 구분해줘.
-
-FAILED_SAFE를 PASS로 판단하지 마.
-
-5. 최종 PASS 조건
-
-아래가 모두 만족되어야 한다.
-
-JOB_LIST_VERSION = 0.2.0
-JOB_SYNC = PASS
 MIGRATION = PASS
 COPY = PASS
 VERIFY = PASS
@@ -142,44 +88,138 @@ MANIFEST_MATCH = true
 SOURCE_CHANGED = false
 ACTIVATION_PERFORMED = false
 
-모두 만족하면:
+새 target root는:
 
-JOB_LIST_V0_2_0_POST_CHECK = PASS
-NEXT_STEP = V0_2_1_COMPATIBILITY_CHECK
+~/l1sw-skills/private-skills/<skill>/
 
-하나라도 만족하지 않으면:
+이다.
 
-JOB_LIST_V0_2_0_POST_CHECK = FAIL
-NEXT_STEP = STOP_AND_ANALYZE
+단순히 target directory가 생성됐다는 이유로 PASS 처리하지 마.
 
-기존 source 변경 같은 안전 위반이 있으면:
+source/target manifest 또는 SHA256 검증 근거가 있어야 한다.
 
-JOB_LIST_V0_2_0_POST_CHECK = CRITICAL
-NEXT_STEP = STOP_AND_REVIEW
+---
 
-6. 최종 출력
+4. Source 보호 확인
 
-마지막에 반드시 아래 형식으로 출력해줘.
+기존 source에 대해 반드시 확인해.
 
-JOB_LIST_VERSION = <version>
-JOB_SYNC = <PASS|FAIL|UNKNOWN>
-MIGRATION = <PASS|FAIL|FAILED_SAFE|NOT_RUN|UNKNOWN>
-COPY = <PASS|FAIL|UNKNOWN>
-VERIFY = <PASS|FAIL|UNKNOWN>
-MANIFEST_MATCH = <true|false|unknown>
-SOURCE_CHANGED = <true|false|unknown>
-ACTIVATION_PERFORMED = <true|false|unknown>
+삭제 없음
+move 없음
+rename 없음
+content 변경 없음
 
-JOB_LIST_V0_2_0_POST_CHECK = <PASS|FAIL|CRITICAL>
-NEXT_STEP = <V0_2_1_COMPATIBILITY_CHECK|STOP_AND_ANALYZE|STOP_AND_REVIEW>
+기대:
 
-추가로 문제가 있다면:
+SOURCE_CHANGED = false
 
-- 어느 단계에서 실패했는지
-- 확인한 로그/결과 파일
-- 핵심 오류 메시지
-- 기존 source가 안전한지
+source 변경이 확인되면 즉시 CRITICAL로 판정하고 추가 작업을 하지 마.
 
-를 짧게 정리해줘.
+---
 
-추가 질문하지 말고 현재 PC에서 확인 가능한 자료로 끝까지 점검해줘.
+5. Activation 금지 확인
+
+이번 v0.2.0은 PRE-STAGE 단계다.
+
+따라서:
+
+ACTIVATION_PERFORMED = false
+
+여야 한다.
+
+새 implementation root를 실제 runtime으로 전환하면 안 된다.
+
+---
+
+6. 결과 위치 확인
+
+가능하면 다음 위치의 최신 결과를 사용해.
+
+~/.claude/main/job-list/output/
+~/.claude/main/job-list/output/actions/
+~/.claude/main/job-list/output/runs/
+~/.claude/main/job-list/history/
+
+필요한 경우 skill-updater의 최신 실행 로그도 함께 확인해.
+
+---
+
+7. 최종 판정
+
+다음 중 숫자 하나로 판정해.
+
+1 = PASS
+    updater 실행 성공
+    job_sync 성공
+    migration 실행 성공
+    COPY/VERIFY 성공
+    manifest 일치
+    source 안전
+    Activation 없음
+
+2 = UPDATER_FAIL
+    updater 자체가 정상 완료하지 못함
+
+3 = JOB_SYNC_FAIL
+    updater는 진행했지만 job_sync 단계 실패
+
+4 = RUNNER_FAIL
+    queue merge까지 성공했지만 skillsilent/job-list runner 실행 실패
+
+5 = MIGRATION_FAIL
+    job-list runner는 실행됐지만 migration 실패
+
+6 = FAILED_SAFE
+    migration 실패했지만 기존 source는 완전히 보존됨
+
+7 = VERIFY_FAIL
+    COPY는 수행됐으나 manifest/SHA256 검증 실패
+
+8 = CRITICAL
+    source 변경/삭제/rename 또는 의도하지 않은 Activation 발생
+
+9 = UNKNOWN
+    로그/결과 부족으로 객관적 판정 불가
+
+---
+
+8. 답변 형식
+
+첫 줄에는 반드시 숫자 하나만 출력해.
+
+예:
+
+1
+
+그 아래 최대 10줄까지만 출력해.
+
+UPDATER=PASS|FAIL|UNKNOWN
+JOB_SYNC=PASS|FAIL|UNKNOWN
+RUNNER=PASS|FAIL|NOT_RUN|UNKNOWN
+MIGRATION=PASS|FAIL|FAILED_SAFE|NOT_RUN|UNKNOWN
+COPY=PASS|FAIL|NOT_RUN|UNKNOWN
+VERIFY=PASS|FAIL|NOT_RUN|UNKNOWN
+MANIFEST_MATCH=true|false|unknown
+SOURCE_CHANGED=true|false|unknown
+ACTIVATION_PERFORMED=true|false|unknown
+NEXT_STEP=V0_2_1_COMPATIBILITY_CHECK|STOP_AND_ANALYZE|STOP_AND_REVIEW
+
+"1"일 때만:
+
+NEXT_STEP=V0_2_1_COMPATIBILITY_CHECK
+
+그 외에는:
+
+NEXT_STEP=STOP_AND_ANALYZE
+
+단, "8 = CRITICAL"이면:
+
+NEXT_STEP=STOP_AND_REVIEW
+
+로 출력해.
+
+중요
+
+결과가 "1"이어도 이번 작업에서 "job-list v0.2.1"은 실행하지 마.
+
+v0.2.1은 결과를 사용자가 확인한 뒤 별도 단계에서 수행한다.
