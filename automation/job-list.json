@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "execution_policy": {
+    "mode": "one-shot",
+    "on_failure": "continue",
+    "consume_after_attempt": true
+  },
+  "description": "Phase 2-A: Private skill pre-stage (copy-verify). Source = ~/l1sw-skills/<category>/<skill>. Target = ~/l1sw-skills/private-skills/<skill>/. No activation, no source mutation.",
+  "jobs": [
+    {
+      "id": "PRIVATE-SKILL-PRESTAGE",
+      "revision": 1,
+      "order": 10,
+      "skill": "job-list",
+      "action": "safe-migration",
+      "executor": "builtin",
+      "enabled": true,
+      "description": "Phase 2-A copy-verify: l1sw-skills private skills -> private-skills/",
+      "migration": {
+        "mode": "copy-verify",
+        "items": [
+          {
+            "name": "l1sw-architectures",
+            "source": "~/l1sw-skills/dev-skills/l1sw-architectures",
+            "target": "~/l1sw-skills/private-skills/l1sw-architectures",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-defect-analyzer",
+            "source": "~/l1sw-skills/dev-skills/l1sw-defect-analyzer",
+            "target": "~/l1sw-skills/private-skills/l1sw-defect-analyzer",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-log-analyzer",
+            "source": "~/l1sw-skills/dev-skills/l1sw-log-analyzer",
+            "target": "~/l1sw-skills/private-skills/l1sw-log-analyzer",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-refactor-finder",
+            "source": "~/l1sw-skills/dev-skills/l1sw-refactor-finder",
+            "target": "~/l1sw-skills/private-skills/l1sw-refactor-finder",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-cafe-review",
+            "source": "~/l1sw-skills/mgmt-skills/l1sw-cafe-review",
+            "target": "~/l1sw-skills/private-skills/l1sw-cafe-review",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-field-issue",
+            "source": "~/l1sw-skills/mgmt-skills/l1sw-field-issue",
+            "target": "~/l1sw-skills/private-skills/l1sw-field-issue",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-he-tracker",
+            "source": "~/l1sw-skills/mgmt-skills/l1sw-he-tracker",
+            "target": "~/l1sw-skills/private-skills/l1sw-he-tracker",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-jira-issue",
+            "source": "~/l1sw-skills/mgmt-skills/l1sw-jira-issue",
+            "target": "~/l1sw-skills/private-skills/l1sw-jira-issue",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-project-dashboard",
+            "source": "~/l1sw-skills/mgmt-skills/l1sw-project-dashboard",
+            "target": "~/l1sw-skills/private-skills/l1sw-project-dashboard",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-weekly-report",
+            "source": "~/l1sw-skills/mgmt-skills/l1sw-weekly-report",
+            "target": "~/l1sw-skills/private-skills/l1sw-weekly-report",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "confluence-fetcher",
+            "source": "~/l1sw-skills/shared-skills/confluence-fetcher",
+            "target": "~/l1sw-skills/private-skills/confluence-fetcher",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "confluence-tools",
+            "source": "~/l1sw-skills/shared-skills/confluence-tools",
+            "target": "~/l1sw-skills/private-skills/confluence-tools",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "jira-core",
+            "source": "~/l1sw-skills/shared-skills/jira-core",
+            "target": "~/l1sw-skills/private-skills/jira-core",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "jira-read",
+            "source": "~/l1sw-skills/shared-skills/jira-read",
+            "target": "~/l1sw-skills/private-skills/jira-read",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "jira-write",
+            "source": "~/l1sw-skills/shared-skills/jira-write",
+            "target": "~/l1sw-skills/private-skills/jira-write",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "l1sw-env",
+            "source": "~/l1sw-skills/shared-skills/l1sw-env",
+            "target": "~/l1sw-skills/private-skills/l1sw-env",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "samsung-jira",
+            "source": "~/l1sw-skills/shared-skills/samsung-jira",
+            "target": "~/l1sw-skills/private-skills/samsung-jira",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          },
+          {
+            "name": "sdm-parser",
+            "source": "~/l1sw-skills/shared-skills/sdm-parser",
+            "target": "~/l1sw-skills/private-skills/sdm-parser",
+            "target_kind": "skill",
+            "scan_legacy_paths": true
+          }
+        ]
+      }
+    }
+  ]
+}
