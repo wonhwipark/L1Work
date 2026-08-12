@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCD 개선 AI 시스템화 — v0.2.24 청사진</title>
+<style>
+:root{
+ --ink:#18232e;--muted:#5f6d79;--faint:#8d99a5;--line:#e3e9ee;--line2:#eef2f5;
+ --paper:#fff;--wash:#f6f8fa;--wash2:#eef3f6;--teal:#2f7d8f;--blue:#4f7bd4;
+ --violet:#7468c8;--clay:#bd6633;--green:#4a8f5b;--rose:#a44c6e;--ok:#3f9658;
+ --warn:#b85f2a;--bad:#b84d4d
+}
+*{box-sizing:border-box}
+body{
+ margin:0;color:var(--ink);line-height:1.65;letter-spacing:-.004em;
+ font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR","Segoe UI",system-ui,sans-serif;
+ background:radial-gradient(900px 440px at 100% -5%,#edf5f7 0,transparent 60%),
+ radial-gradient(700px 380px at -8% 3%,#f1effa 0,transparent 58%),var(--wash)
+}
+.wrap{max-width:1140px;margin:auto;padding:0 28px 84px}
+.mono{font-family:"SFMono-Regular","JetBrains Mono","Consolas","D2Coding",monospace}
+.mast{padding:58px 0 32px;border-bottom:1px solid var(--line);margin-bottom:36px}
+.eyebrow{margin:0 0 14px;font-size:12px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+h1{margin:0 0 18px;font-size:clamp(34px,6vw,62px);line-height:1.04;letter-spacing:-.03em}
+h1 span{font-weight:300;color:var(--teal)}
+.lede{margin:0 0 26px;max-width:78ch;color:var(--muted);font-size:17px}
+.hero{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.hero>div,.box,.path,.report,.plan,.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;box-shadow:0 1px 3px rgba(24,35,46,.04)}
+.hero>div{padding:16px 18px}.hero .k{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--faint);font-weight:800}.hero .v{font-weight:800;font-size:17px}.hero .big{font-size:30px}
+.goal{border-left:4px solid var(--clay)!important}.now{border-left:4px solid var(--teal)!important}.ver{border-left:4px solid var(--violet)!important}.store{border-left:4px solid var(--green)!important}
+.sec{padding-top:28px;margin-bottom:24px}.sec-h{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:22px}.sec-h .num{background:var(--ink);color:#fff;border-radius:6px;padding:3px 9px;font-weight:800;font-size:12px}.sec-h h2{margin:0;font-size:24px}.sec-h .tag{margin-left:auto;color:var(--faint);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
+.pipeline{display:flex;flex-direction:column}.stage{display:grid;grid-template-columns:64px 1fr}.rail{display:flex;flex-direction:column;align-items:center}.dot{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;z-index:2}.vline{width:2px;flex:1;min-height:24px;opacity:.45}.card{margin:0 0 16px 10px;padding:18px 20px}.card-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:7px}.card h3{margin:0;font-size:18px}.owner,.kind{font-size:11px;font-weight:800;border-radius:999px;padding:4px 9px}.kind{margin-left:auto;border-radius:6px}.desc{margin:4px 0 12px;color:var(--muted)}.flow{background:var(--wash);border:1px dashed var(--line);border-radius:9px;padding:10px 12px;color:var(--muted);font-size:12.5px;margin:10px 0}.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.chip{font-size:12px;padding:4px 9px;border:1px solid var(--line2);border-radius:6px;background:var(--wash2);color:var(--muted)}.chip.ok{background:#edf7f0;border-color:#d9ebdf;color:#2f7345}.chip.no{background:#fbecec;border-color:#f1d2d2;color:#9c4444}.why{font-size:13.5px;color:var(--muted);background:var(--wash);border-left:3px solid var(--line);border-radius:0 8px 8px 0;padding:10px 13px;margin-top:11px}.why b{color:var(--ink)}
+.s1 .dot{background:var(--teal)}.s1 .vline{background:linear-gradient(var(--teal),var(--blue))}.s2 .dot{background:var(--blue)}.s2 .vline{background:linear-gradient(var(--blue),var(--violet))}.s3 .dot{background:var(--violet)}.s3 .vline{background:linear-gradient(var(--violet),var(--clay))}.sg .dot{background:var(--clay)}.sg .vline{background:linear-gradient(var(--clay),var(--green))}.s4 .dot{background:var(--green)}.s4 .vline{background:linear-gradient(var(--green),var(--teal))}.s5 .dot{background:var(--teal)}
+.s1 .card{border-top:3px solid var(--teal)}.s2 .card{border-top:3px solid var(--blue)}.s3 .card{border-top:3px solid var(--violet)}.sg .card{border-top:3px solid var(--clay);background:#fffdfa}.s4 .card{border-top:3px solid var(--green)}.s5 .card{border-top:3px solid var(--teal)}
+.det{background:#e7f2f4;color:#276472}.ai{background:#f6eadf;color:#995122}.hum{background:#f6e5ec;color:#8c3556}.know{background:#efedfa;color:#5a4ea5}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.box,.path{padding:16px 18px}.box h4{margin:0 0 9px;font-size:13px;color:var(--teal);letter-spacing:.06em;text-transform:uppercase}.box ul{margin:0;padding-left:18px}.box li{font-size:13.5px;color:var(--muted);margin:4px 0}.box b{color:var(--ink)}
+.target{display:grid;grid-template-columns:1.05fr .95fr;gap:14px}.scorepanel{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px}.scoreline{display:flex;justify-content:space-between;align-items:end;gap:12px}.label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--faint);font-weight:800}.value{font-weight:800;font-size:26px}.bar{height:11px;background:var(--line2);border-radius:999px;overflow:hidden;margin:10px 0}.fill{height:100%;width:71%;background:linear-gradient(90deg,var(--teal),var(--green));border-radius:999px}.small{font-size:12.5px;color:var(--faint)}.plans{display:grid;gap:10px}.plan{padding:14px 16px}.plan.best{border-left:4px solid var(--green)}.plan .ttl{font-weight:800;margin-bottom:6px}.row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:2px 0}.row b{color:var(--ink)}
+.callout{background:linear-gradient(180deg,#fffaf5,#fff5ec);border:1px solid #efddce;border-radius:12px;padding:16px 20px;margin-top:15px}.callout.green{background:linear-gradient(180deg,#f7fbf8,#eef7f1);border-color:#d7eadd}.callout .lbl{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.08em;color:var(--warn);margin-bottom:5px}.callout.green .lbl{color:var(--ok)}.callout p{margin:0;font-size:14.5px}
+.queue{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.q{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:14px}.q .id{font-size:11px;font-weight:800;color:var(--faint)}.q .name{font-weight:800;margin:5px 0}.q .meta{font-size:12.5px;color:var(--muted)}.q.reuse{border-top:3px solid var(--green)}.q.reval{border-top:3px solid #b8872d}.q.new{border-top:3px solid var(--blue)}
+.tbl{width:100%;border-collapse:collapse;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}.tbl th,.tbl td{padding:11px 14px;border-bottom:1px solid var(--line2);font-size:13px;text-align:left}.tbl th{background:var(--wash2);font-size:11px;color:var(--muted);text-transform:uppercase}.tbl tr:last-child td{border-bottom:none}.pill{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:5px}.reuseP{background:#eaf4ed;color:#357347}.revalP{background:#fff4e8;color:#99541f}
+.reports{display:grid;grid-template-columns:1fr 1fr;gap:14px}.report{padding:17px 18px}.report h4{margin:0 0 10px;font-size:16px}.report .section{margin-top:11px;border-top:1px solid var(--line2);padding-top:10px}.report p{margin:0;color:var(--muted);font-size:13.5px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{background:var(--wash);border:1px solid var(--line2);border-radius:8px;padding:9px}.metric .k{font-size:10.5px;color:var(--faint);text-transform:uppercase;font-weight:800}.metric .v{font-size:16px;font-weight:800}
+.path .root{font-weight:800}.path .note{color:var(--muted);margin-top:5px;font-size:13px}.disabled{border-left:4px solid var(--bad)}
+footer{margin-top:54px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--faint);font-size:12px}
+@media(max-width:900px){.hero,.grid,.queue{grid-template-columns:repeat(2,1fr)}.target,.reports{grid-template-columns:1fr}}
+@media(max-width:640px){.wrap{padding:0 18px 64px}.hero,.grid,.queue{grid-template-columns:1fr}.stage{grid-template-columns:50px 1fr}.sec-h .tag{display:none}.metrics{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+<p class="eyebrow">L1 Channel · Architecture Maturity · Light Theme</p>
+<h1>MCD 개선의 <span>AI 시스템화</span></h1>
+<p class="lede">공식 SAM을 측정 SSOT로 유지하면서, <b>어디를 고칠지</b>뿐 아니라 <b>3.77/5 기준을 넘기 위해 어떤 Cycle을 어떤 순서로 고쳐야 하는지</b>를 저사양 모델에서도 반복 가능하게 계획·수정·검증하는 운영 청사진.</p>
+<div class="hero">
+ <div class="goal"><div class="k">MCD 기준</div><div class="v"><span class="big">3.77</span> / 5 이상</div></div>
+ <div class="now"><div class="k">핵심 목표</div><div class="v">최소 Risk · 최소 변경으로 기준 초과</div></div>
+ <div class="ver"><div class="k">현재 스킬</div><div class="v">l1-sam-fixer <span class="mono">v0.2.24</span></div></div>
+ <div class="store"><div class="k">저장 원칙</div><div class="v">Persistent / Run Output 분리 · main 비활성</div></div>
+</div>
+</header>
+
+<section class="sec">
+<div class="sec-h"><span class="num">01</span><h2>전체 파이프라인</h2><span class="tag">5 stages · human gate · official sam</span></div>
+<div class="pipeline">
+
+<div class="stage s1"><div class="rail"><div class="dot">1</div><div class="vline"></div></div><div class="card">
+<div class="card-top"><h3>감지 + Score Impact Planning</h3><span class="owner det">l1-sam-fixer</span><span class="kind det">Deterministic</span></div>
+<p class="desc">QuickBuild/SAM 산출물을 읽어 Cycle을 구조적으로 식별하고, 목표 3.77까지 필요한 개선량과 후보 조합을 계산한다.</p>
+<div class="flow mono">MCD CSV + sam-result.html → CycleIdentity → penalty join → current score → target gap → Plan A/B/C</div>
+<div class="chips"><span class="chip ok">Cycle structural identity</span><span class="chip ok">CycleIndex = score join key</span><span class="chip ok">Target 3.77 persistent</span><span class="chip ok">Penalty coverage fail-closed</span><span class="chip ok">Score model confidence</span></div>
+<p class="why"><b>핵심:</b> “Penalty가 큰 것부터”가 아니라 <b>목표 점수 달성에 필요한 최소 수정 조합</b>을 계산한다. 공식 산식이 검증되지 않으면 예상값을 공식 점수처럼 표시하지 않는다.</p>
+</div></div>
+
+<div class="stage s2"><div class="rail"><div class="dot">2</div><div class="vline"></div></div><div class="card">
+<div class="card-top"><h3>순환 분석 — 저사양 Batch Queue</h3><span class="owner ai">code-analyzer</span><span class="kind ai">AI + Evidence</span></div>
+<p class="desc">전체 Cycle을 모델에 한 번에 주지 않고 Target Planner가 필요한 후보만 기본 2개씩 분석한다.</p>
+<div class="flow mono">Target candidates → batch(2 cycles) → edge facts → checkpoint → next batch</div>
+<div class="chips"><span class="chip ok">기본 2 Cycle / 최대 3</span><span class="chip ok">파일·라인·edge bounded</span><span class="chip ok">UNKNOWN 허용</span><span class="chip ok">재사용 가능 Cycle은 모델 호출 생략</span></div>
+<p class="why"><b>저사양 방어:</b> Python이 grouping·계산·정렬·queue를 담당하고, 모델은 현재 batch의 사실 판정만 수행한다.</p>
+</div></div>
+
+<div class="stage s3"><div class="rail"><div class="dot">3</div><div class="vline"></div></div><div class="card">
+<div class="card-top"><h3>도메인 판단</h3><span class="owner know">knowledge-manager</span><span class="kind know">Knowledge</span></div>
+<p class="desc">C++ 일반 원칙만으로 결정할 수 없는 runtime·ownership·house convention·branch delta를 제공한다.</p>
+<div class="chips"><span class="chip">Runtime direction</span><span class="chip">Shared data ownership</span><span class="chip">CMD semantics</span><span class="chip">Branch / CL delta</span></div>
+<p class="why"><b>조건부 조회:</b> REMOVE_UNUSED나 명백한 FORWARD_DECLARE는 코드 증거만으로 처리 가능. Shared DB/CMD/책임 이동처럼 도메인 영향이 큰 경우에만 지식 조회를 강제한다.</p>
+</div></div>
+
+<div class="stage sg"><div class="rail"><div class="dot">★</div><div class="vline"></div></div><div class="card">
+<div class="card-top"><h3>추천안 승인</h3><span class="owner hum">사람</span><span class="kind hum">Human Gate</span></div>
+<p class="desc">시스템이 Recommended Plan + 대안 + 근거 + 예상 Gain + Risk를 제시하고, 사용자는 승인/대안/보류를 선택한다.</p>
+<div class="flow mono">Recommended break → fix pattern → expected gain → risk → change scope → [승인 / 대안 / 보류]</div>
+<p class="why"><b>원칙:</b> 사람은 처음부터 설계하는 대신 승인자 역할에 집중한다. runtime·ownership 영향이 큰 break/write 최종 결정은 사람 gate를 유지한다.</p>
+</div></div>
+
+<div class="stage s4"><div class="rail"><div class="dot">4</div><div class="vline"></div></div><div class="card">
+<div class="card-top"><h3>수정</h3><span class="owner ai">code-fix</span><span class="kind ai">AI Write</span></div>
+<p class="desc">승인된 break와 fix pattern에 따라 diff를 만들고 신규/삭제/이동 파일까지 patch lifecycle로 추적한다.</p>
+<div class="chips"><span class="chip ok">REMOVE_UNUSED_DEPENDENCY</span><span class="chip ok">FORWARD_DECLARE_TYPE</span><span class="chip ok">MOVE_SHARED_DB_TO_CLASS</span><span class="chip ok">DIRECT_CALL_TO_CMD</span><span class="chip ok">EXTRACT_INTERFACE / 대안</span></div>
+<div class="chips"><span class="chip no">HIDE_WITH_IFDEF</span><span class="chip no">DUPLICATE_TO_BREAK</span><span class="chip no">EXCLUDE_FROM_SAM_SCOPE</span></div>
+<p class="why"><b>Patch completeness:</b> MODIFIED→p4 edit, ADDED→p4 add, DELETED→p4 delete, MOVED→p4 move.</p>
+</div></div>
+
+<div class="stage s5"><div class="rail"><div class="dot">5</div></div><div class="card">
+<div class="card-top"><h3>검증 + 다음 Run 승계</h3><span class="owner det">l1-sam-fixer</span><span class="kind det">Deterministic Gate</span></div>
+<p class="desc">Build/Test/공식 SAM 재측정으로 사실을 확인하고 실제 gain을 다음 Run의 planning 근거로 남긴다.</p>
+<div class="flow mono">build → test → official SAM → resolved/persisting/new → score delta → lineage observation</div>
+<div class="chips"><span class="chip ok">NO_NEW_CYCLE</span><span class="chip ok">Expected vs Actual Gain</span><span class="chip ok">Run Lineage</span><span class="chip ok">Compatible evidence reuse</span></div>
+<p class="why"><b>재사용 조건:</b> cycle_signature + relevant file digest + knowledge snapshot이 모두 호환될 때만 REUSED. 아니면 REVALIDATE_REQUIRED.</p>
+</div></div>
+</div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">02</span><h2>3.77 Target Planner</h2><span class="tag">minimum-risk goal planning</span></div>
+<div class="target">
+<div class="scorepanel">
+<div class="scoreline"><div><div class="label">현재 공식 MCD Score</div><div class="value">3.55 / 5</div></div><div><div class="label">목표</div><div class="value">3.77</div></div></div>
+<div class="bar"><div class="fill"></div></div>
+<div class="small">예시 화면. 실제 실행에서는 공식 SAM current score를 사용.</div>
+<div class="metrics" style="margin-top:10px"><div class="metric"><div class="k">필요 Gain</div><div class="v">+0.22</div></div><div class="metric"><div class="k">Score Model</div><div class="v" style="font-size:13px">VERIFIED / ESTIMATE</div></div><div class="metric"><div class="k">Coverage</div><div class="v">100%</div></div></div>
+</div>
+<div class="plans">
+<div class="plan best"><div class="ttl">Plan A — 권장</div><div class="row"><span>Cycle</span><b>2</b></div><div class="row"><span>예상 Gain</span><b>+0.25</b></div><div class="row"><span>예상 Score</span><b>3.80 ✓</b></div><div class="row"><span>Risk</span><b>LOW</b></div><div class="row"><span>변경 파일</span><b>3</b></div></div>
+<div class="plan"><div class="ttl">Plan B — 단일 Cycle</div><div class="row"><span>Cycle</span><b>1</b></div><div class="row"><span>예상 Gain</span><b>+0.31</b></div><div class="row"><span>예상 Score</span><b>3.86</b></div><div class="row"><span>Risk</span><b>HIGH</b></div><div class="row"><span>변경 파일</span><b>14</b></div></div>
+</div>
+</div>
+<div class="callout green"><div class="lbl">Planner Ranking</div><p><b>목표 달성 → 분석 미완료 최소 → Risk 최소 → 변경 파일 최소 → Cycle 수 최소 → 목표 초과량 최소</b> 순으로 비교한다.</p></div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">03</span><h2>저사양 모델 Queue</h2><span class="tag">bounded context</span></div>
+<div class="queue">
+<div class="q reuse"><div class="id">REUSED</div><div class="name">Tx / ChCfg Cycle</div><div class="meta">signature·file digest·knowledge 동일<br>→ 모델 재분석 없음</div></div>
+<div class="q reval"><div class="id">REVALIDATE_REQUIRED</div><div class="name">TxDB / TxMngr</div><div class="meta">관련 파일 digest 변경<br>→ 현재 batch 재검증</div></div>
+<div class="q new"><div class="id">BATCH-001</div><div class="name">New Cycle A + B</div><div class="meta">2 Cycle만 code-analyzer에 전달</div></div>
+<div class="q"><div class="id">WAIT</div><div class="name">Remaining Cycles</div><div class="meta">목표 달성에 필요할 때만 후속 분석</div></div>
+</div>
+<div class="callout"><div class="lbl">Context 절감 원칙</div><p>전체 52 Cycle/163 edge를 한 번에 전달하지 않는다. <b>3.77 달성에 필요한 후보부터 작은 batch로 분석하고 충분하면 STOP</b>한다.</p></div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">04</span><h2>Run Lineage / 이전 작업 재사용</h2><span class="tag">cross-run continuation</span></div>
+<table class="tbl">
+<thead><tr><th>검사 항목</th><th>조건</th><th>결과</th></tr></thead>
+<tbody>
+<tr><td>Cycle 구조</td><td>cycle_signature 동일</td><td><span class="pill reuseP">재사용 후보</span></td></tr>
+<tr><td>관련 코드</td><td>relevant file digest 동일</td><td><span class="pill reuseP">재사용 후보</span></td></tr>
+<tr><td>도메인 지식</td><td>knowledge snapshot compatible</td><td><span class="pill reuseP">재사용 가능</span></td></tr>
+<tr><td>하나라도 변경</td><td>signature/digest/knowledge 불일치</td><td><span class="pill revalP">재검증 필요</span></td></tr>
+</tbody></table>
+<div class="flow mono" style="margin-top:14px">Run 001 (3.55) → Cycle A/B 수정 → Official SAM 3.73<br>↓ lineage<br>Run 002 → prior facts 재사용 → 남은 gap +0.04 → 다음 최소-risk Cycle만 분석</div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">05</span><h2>사용자 의사결정형 보고서 v2</h2><span class="tag">why · what · gain · risk · next</span></div>
+<div class="reports">
+<div class="report">
+<h4>TxManager ↔ ChCfg — 추천 Cycle</h4>
+<div class="metrics"><div class="metric"><div class="k">예상 Gain</div><div class="v">+0.14</div></div><div class="metric"><div class="k">Risk</div><div class="v">LOW</div></div><div class="metric"><div class="k">변경 파일</div><div class="v">2</div></div></div>
+<div class="section"><div class="label">왜 먼저 수정하는가</div><p>목표 3.77 달성 조합에서 높은 기여도를 가지면서 runtime 영향과 변경 범위가 작다.</p></div>
+<div class="section"><div class="label">무엇을 수정하는가</div><p><span class="mono">TxManager → ChCfg</span> dependency edge를 끊고 header include를 전방선언으로 전환한다.</p></div>
+<div class="section"><div class="label">왜 이 방법인가</div><p>해당 타입은 pointer/reference 용도로만 사용되며 inline complete-type 접근이 확인되지 않았다.</p></div>
+<div class="section"><div class="label">다음 행동</div><p><b>Recommended Plan 승인</b> 후 code-fix → QuickBuild → 공식 SAM 재측정.</p></div>
+</div>
+<div class="report">
+<h4>Folder / Module Dashboard</h4>
+<div class="metrics"><div class="metric"><div class="k">MCD Cycle</div><div class="v">7</div></div><div class="metric"><div class="k">총 Penalty</div><div class="v">-0.42</div></div><div class="metric"><div class="k">Expected Gain</div><div class="v">+0.24</div></div></div>
+<div class="section"><div class="label">Quick Win</div><p>3개 — REMOVE_UNUSED / FORWARD_DECLARE 계열</p></div>
+<div class="section"><div class="label">Risk 분포</div><p>LOW 3 · MEDIUM 2 · HIGH 2</p></div>
+<div class="section"><div class="label">View 지원</div><p><span class="mono">overview / folder / module / all</span></p></div>
+<div class="section"><div class="label">표현 원칙</div><p>기술 ID만 보여주지 않고 모듈명·원인·추천이유·목표기여도를 함께 표시한다.</p></div>
+</div>
+</div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">06</span><h2>저장소 / 운영 경계</h2><span class="tag">persistent ssot</span></div>
+<div class="grid">
+<div class="path"><div class="root mono">~/l1sw-data/l1-sam-fixer/</div><div class="note">Target 3.77, QuickBuild profile, parser/mapping, knowledge/policy, observation history 등 재사용 가능한 영구 정보.</div></div>
+<div class="path"><div class="root mono">&lt;branch-root&gt;/output/l1_sam_fix/&lt;run-id&gt;/</div><div class="note">Run별 state, baseline/after, evidence, report, analysis queue, lineage 결과.</div></div>
+<div class="path disabled"><div class="root mono">~/.claude/main/l1-sam-fixer/</div><div class="note"><b>일반 운영 비활성.</b> 신규 write/output/fallback 없음. legacy migration 전용 action에서만 명시적 접근.</div></div>
+</div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">07</span><h2>QuickBuild / SAM 연계</h2><span class="tag">reusable environment profile</span></div>
+<div class="grid">
+<div class="box"><h4>Build 접근</h4><ul><li>기본 접근은 <b>quickbuild skill</b></li><li>일회성 Build URL/ID는 Run evidence에만 저장</li></ul></div>
+<div class="box"><h4>Artifact 위치</h4><ul><li><b>sam-result.html</b> path / filename persistent 저장</li><li>MCD/CC/LOC CSV path / filename persistent 저장</li><li>환경 변경 시 update 후 다음 Run부터 자동 재사용</li></ul></div>
+<div class="box"><h4>MCD 검증</h4><ul><li>CSV로 구조/edge 확인</li><li>HTML로 score_penalty 병합</li><li>수정 후 공식 SAM 재측정이 최종 SSOT</li></ul></div>
+</div>
+</section>
+
+<section class="sec">
+<div class="sec-h"><span class="num">08</span><h2>최종 운영 목표</h2><span class="tag">continuous improvement</span></div>
+<div class="callout green"><div class="lbl">Desired UX</div><p><b>“지난번 이어서 MCD 3.77까지 개선해줘”</b>라고 요청하면, 이전 Run의 호환 가능한 분석을 재사용하고 남은 gap만 계산한 뒤 필요한 Cycle만 작은 batch로 분석하여 최소-risk 수정안을 제안하고 공식 SAM으로 반복 검증한다.</p></div>
+</section>
+
+<footer><span>MCD 개선 AI 시스템화 · l1-sam-fixer v0.2.24 · 2026-08-12</span><span>Light theme only · Standalone HTML · No external JS/CSS</span></footer>
+
+</div></body></html>
