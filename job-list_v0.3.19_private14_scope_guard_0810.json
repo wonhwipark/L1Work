@@ -1,0 +1,297 @@
+{
+  "schema_version": 1,
+  "job_list_version": "0.3.19",
+  "execution_policy": {
+    "mode": "one-shot",
+    "on_failure": "stop-current-pipeline-safe",
+    "consume_after_attempt": true,
+    "success_only_completion": true,
+    "failed_blocked_retryable": true
+  },
+  "description": "job-list v0.3.19: after successful v0.3.18, perform the read-only 14-skill IMPLEMENTATION_REPAIR_COMPLETE gate, regenerate the Activation Plan, freeze its SHA256, and execute Activation POST_CHECK. No execution_root switch or Activation APPLY is allowed. Scope is strictly limited to the listed 14 Private Skills. Group common/shared skills and any unlisted skill are NO_TOUCH.",
+  "safety_contract": {
+    "activation_apply_allowed": false,
+    "source_delete_allowed": false,
+    "move_allowed": false,
+    "rename_allowed": false,
+    "cleanup_allowed": false,
+    "persistent_runtime_output_mutation_allowed": false,
+    "skill_md_mutation_allowed": false,
+    "old_source_must_remain": true,
+    "plan_change_after_freeze": "STOP_PLAN_CHANGED",
+    "scope_enforcement_required": true,
+    "allowed_skill_set_only": [
+      "code-analyzer",
+      "code-fix",
+      "doc-converter",
+      "hld-code-compare",
+      "hld-code-implement",
+      "hld-composer",
+      "issue-analyzer",
+      "issue-fix-implement",
+      "l1_fla",
+      "l1-sam-fixer",
+      "p4-code-owner",
+      "p4-fix-kb",
+      "slte-knowledge-manager",
+      "slte-port-impact-analyzer"
+    ],
+    "group_common_skill_mutation_allowed": false,
+    "unlisted_skill_mutation_allowed": false,
+    "scope_violation_behavior": "FAILED_SAFE_STOP_BEFORE_MUTATION"
+  },
+  "pipeline": [
+    {
+      "stage": "PRIVATE_SCOPE_GUARD",
+      "order": 5,
+      "mode": "read-only",
+      "checks": [
+        "job target set exactly matches allowed Private Skill 14 list",
+        "no group common/shared skill is present in target set",
+        "no unlisted skill is present in target set",
+        "all writable paths resolve only under allowed Private Skill paths",
+        "~/.claude/main/<skill> is verification-only and not a mutation target",
+        "no group common/shared skill path is selected for backup/copy/repair/reconcile/activation"
+      ],
+      "pass_condition": "SCOPE_MATCH=YES AND GROUP_COMMON_TARGETS=0 AND UNLISTED_TARGETS=0",
+      "on_fail": {
+        "stop_pipeline": true,
+        "activation_allowed": false,
+        "mutation_allowed": false,
+        "result": "FAILED_SAFE_SCOPE_VIOLATION"
+      }
+    },
+    {
+      "stage": "IMPLEMENTATION_REPAIR_COMPLETE_GATE",
+      "order": 10,
+      "mode": "read-only",
+      "skills": [
+        {
+          "skill": "code-analyzer",
+          "expected_package_version": "0.13.19"
+        },
+        {
+          "skill": "code-fix",
+          "expected_package_version": "0.4.5"
+        },
+        {
+          "skill": "doc-converter",
+          "expected_package_version": "0.2.0"
+        },
+        {
+          "skill": "hld-code-compare",
+          "expected_package_version": "0.10.4"
+        },
+        {
+          "skill": "hld-code-implement",
+          "expected_package_version": "0.5.9"
+        },
+        {
+          "skill": "hld-composer",
+          "expected_package_version": "0.4.13"
+        },
+        {
+          "skill": "issue-analyzer",
+          "expected_package_version": "0.11.5"
+        },
+        {
+          "skill": "issue-fix-implement",
+          "expected_package_version": "0.3.1"
+        },
+        {
+          "skill": "l1_fla",
+          "expected_package_version": "0.2.0"
+        },
+        {
+          "skill": "l1-sam-fixer",
+          "expected_package_version": "0.2.14"
+        },
+        {
+          "skill": "p4-code-owner",
+          "expected_package_version": "0.6.0"
+        },
+        {
+          "skill": "p4-fix-kb",
+          "expected_package_version": "0.2.2"
+        },
+        {
+          "skill": "slte-knowledge-manager",
+          "expected_package_version": "0.4.5"
+        },
+        {
+          "skill": "slte-port-impact-analyzer",
+          "expected_package_version": "0.8.23"
+        }
+      ],
+      "checks": [
+        "installed package entry exists",
+        "target implementation root exists",
+        "required executable dependency closure exists",
+        "source/target expected content SHA256 verification passes where applicable",
+        "SKILL.md remains present in installed package",
+        "~/.claude/main/<skill> persistent/runtime/output boundary is not migrated or modified",
+        "current skillsilent execution_root is discoverable",
+        "rollback source/root is discoverable"
+      ],
+      "pass_condition": "FAIL=0 AND BLOCKED=0",
+      "on_fail": {
+        "stop_pipeline": true,
+        "activation_allowed": false,
+        "next_step": "REPAIR_FAILED_SKILL_ONLY"
+      },
+      "run_only_if_scope_guard_pass": true
+    },
+    {
+      "stage": "REGENERATE_ACTIVATION_PLAN",
+      "order": 20,
+      "run_only_if_previous_pass": true,
+      "mode": "plan-only",
+      "plan_output": "~/.claude/main/job-list/output/private_skill_activation_plan_v0.3.19.json",
+      "required_fields_per_skill": [
+        "skill",
+        "current_execution_root",
+        "target_execution_root",
+        "manifest_path",
+        "dependencies",
+        "precheck",
+        "validate",
+        "dry_run",
+        "reconcile",
+        "functional_validation",
+        "rollback_execution_root",
+        "wave_assignment"
+      ],
+      "target_execution_root_template": "~/l1sw-skills/private-skills/<skill>",
+      "prohibitions": [
+        "do not reuse an old Activation Plan blindly",
+        "do not switch execution_root",
+        "do not reconcile Activation APPLY",
+        "do not delete old implementation"
+      ],
+      "run_only_if_scope_guard_pass": true
+    },
+    {
+      "stage": "PLAN_SHA256_FREEZE",
+      "order": 30,
+      "run_only_if_previous_pass": true,
+      "mode": "read-only-hash",
+      "input": "~/.claude/main/job-list/output/private_skill_activation_plan_v0.3.19.json",
+      "freeze_receipt": "~/.claude/main/job-list/output/private_skill_activation_plan_v0.3.19.sha256",
+      "rule": "Any plan content change after freeze => STOP_PLAN_CHANGED",
+      "run_only_if_scope_guard_pass": true
+    },
+    {
+      "stage": "ACTIVATION_POST_CHECK",
+      "order": 40,
+      "run_only_if_previous_pass": true,
+      "mode": "read-only",
+      "checks": [
+        "skillsilent operational",
+        "job-list runner operational",
+        "all target implementation roots exist",
+        "all manifests valid",
+        "execution_root switch is applicable",
+        "persistent data paths preserved and reachable",
+        "rollback execution roots exist",
+        "dependencies accessible",
+        "no unsafe pending operation",
+        "frozen Activation Plan SHA256 still matches"
+      ],
+      "pass_condition": "FAIL=0 AND BLOCKED=0 AND PLAN_SHA256_MATCH=YES",
+      "on_pass": {
+        "ready_for_activation": true,
+        "next_step": "ACTIVATION_WAVES"
+      },
+      "on_fail": {
+        "ready_for_activation": false,
+        "stop_pipeline": true,
+        "activation_allowed": false,
+        "next_step": "REPAIR_OR_REGENERATE_PLAN"
+      },
+      "run_only_if_scope_guard_pass": true
+    }
+  ],
+  "result_contract": {
+    "pass_example": {
+      "RESULT_CODE": 1,
+      "RESULT": "PASS",
+      "TOTAL_SKILLS": 14,
+      "FAIL": 0,
+      "BLOCKED": 0,
+      "IMPLEMENTATION_REPAIR_COMPLETE": "YES",
+      "PLAN_GENERATED": "YES",
+      "PLAN_SHA256_FROZEN": "YES",
+      "POST_CHECK": "PASS",
+      "READY_FOR_ACTIVATION": "YES",
+      "NEXT_STEP": "ACTIVATION_WAVES"
+    },
+    "fail_example": {
+      "RESULT_CODE": 5,
+      "RESULT": "FAILED_SAFE",
+      "FAILED_STAGE": "<stage>",
+      "FAILED_SKILL": "<skill-or-none>",
+      "ACTIVATION_PERFORMED": "NO",
+      "CHANGED_SOURCE": "NO",
+      "DELETED_FILE": "NO",
+      "ROLLBACK_AVAILABLE": "YES"
+    },
+    "scope_fail_example": {
+      "RESULT_CODE": 5,
+      "RESULT": "FAILED_SAFE_SCOPE_VIOLATION",
+      "PRIVATE_SCOPE_GUARD": "FAIL",
+      "GROUP_COMMON_SKILL_TOUCHED": "NO",
+      "UNLISTED_SKILL_TOUCHED": "NO",
+      "ACTIVATION_PERFORMED": "NO",
+      "NEXT_STEP": "FIX_JOB_SCOPE"
+    }
+  },
+  "scope_guard": {
+    "scope_mode": "PRIVATE_SKILL_14_ONLY",
+    "allowed_skills": [
+      "code-analyzer",
+      "code-fix",
+      "doc-converter",
+      "hld-code-compare",
+      "hld-code-implement",
+      "hld-composer",
+      "issue-analyzer",
+      "issue-fix-implement",
+      "l1_fla",
+      "l1-sam-fixer",
+      "p4-code-owner",
+      "p4-fix-kb",
+      "slte-knowledge-manager",
+      "slte-port-impact-analyzer"
+    ],
+    "group_common_skills_policy": "NO_TOUCH",
+    "forbidden_for_group_common_skills": [
+      "read_for_mutation",
+      "write",
+      "copy",
+      "repair",
+      "backup",
+      "overwrite",
+      "delete",
+      "move",
+      "rename",
+      "reconcile",
+      "activation",
+      "execution_root_change",
+      "manifest_change",
+      "registration_change",
+      "unregistration",
+      "cleanup",
+      "quarantine",
+      "version_change"
+    ],
+    "allowed_private_paths": [
+      "~/.claude/skills/<allowed_private_skill>/",
+      "~/l1sw-skills/private-skills/<allowed_private_skill>/",
+      "~/.claude/main/<allowed_private_skill>/"
+    ],
+    "main_path_access": "VERIFY_ONLY_NO_MUTATION",
+    "group_common_paths": "NO_TOUCH",
+    "unknown_or_unlisted_skill": "BLOCK_AND_SKIP",
+    "scope_violation_action": "FAILED_SAFE_STOP_BEFORE_MUTATION"
+  }
+}

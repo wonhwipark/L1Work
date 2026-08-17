@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "execution_policy": {
+    "mode": "one-shot",
+    "on_failure": "continue",
+    "consume_after_attempt": true
+  },
+  "description": "job-list v0.3.18: remaining four Private Skill implementation repair/verification batch after v0.3.17 completion. SUCCESS-only completion/dedupe; failed/blocked records remain retryable. Metadata/version mismatch is WARN-only. Each Skill transaction is independent. PASS/FAIL read-only result signal retained. No activation, cleanup, delete, move, rename, or persistent/runtime/output mutation.",
+  "jobs": [
+    {
+      "id": "PRIVATE-SKILL-IMPL-REPAIR-REMAINING-4-0810",
+      "revision": 1,
+      "order": 10,
+      "skill": "job-list",
+      "action": "implementation-repair",
+      "executor": "builtin",
+      "enabled": true,
+      "description": "Verify/repair the remaining four Private Skill implementation closures from installed package sources into private-skills targets; continue safely if an individual Skill fails.",
+      "repair": {
+        "items": [
+          {
+            "skill": "doc-converter",
+            "expected_package_version": "0.2.0",
+            "assets": [
+              "scripts",
+              "references"
+            ]
+          },
+          {
+            "skill": "hld-code-implement",
+            "expected_package_version": "0.5.9",
+            "assets": [
+              "scripts",
+              "references",
+              "schema"
+            ]
+          },
+          {
+            "skill": "issue-analyzer",
+            "expected_package_version": "0.11.5",
+            "assets": [
+              "scripts",
+              "references",
+              "schema",
+              "integrations"
+            ]
+          },
+          {
+            "skill": "slte-port-impact-analyzer",
+            "expected_package_version": "0.8.23",
+            "assets": [
+              "scripts",
+              "schemas",
+              "templates"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
