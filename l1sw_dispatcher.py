@@ -188,7 +188,9 @@ def task_info() -> dict:
         "$a=$t.Actions[0]; "
         "@{ exists=$true; state=[string]$t.State; execute=[string]$a.Execute; "
         "arguments=[string]$a.Arguments; last_run=[string]$i.LastRunTime; "
-        "next_run=[string]$i.NextRunTime; last_result=$i.LastTaskResult } | "
+        "next_run=[string]$i.NextRunTime; last_result=$i.LastTaskResult; "
+        "no_battery_start=$t.Settings.DisallowStartIfOnBatteries; "
+        "stop_on_battery=$t.Settings.StopIfGoingOnBatteries } | "
         "ConvertTo-Json -Compress }"
     ).replace("@NAME@", TASK_NAME)
     raw = ps(script)
@@ -198,22 +200,125 @@ def task_info() -> dict:
         return {}
 
 
+TASK_XML = """<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Description>Liveness and on-demand trigger agent for the skill update chain.</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <TimeTrigger>
+      <Repetition>
+        <Interval>PT@INTERVAL@M</Interval>
+        <StopAtDurationEnd>false</StopAtDurationEnd>
+      </Repetition>
+      <StartBoundary>@START@</StartBoundary>
+      <Enabled>true</Enabled>
+    </TimeTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <IdleSettings>
+      <StopOnIdleEnd>false</StopOnIdleEnd>
+      <RestartOnIdle>false</RestartOnIdle>
+    </IdleSettings>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT2H</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>@COMMAND@</Command>
+      <Arguments>@ARGUMENTS@</Arguments>
+    </Exec>
+  </Actions>
+</Task>
+"""
+
+
 def register_task(interval_min: int, dry_run: bool = False) -> bool:
-    command = f'"{pythonw()}" "{script_path()}" run'
-    args = ["schtasks", "/create", "/tn", TASK_NAME, "/tr", command,
-            "/sc", "MINUTE", "/mo", str(interval_min), "/f"]
+    """Register via an XML definition so power settings can be set at creation.
+
+    A plain `schtasks /sc MINUTE` registration inherits two defaults that are
+    fatal here: DisallowStartIfOnBatteries and StopIfGoingOnBatteries. On a
+    portable machine the agent then stops the moment the power cable comes out.
+    The scheduler still records a run time and a refusal code, but the process
+    never starts, so no log and no liveness signal appears -- the exact silent
+    failure this agent exists to detect.
+
+    Those settings cannot be changed afterwards without elevation
+    (Set-ScheduledTask returns access denied), so they must be supplied in the
+    definition itself. Registering from XML needs no more privilege than the
+    plain form.
+    """
+    command = pythonw()
+    arguments = f'"{script_path()}" run'
     if dry_run:
-        log("dry-run: " + " ".join(args))
+        log(f"dry-run: register {TASK_NAME} every {interval_min}min -> {command} {arguments}")
         return True
+
+    def escape(value: str) -> str:
+        return (value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+                .replace('"', "&quot;"))
+
+    xml = (TASK_XML
+           .replace("@INTERVAL@", str(int(interval_min)))
+           .replace("@START@", datetime.now().replace(microsecond=0).isoformat())
+           .replace("@COMMAND@", escape(command))
+           .replace("@ARGUMENTS@", escape(arguments)))
+    xml_path = ROOT / "task.xml"
     try:
-        out = subprocess.run(args, capture_output=True, timeout=60, creationflags=NO_WINDOW)
-        ok = out.returncode == 0
+        ROOT.mkdir(parents=True, exist_ok=True)
+        xml_path.write_text(xml, encoding="utf-16")
+        out = subprocess.run(["schtasks", "/create", "/tn", TASK_NAME, "/xml", str(xml_path), "/f"],
+                             capture_output=True, timeout=60, creationflags=NO_WINDOW)
         message = (decode_output(out.stdout) or decode_output(out.stderr)).strip()
         log(f"register interval={interval_min}min rc={out.returncode} {message[:160]}")
-        return ok
+        if out.returncode == 0:
+            verify_power_settings()
+            return True
+        log("XML registration failed; falling back to the plain form "
+            "(agent will stop on battery power)")
+        return register_task_fallback(interval_min)
     except Exception as exc:
         log(f"register failed: {type(exc).__name__}: {exc}")
         return False
+
+
+def register_task_fallback(interval_min: int) -> bool:
+    command = f'"{pythonw()}" "{script_path()}" run'
+    args = ["schtasks", "/create", "/tn", TASK_NAME, "/tr", command,
+            "/sc", "MINUTE", "/mo", str(interval_min), "/f"]
+    try:
+        out = subprocess.run(args, capture_output=True, timeout=60, creationflags=NO_WINDOW)
+        log(f"fallback register rc={out.returncode}")
+        return out.returncode == 0
+    except Exception as exc:
+        log(f"fallback register failed: {type(exc).__name__}: {exc}")
+        return False
+
+
+def verify_power_settings() -> bool:
+    info = task_info()
+    if info.get("no_battery_start") or info.get("stop_on_battery"):
+        log("WARNING: task still stops on battery power")
+        return False
+    log("power settings verified: runs on battery")
+    return True
 
 
 def registration_is_healthy(info: dict) -> bool:
@@ -429,6 +534,10 @@ def cmd_status(args) -> int:
         print(f"  last_run        : {info.get('last_run')}   result={info.get('last_result')}")
         print(f"  next_run        : {info.get('next_run')}")
         print(f"  registration    : {'정상' if registration_is_healthy(info) else '비정상 (다음 실행 시 자동 복구)'}")
+        battery_blocked = bool(info.get("no_battery_start")) or bool(info.get("stop_on_battery"))
+        print(f"  battery         : {'위험 - 배터리 전원에서 중단됨 (install 재실행 필요)' if battery_blocked else '안전 (배터리에서도 동작)'}")
+        if str(info.get("last_result")) == "2147946720":
+            print("  경고            : 마지막 실행이 거부됨(0x800710E0). 전원 설정이 원인일 가능성이 높습니다")
     else:
         print("  등록되지 않음 -- 'install'을 실행하세요")
     print("  --- 실행 상태 ---")
