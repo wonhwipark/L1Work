@@ -1,6 +1,5 @@
 {
-  "nonce": "20260816T235545Z-2e65efce",
-  "issued_at": "2026-08-17T08:55:45.057128+09:00",
-  "note": "dispatcher bring-up",
-  "interval_min": 30
+  "nonce": "20260817T000146Z-3b67bfd5",
+  "issued_at": "2026-08-17T09:01:46.649384+09:00",
+  "note": "scheduler path validation"
 }
