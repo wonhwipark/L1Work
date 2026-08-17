@@ -31,9 +31,28 @@ python l1sw_dispatcher.py status
 `status`에서 확인할 것:
 
 ```text
-registration    : 정상          <- 이게 아니면 경로 문제
+registration    : 정상                      <- 이게 아니면 경로 문제
+battery         : 안전 (배터리에서도 동작)   <- '위험'이면 아래 참고
 next_run        : (30분 뒤)
 ```
+
+### 이미 예전 버전으로 설치했다면 반드시 재설치하세요
+
+초기 버전은 예약 작업을 만들 때 Windows 기본 전원 설정을 그대로 물려받았습니다.
+그 설정은 **배터리 전원에서 작업 시작을 거부**하므로, 노트북에서 전원 케이블을
+빼는 순간 dispatcher가 조용히 멈춥니다. 스케줄러는 실행 시각과 거부 코드
+(`0x800710E0`)를 기록하지만 프로세스는 시작되지 않아 **로그도 신호도 남지
+않습니다.** 이 도구가 잡아내려는 바로 그 유형의 고장입니다.
+
+최신 스크립트로 아래를 다시 실행하면 해결됩니다.
+
+```powershell
+curl -sL -o l1sw_dispatcher.py https://raw.githubusercontent.com/wonhwipark/L1Work/main/l1sw_dispatcher.py
+python l1sw_dispatcher.py install --interval-min 30
+python l1sw_dispatcher.py status     # battery 항목이 '안전'인지 확인
+```
+
+`status`의 `battery`가 `위험`으로 남아 있으면 알려주세요.
 
 ---
 
