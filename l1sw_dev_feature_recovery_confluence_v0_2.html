@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>l1sw-dev-feature × L1 Recovery 설계 제안 v0.2</title>
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --surface:#ffffff;
+    --ink:#17202a;
+    --muted:#5f6b76;
+    --line:#d9e0e7;
+    --blue:#1f4f8a;
+    --blue2:#2d6ca8;
+    --teal:#287d7a;
+    --green:#2f8a5b;
+    --orange:#b66a18;
+    --red:#b43b47;
+    --purple:#6a4aa0;
+    --soft-blue:#edf4fb;
+    --soft-teal:#edf8f7;
+    --soft-green:#eef8f2;
+    --soft-orange:#fff6e9;
+    --soft-red:#fff0f1;
+    --soft-purple:#f4effb;
+    --soft-gray:#f1f4f7;
+    --shadow:0 8px 24px rgba(27,39,51,.07);
+    --mono:Consolas, "SFMono-Regular", Menlo, monospace;
+    --body:"Malgun Gothic","Apple SD Gothic Neo","Segoe UI",Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:var(--body);
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.72;
+    font-size:15px;
+  }
+  .page{max-width:1120px;margin:0 auto;padding:36px 24px 88px}
+  .hero{
+    background:linear-gradient(135deg,#173b67 0%,#245f91 58%,#287d7a 100%);
+    color:#fff;
+    padding:44px 46px;
+    border-radius:18px;
+    box-shadow:var(--shadow);
+  }
+  .hero .tag{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    opacity:.86;
+    margin-bottom:12px;
+  }
+  .hero h1{margin:0 0 14px;font-size:38px;line-height:1.22;letter-spacing:-.03em}
+  .hero p{margin:0;max-width:860px;font-size:17px;color:#eaf3fb}
+  .hero .one-line{
+    margin-top:24px;
+    padding:15px 18px;
+    border:1px solid rgba(255,255,255,.28);
+    background:rgba(255,255,255,.10);
+    border-radius:12px;
+    font-weight:700;
+  }
+  h2{
+    font-size:27px;
+    margin:0 0 12px;
+    letter-spacing:-.025em;
+  }
+  h3{
+    font-size:19px;
+    margin:0 0 8px;
+    letter-spacing:-.015em;
+  }
+  p{margin:0 0 12px}
+  .section{
+    margin-top:28px;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:30px 32px;
+    box-shadow:var(--shadow);
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--blue2);
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    margin-bottom:8px;
+    font-weight:700;
+  }
+  .lead{font-size:16px;color:#2e3943;max-width:930px}
+  .callout{
+    margin:18px 0;
+    border-left:4px solid var(--blue2);
+    background:var(--soft-blue);
+    padding:15px 18px;
+    border-radius:8px;
+  }
+  .callout strong{display:block;margin-bottom:4px}
+  .callout.green{border-color:var(--green);background:var(--soft-green)}
+  .callout.orange{border-color:var(--orange);background:var(--soft-orange)}
+  .callout.red{border-color:var(--red);background:var(--soft-red)}
+  .callout.purple{border-color:var(--purple);background:var(--soft-purple)}
+  .beginner{
+    margin:18px 0;
+    background:var(--soft-gray);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:15px 17px;
+  }
+  .beginner b{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:.06em;
+    display:block;
+    margin-bottom:5px;
+  }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:16px 0 8px;
+    background:#fff;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:11px 12px;
+    vertical-align:top;
+    text-align:left;
+  }
+  th{
+    background:#eef3f7;
+    font-size:13px;
+  }
+  td{font-size:14px}
+  code{
+    font-family:var(--mono);
+    font-size:.9em;
+    background:#edf1f4;
+    padding:1px 5px;
+    border-radius:4px;
+  }
+  pre{
+    font-family:var(--mono);
+    font-size:12.5px;
+    line-height:1.63;
+    overflow:auto;
+    background:#18222d;
+    color:#edf3f8;
+    padding:18px 20px;
+    border-radius:10px;
+    margin:14px 0;
+    white-space:pre-wrap;
+  }
+  .flow{
+    display:flex;
+    align-items:stretch;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:18px 0;
+  }
+  .node{
+    flex:1 1 150px;
+    min-width:150px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    background:#fff;
+  }
+  .node b{display:block;margin-bottom:4px}
+  .node small{display:block;color:var(--muted);line-height:1.5}
+  .node.rec{border-top:4px solid var(--red);background:var(--soft-red)}
+  .node.intake{border-top:4px solid var(--orange);background:var(--soft-orange)}
+  .node.s1{border-top:4px solid var(--blue);background:var(--soft-blue)}
+  .node.s2{border-top:4px solid var(--blue2)}
+  .node.s3{border-top:4px solid var(--teal);background:var(--soft-teal)}
+  .node.s4{border-top:4px solid var(--green);background:var(--soft-green)}
+  .node.s5{border-top:4px solid var(--purple);background:var(--soft-purple)}
+  .arrow{
+    align-self:center;
+    color:#8b97a3;
+    font-size:24px;
+    font-weight:700;
+    padding:0 2px;
+  }
+  .grid2{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:16px 0;
+  }
+  .card{
+    border:1px solid var(--line);
+    border-radius:11px;
+    padding:16px 17px;
+    background:#fff;
+  }
+  .card h3{margin-bottom:7px}
+  .card p,.card li{font-size:14px;color:#394651}
+  .card ul{margin:8px 0 0;padding-left:19px}
+  .pill{
+    display:inline-block;
+    padding:3px 8px;
+    border-radius:99px;
+    font-size:11px;
+    font-family:var(--mono);
+    font-weight:700;
+    background:#e9eef3;
+    color:#47535e;
+    margin-right:5px;
+  }
+  .pill.red{background:#f8dfe2;color:#8b2b36}
+  .pill.green{background:#dff1e6;color:#216942}
+  .pill.blue{background:#dfeaf7;color:#244f7a}
+  .pill.orange{background:#fde9cf;color:#875019}
+  .kpi{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:10px;
+    margin:16px 0;
+  }
+  .kpi .item{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    background:#fbfcfd;
+  }
+  .kpi .item b{font-size:18px;display:block;color:var(--blue)}
+  .kpi .item span{font-size:12px;color:var(--muted)}
+  .checklist{
+    margin:10px 0 0;
+    padding:0;
+    list-style:none;
+  }
+  .checklist li{
+    padding:8px 0 8px 28px;
+    border-bottom:1px solid #edf0f3;
+    position:relative;
+  }
+  .checklist li::before{
+    content:"✓";
+    position:absolute;
+    left:2px; top:8px;
+    color:var(--green);
+    font-weight:800;
+  }
+  .foot{
+    margin-top:30px;
+    color:#66727d;
+    font-size:12px;
+    text-align:center;
+  }
+  .mini-title{
+    font-size:14px;
+    font-weight:700;
+    margin-top:18px;
+    margin-bottom:5px;
+    color:#26313b;
+  }
+  .center{text-align:center}
+  @media(max-width:760px){
+    .page{padding:18px 12px 48px}
+    .hero{padding:28px 22px}
+    .hero h1{font-size:30px}
+    .section{padding:22px 18px}
+    .grid2{grid-template-columns:1fr}
+    .kpi{grid-template-columns:1fr 1fr}
+    .arrow{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="tag">L1 SW DEVELOPMENT PROCESS · CONCEPT v0.2</div>
+    <h1>l1sw-dev-feature × L1 Recovery<br>표준 피처 개발 프로세스 설계 제안</h1>
+    <p>
+      Crash · Stuck · WDT 같은 L1 문제를 AI로 분석한 뒤, 그 결과를 실제 제품 피처로
+      개발·검증·종료하기까지 담당자마다 같은 절차와 같은 산출물을 사용하도록 만드는
+      <strong>Feature Lifecycle Orchestrator</strong> 설계안입니다.
+    </p>
+    <div class="one-line">
+      핵심 아이디어: L1 Recovery는 “문제와 Recovery 후보”를 만들고, l1sw-dev-feature는 그 후보를
+      “검증 가능한 개발 계약”으로 승격해 SRS → HLD → 구현 → 검증 → 환류를 끝까지 관리한다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">01 · 배경</div>
+    <h2>왜 새로운 스킬이 필요한가</h2>
+    <p class="lead">
+      현재도 코드 분석, HLD 작성, 코드 구현, Fix 이력 검색, 지식 관리 등 각 구간을 잘 수행하는
+      스킬은 존재합니다. 문제는 <strong>각 스킬이 자기 구간만 알고 있다는 점</strong>입니다.
+      그래서 “처음 요구한 내용이 실제 코드에 반영됐는가?”, “그 변경이 어떤 시험으로 검증됐는가?”,
+      “이번 과제에서 배운 것이 다음 과제에 재사용되는가?”를 하나의 흐름으로 답하기 어렵습니다.
+    </p>
+
+    <table>
+      <tr><th>현재 잘하는 것</th><th>하지만 남아 있는 문제</th></tr>
+      <tr><td>코드 분석</td><td>이 분석이 어떤 Feature 요구 때문인지 연결이 약함</td></tr>
+      <tr><td>HLD 작성</td><td>설계가 실제 구현·검증까지 완료됐는지 한눈에 보기 어려움</td></tr>
+      <tr><td>구현 / Fix</td><td>변경의 원 요구·설계 근거를 나중에 다시 찾아야 함</td></tr>
+      <tr><td>UT / 로그 검증</td><td>무엇을 어떤 기준으로 검증해야 하는지 담당자마다 달라질 수 있음</td></tr>
+      <tr><td>지식 관리</td><td>이번 과제에서 무엇을 배웠고 무엇을 등록해야 하는지 별도 정리가 필요함</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>따라서 부족한 것은 “분석 능력”이 아니라 “개발 생명주기를 연결하는 공통 Control Plane”입니다.</strong>
+      l1sw-dev-feature는 모든 기능을 다시 만드는 Mega Skill이 아니라, 단계(Stage), 완료 조건(DoD),
+      승인 Gate, 추적성, 다음 동작을 관리하는 워크플로우 계층이어야 합니다.
+    </div>
+
+    <div class="beginner">
+      <b>초보자 설명</b>
+      여러 전문가가 각각 좋은 일을 하고 있어도, 프로젝트 매니저가 없다면 “누가 무엇을 끝냈고 다음에 무엇을 해야 하는지”가
+      흐려질 수 있습니다. l1sw-dev-feature는 코드를 직접 잘 고치는 전문가가 아니라,
+      <strong>각 전문가가 같은 순서와 같은 기준으로 일하도록 만드는 프로젝트 실행 엔진</strong>에 가깝습니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">02 · 목적</div>
+    <h2>l1sw-dev-feature가 달성해야 할 것</h2>
+
+    <div class="grid2">
+      <div class="card">
+        <h3>담당자 편차 축소</h3>
+        <p>누가 맡아도 같은 단계, 같은 질문, 같은 완료 기준을 사용합니다.</p>
+      </div>
+      <div class="card">
+        <h3>요구 → 검증 추적</h3>
+        <p>“이 요구가 실제로 구현되고 시험됐는가?”를 레코드 하나에서 확인합니다.</p>
+      </div>
+      <div class="card">
+        <h3>산출물 표준화</h3>
+        <p>SRS/HLD/구현계획/검증표/종료보고를 동일 데이터에서 생성합니다.</p>
+      </div>
+      <div class="card">
+        <h3>과제를 통한 자동 학습</h3>
+        <p>과제 종료 시 새 절차, 실패 모드, 구현 패턴을 지식 후보로 환류합니다.</p>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <strong>목표는 문서를 더 많이 만드는 것이 아닙니다.</strong>
+      하나의 Feature Record를 단계별로 채우고, 필요한 문서는 그 레코드에서 자동 생성되게 하는 것이 목표입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">03 · 전체 구조</div>
+    <h2>L1 Recovery와 Feature 개발의 연결</h2>
+    <p class="lead">
+      L1 Recovery 스킬의 출력은 바로 SRS가 되기보다 먼저 <strong>Feature Intake</strong>를 거치는 것이 안전합니다.
+      Recovery 분석 시점의 일부 내용은 아직 확정된 요구가 아니라 원인 가설 또는 해결 후보일 수 있기 때문입니다.
+    </p>
+
+    <div class="flow">
+      <div class="node rec">
+        <b>L1 Recovery</b>
+        <small>Crash / Stuck / WDT 분석<br>Facts · Hypothesis · Recovery Candidate</small>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node intake">
+        <b>S0 · Feature Intake</b>
+        <small>후보를 개발 가능한 계약으로 정규화<br>Gate 추가 없음</small>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node s1">
+        <b>S1 · SRS</b>
+        <small>무엇이 달라져야 하는지<br>관측 가능한 요구 확정</small>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node s2">
+        <b>S2 · HLD</b>
+        <small>어느 절차·모듈에서<br>어떻게 달라지는지 설계</small>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node s3">
+        <b>S3 · 구현</b>
+        <small>승인 범위 내 코드 변경<br>Diff / Change ID 연결</small>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node s4">
+        <b>S4 · 검증</b>
+        <small>UT / Log / Fault Injection<br>Evidence로 PASS 판정</small>
+      </div>
+      <div class="arrow">→</div>
+      <div class="node s5">
+        <b>S5 · 환류</b>
+        <small>새 절차·실패 모드·패턴을<br>Knowledge 후보로 등록</small>
+      </div>
+    </div>
+
+    <div class="callout orange">
+      <strong>S0는 “새로운 승인 단계”가 아닙니다.</strong>
+      L1 Recovery 출력의 Fact·Hypothesis·Candidate를 분리하고 Feature 입력 형식으로 정리하는 전처리 단계입니다.
+      첫 사람 승인은 기존처럼 G-SRS에서 수행합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">04 · 역할 경계</div>
+    <h2>Recovery Candidate와 Feature Requirement는 다르다</h2>
+
+    <div class="grid2">
+      <div class="card" style="background:var(--soft-red)">
+        <h3>L1 Recovery가 만드는 것</h3>
+        <ul>
+          <li>어떤 현상이 발생했는가</li>
+          <li>어떤 증거가 있는가</li>
+          <li>가능한 Root Cause는 무엇인가</li>
+          <li>어떤 Recovery 방법이 후보인가</li>
+          <li>어떤 부작용 또는 Open Item이 있는가</li>
+        </ul>
+        <p><span class="pill red">CANDIDATE</span> 아직 설계 승인 전</p>
+      </div>
+      <div class="card" style="background:var(--soft-green)">
+        <h3>l1sw-dev-feature가 만드는 것</h3>
+        <ul>
+          <li>제품 동작이 어떻게 달라져야 하는가</li>
+          <li>그 변화가 외부에서 어떻게 관측되는가</li>
+          <li>어떤 절차/모듈이 소유하는가</li>
+          <li>무엇을 구현하고 무엇으로 검증하는가</li>
+          <li>언제 “완료”라고 판정할 수 있는가</li>
+        </ul>
+        <p><span class="pill green">FEATURE CONTRACT</span> 승인 가능한 개발 기준</p>
+      </div>
+    </div>
+
+    <div class="beginner">
+      <b>예시</b>
+      “TxSwitchMngr가 stuck해서 WDT가 발생한 것 같다 → 일정 시간 후 reset하자”는 좋은 <strong>Recovery 후보</strong>입니다.
+      하지만 Feature Requirement가 되려면 “어떤 상태를 stuck으로 판정하는지”, “정상 지연과 어떻게 구분하는지”,
+      “reset 후 무엇이 정상 복귀 증거인지”까지 정의되어야 합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">05 · 핵심 데이터 모델</div>
+    <h2>Feature의 중심은 문서가 아니라 Behavior Delta</h2>
+    <p class="lead">
+      <strong>Behavior Delta(BD)</strong>는 “이 과제를 적용하면 시스템 행위가 어떻게 달라지는가”를 한 건 단위로 기록한 것입니다.
+      SRS, HLD, 구현, 검증이 각각 다른 문서에서 별도 ID를 만들기보다, 같은 BD가 단계별 필드를 얻어가는 방식을 권장합니다.
+    </p>
+
+    <div class="callout purple">
+      <strong>기본 형식</strong>
+      어떤 조건에서(Condition) · 지금은 어떻게 동작하고(Current) · 앞으로는 어떻게 동작해야 하며(Target) ·
+      무엇을 보면 성공 여부를 알 수 있는가(Observable)
+    </div>
+
+    <pre>behavior_delta:
+  id: BD-003
+
+  # S0 · Recovery 출처
+  recovery_source: RC-001
+  failure_fact_refs: [FACT-001, FACT-004]
+
+  # S1 · 요구
+  condition: "ULCA active + TX switch pending"
+  current_behavior: "재진입 CMD 발행"
+  target_behavior: "재진입 CMD 억제"
+  observable:
+    type: MESSAGE
+    anchor: "TX_SWITCH_REQ 이후 CMD_TX_SWITCH 미발행"
+
+  # S2 · 설계
+  procedure: "proc_periodic_tx_switch"
+  owner_module: "TxSwitchMngr"
+  design_intent: "pending 상태 재진입 방지"
+
+  # S3 · 구현
+  code_refs: ["tx_switch_mngr.cpp::handleReq"]
+  change_id: "CL / PR / commit"
+
+  # S4 · 검증
+  evidence:
+    - {type: UT, result: PASS}
+    - {type: FAULT_INJECTION, result: PASS}
+    - {type: LOG, result: PASS}
+
+  # S5 · 환류
+  knowledge_candidates:
+    - FAILURE_MODE
+    - IMPLEMENTATION_IDIOM</pre>
+
+    <div class="beginner">
+      <b>초보자 설명</b>
+      SRS 문서, HLD 문서, 시험 문서를 서로 번역해서 연결하는 대신, <strong>같은 BD-003에 요구·설계·코드·시험 정보를 차곡차곡 붙입니다.</strong>
+      그러면 BD-003을 읽는 것 자체가 추적성입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">06 · Recovery Feature 표준 관점</div>
+    <h2>Crash / Stuck / WDT는 공통 질문을 강제할 수 있다</h2>
+    <p>
+      Recovery 기능은 일반 Feature보다 공통 구조가 뚜렷합니다. 따라서 담당자가 아래 관점을 반드시 검토하게 하면
+      경험 차이를 크게 줄일 수 있습니다.
+    </p>
+
+    <table>
+      <tr><th>BD 유형</th><th>필수 질문</th><th>예시</th></tr>
+      <tr><td><b>Detection</b></td><td>고장을 무엇으로 검출하는가?</td><td>Progress counter 정지, timeout, state mismatch</td></tr>
+      <tr><td><b>Qualification</b></td><td>진짜 장애와 정상 지연을 어떻게 구분하는가?</td><td>연속 N회 미변경 + procedure 상태 확인</td></tr>
+      <tr><td><b>Recovery Action</b></td><td>무엇을 reset/reinit/retry 하는가?</td><td>Sub-state 재초기화, command retry</td></tr>
+      <tr><td><b>Guard / Safety</b></td><td>정상 상황에서 잘못 Recovery하지 않도록 무엇을 막는가?</td><td>진행 중 중요 procedure에서는 trigger 금지</td></tr>
+      <tr><td><b>Escalation</b></td><td>Recovery가 실패하거나 반복되면 다음 단계는?</td><td>Local recovery → subsystem recovery → 상위 recovery</td></tr>
+      <tr><td><b>Post-validation</b></td><td>Recovery 후 정상 복귀를 무엇으로 확인하는가?</td><td>정상 state + 정상 message sequence 재개</td></tr>
+      <tr><td><b>Diagnostics</b></td><td>다음 분석을 위해 무엇을 남기는가?</td><td>Pre-recovery state snapshot, reason code, counter</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>이 7개가 반드시 7개의 BD가 되어야 한다는 의미는 아닙니다.</strong>
+      작은 Feature에서는 합칠 수 있습니다. 중요한 것은 “이 관점을 검토했는가”를 자동 체크하는 것입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">07 · 단계 모델</div>
+    <h2>S0 ~ S5 표준 개발 프로세스</h2>
+
+    <table>
+      <tr>
+        <th>단계</th><th>목적</th><th>주요 입력</th><th>핵심 산출/필드</th><th>완료 조건(DoD)</th><th>Gate</th>
+      </tr>
+      <tr>
+        <td><b>S0 Intake</b></td>
+        <td>Recovery 결과 정규화</td>
+        <td>Facts / Hypothesis / Recovery Candidate</td>
+        <td>Feature 후보, BD 후보, Open Item</td>
+        <td>Fact와 가설이 구분되고 출처가 존재</td>
+        <td>없음</td>
+      </tr>
+      <tr>
+        <td><b>S1 SRS</b></td>
+        <td>무엇이 달라져야 하는지 확정</td>
+        <td>BD 후보, 요구 원문, 규격/Issue</td>
+        <td>Condition / Current / Target / Observable</td>
+        <td>모든 BD가 관측 가능하고 근거가 있음</td>
+        <td>G-SRS</td>
+      </tr>
+      <tr>
+        <td><b>S2 HLD</b></td>
+        <td>어떻게 달라질지 설계</td>
+        <td>코드 사실, 기존 HLD, 지식</td>
+        <td>Procedure / Owner / Design Intent / MSC</td>
+        <td>모든 BD가 절차와 소유 모듈에 매핑</td>
+        <td>G-HLD</td>
+      </tr>
+      <tr>
+        <td><b>S3 구현</b></td>
+        <td>승인된 설계를 코드로 반영</td>
+        <td>HLD Delta, Gap, 범위</td>
+        <td>Code refs / Diff / Change ID</td>
+        <td>모든 구현 BD가 변경 식별자와 연결</td>
+        <td>G1 / G2 재사용</td>
+      </tr>
+      <tr>
+        <td><b>S4 검증</b></td>
+        <td>S1에서 정한 관측 기준으로 증명</td>
+        <td>UT, 로그, Fault Injection</td>
+        <td>Evidence / Verification Matrix / Verdict</td>
+        <td>모든 AC/BD가 PASS 또는 승인된 WAIVED</td>
+        <td>G-VER</td>
+      </tr>
+      <tr>
+        <td><b>S5 종료·환류</b></td>
+        <td>과제 종료 및 지식 재사용</td>
+        <td>완료 BD, 증거, 변경 이력</td>
+        <td>Closeout / Knowledge Candidate</td>
+        <td>모든 후보가 승인/거절 판정을 받음</td>
+        <td>G-CLOSE</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">08 · 산출물</div>
+    <h2>SRS/HLD/검증표는 BD에서 생성되는 View로 본다</h2>
+    <p class="lead">
+      담당자가 같은 템플릿 문서를 수동으로 여러 개 유지하면 곧 문서 간 불일치가 생깁니다.
+      따라서 Canonical SSOT는 BD/Feature State로 두고, 사람이 읽는 산출물은 View로 생성하는 방식을 권장합니다.
+    </p>
+
+    <div class="flow">
+      <div class="node intake"><b>Feature / BD SSOT</b><small>사실과 단계 상태의 원본</small></div>
+      <div class="arrow">→</div>
+      <div class="node s1"><b>SRS View</b><small>무엇을 만들 것인가</small></div>
+      <div class="node s2"><b>HLD View</b><small>어떻게 설계할 것인가</small></div>
+      <div class="node s3"><b>Implementation View</b><small>어디를 어떻게 바꿀 것인가</small></div>
+      <div class="node s4"><b>Verification View</b><small>무엇으로 증명했는가</small></div>
+      <div class="node s5"><b>Closeout View</b><small>무엇을 남겼는가</small></div>
+    </div>
+
+    <table>
+      <tr><th>사용자가 보는 산출물</th><th>주요 내용</th><th>생성 방식</th></tr>
+      <tr><td>SRS Summary</td><td>BD 목록, 범위, 제약, 관측 기준</td><td>BD S1 필드에서 생성</td></tr>
+      <tr><td>HLD / MSC</td><td>Procedure, Owner, Design Intent, 시나리오</td><td>BD S2 필드 + hld-composer</td></tr>
+      <tr><td>Implementation Plan</td><td>변경 범위, Gap, 파일/심볼, Change ID</td><td>BD S3 필드 + 구현 스킬</td></tr>
+      <tr><td>Verification Matrix</td><td>BD × Evidence × Verdict</td><td>BD S4 필드에서 생성</td></tr>
+      <tr><td>Feature Status</td><td>현재 단계, Blocker, 다음 행동</td><td>Feature State 계산</td></tr>
+      <tr><td>Closeout Report</td><td>완료 요약, 잔여 위험, 지식 후보</td><td>BD S5 필드에서 생성</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">09 · 검증</div>
+    <h2>Recovery Feature는 “고장이 안 났다”로 검증하면 부족하다</h2>
+    <p>
+      Crash/Stuck/WDT 개선은 정상 케이스만 확인해서는 충분하지 않습니다.
+      가능하면 <strong>Fault Injection을 정식 Evidence 타입</strong>으로 두고 아래 네 축을 확인해야 합니다.
+    </p>
+
+    <div class="grid2">
+      <div class="card"><h3>1. Trigger / Detection</h3><p>의도한 Failure를 정확한 조건에서 검출하는가?</p></div>
+      <div class="card"><h3>2. Recovery Effectiveness</h3><p>Recovery 후 실제로 정상 procedure/state로 복귀하는가?</p></div>
+      <div class="card"><h3>3. Recovery Safety</h3><p>정상 상황에서 오검출 또는 불필요한 Recovery가 없는가?</p></div>
+      <div class="card"><h3>4. Repetition / Escalation</h3><p>반복 장애 또는 Recovery 실패 시 상위 정책이 동작하는가?</p></div>
+    </div>
+
+    <pre>AC-R01  Stuck condition 강제 발생
+        → detection <= N ms
+        → recovery action 1회
+        → 정상 state/message sequence 복귀
+
+AC-R02  정상 processing delay 발생
+        → recovery trigger 없음
+
+AC-R03  Recovery action 자체 실패 유도
+        → escalation policy 동작
+
+AC-R04  연속 fault 반복
+        → resource leak / deadlock / state corruption 없음</pre>
+
+    <div class="callout green">
+      <strong>핵심 원칙: 관측할 수 없는 요구는 승인하지 않는다.</strong>
+      “정상 동작할 것”, “안정성 향상” 같은 문장은 S1에서 구체적인 Message / State / Log / Timing / UT assertion으로 바뀌어야 합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">10 · 학습 데이터</div>
+    <h2>단계별로 필요한 지식과 과제가 남기는 지식</h2>
+
+    <table>
+      <tr><th>단계</th><th>들어가는 지식</th><th>과제 종료 시 남길 수 있는 지식</th></tr>
+      <tr>
+        <td><b>S0</b></td>
+        <td>Failure signature, 유사 Crash/Stuck/WDT, 과거 Fix precedent</td>
+        <td>새 Failure signature</td>
+      </tr>
+      <tr>
+        <td><b>S1</b></td>
+        <td>Recovery requirement pattern, Detection/Guard/Escalation 관측 패턴</td>
+        <td>새 Observable / Requirement pattern</td>
+      </tr>
+      <tr>
+        <td><b>S2</b></td>
+        <td>Message procedure, State machine, Ownership, concurrency invariant</td>
+        <td>새 Recovery procedure / MSC</td>
+      </tr>
+      <tr>
+        <td><b>S3</b></td>
+        <td>Implementation idiom, 금지 패턴, 과거 승인 Fix</td>
+        <td>새 Recovery implementation idiom</td>
+      </tr>
+      <tr>
+        <td><b>S4</b></td>
+        <td>Fault injection pattern, 정상 baseline, Failure mode</td>
+        <td>새 Injection pattern / Failure mode</td>
+      </tr>
+      <tr>
+        <td><b>S5</b></td>
+        <td>Knowledge promotion rule</td>
+        <td>검증 완료된 조직 Knowledge</td>
+      </tr>
+    </table>
+
+    <div class="callout orange">
+      <strong>과거 Fix는 정답이 아니라 참고 근거입니다.</strong>
+      p4-fix-kb 같은 과거 변경 이력은 유사 구현을 찾는 데 매우 유용하지만, 현재 코드/로그/빌드 조건과 다시 맞는지 확인한 뒤에만
+      이번 설계 근거로 승격해야 합니다.
+    </div>
+
+    <div class="beginner">
+      <b>초보자 설명</b>
+      “예전에 이렇게 고쳤으니 이번에도 똑같이 고친다”가 아니라,
+      “예전에 이런 해결 패턴이 있었으니 현재 상황에서도 성립하는지 확인해 보자”가 맞습니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">11 · 스킬 역할 분담</div>
+    <h2>l1sw-dev-feature는 Mega Skill이 아니다</h2>
+
+    <table>
+      <tr><th>스킬</th><th>주요 책임</th></tr>
+      <tr><td><b>l1-recovery</b></td><td>Crash/Stuck/WDT Failure 분석, Evidence, Recovery Candidate 생성</td></tr>
+      <tr><td><b>l1sw-dev-feature</b></td><td>Feature Lifecycle, BD, Stage, Gate, DoD, Traceability, Next Action</td></tr>
+      <tr><td>issue-analyzer</td><td>현재 Issue/로그 Evidence 분석</td></tr>
+      <tr><td>code-analyzer</td><td>현재 코드 구조와 구현 사실 분석</td></tr>
+      <tr><td>hld-composer</td><td>HLD / MSC 표현 및 문서화</td></tr>
+      <tr><td>hld-code-compare</td><td>설계와 코드 Gap 분석</td></tr>
+      <tr><td>hld-code-implement</td><td>승인된 설계를 코드로 구현</td></tr>
+      <tr><td>code-fix</td><td>HLD 근거가 필요하지 않은 국소 Fix</td></tr>
+      <tr><td>p4-fix-kb</td><td>과거 승인 Fix precedent 검색</td></tr>
+      <tr><td>slte-knowledge-manager</td><td>장기 L1 Knowledge SSOT 관리</td></tr>
+    </table>
+
+    <div class="callout">
+      <strong>l1sw-dev-feature가 직접 소유할 것은 네 가지로 제한하는 것이 좋습니다.</strong>
+      Stage State · Traceability · DoD · Next Action.
+      실제 코드 분석·문서 작성·수정·지식 저장은 전문 스킬에 위임합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">12 · 승인 신선도</div>
+    <h2>승인 후 내용이 바뀌면 승인은 자동으로 STALE되어야 한다</h2>
+    <p>
+      프로세스에서 자주 생기는 구멍은 “승인받은 뒤 중요한 내용을 수정했는데 승인 상태는 그대로 남아 있는 경우”입니다.
+      이를 막기 위해 승인 대상 필드의 Digest를 저장하고 매번 다시 계산합니다.
+    </p>
+
+    <pre>G-SRS APPROVED
+  └─ BD-002 target 수정
+      → G-SRS = STALE → 재승인 필요
+
+G-HLD APPROVED
+  └─ procedure / design_intent 수정
+      → G-HLD = STALE
+
+G-VER APPROVED
+  └─ 승인 후 code diff 변경
+      → G-VER = STALE
+
+title / note 같은 무관 필드만 변경
+      → 기존 승인 유지</pre>
+
+    <div class="callout red">
+      <strong>이 기능이 없으면 Gate는 곧 형식적인 체크박스가 됩니다.</strong>
+      반대로 무관한 필드까지 모두 재승인시키면 승인 피로가 생기므로, Gate별로 “승인에 영향을 주는 필드”만 명확히 정의해야 합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">13 · 담당자 UX</div>
+    <h2>담당자가 알아야 할 명령은 최소화한다</h2>
+    <p class="lead">
+      담당자가 “지금 code-analyzer를 불러야 하나, hld-composer를 불러야 하나?”를 고민하게 되면
+      표준 프로세스의 장점이 줄어듭니다. 담당자가 만지는 표면은 l1sw-dev-feature 하나여야 합니다.
+    </p>
+
+    <pre>feature new
+feature import-recovery
+feature status
+feature next
+feature approve
+feature verify
+feature close</pre>
+
+    <div class="mini-title">예시</div>
+    <pre>사용자:
+"이 L1 Recovery 결과로 피처 개발 시작해줘"
+
+출력:
+FEATURE  FT-TX-WDT-004
+SOURCE   REC-WDT-017
+STAGE    S1 REQUIREMENT
+
+BD       7 candidates
+         5 ready / 2 incomplete
+
+BLOCKING
+- BD-004: recovery trigger observable 없음
+- BD-006: escalation 기준 미정
+
+NEXT
+- 위 2개 항목 보완
+- 완료 후 G-SRS 승인</pre>
+
+    <div class="beginner">
+      <b>초보자 설명</b>
+      사용자는 “다음에 무슨 스킬을 실행해야 하지?”를 외울 필요가 없습니다.
+      <strong>현재 상태와 다음 한 단계만</strong> 알면 됩니다. 내부 라우팅은 l1sw-dev-feature가 담당합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">14 · 권장 입력 계약</div>
+    <h2>L1 Recovery → Feature Dev Handoff 형식</h2>
+    <p>
+      두 스킬 사이의 경계를 안정화하려면 자연어 문서만 넘기기보다
+      <code>recovery_feature_handoff.yaml</code> 같은 정형 계약을 두는 것이 좋습니다.
+    </p>
+
+    <pre>recovery_case:
+  id: REC-WDT-001
+  symptom: WDT
+
+facts:
+  - id: FACT-001
+    statement: "..."
+    evidence: "<log/code reference>"
+
+hypotheses:
+  - id: HYP-001
+    statement: "TxSwitchMngr state progression stuck 가능"
+    confidence: MEDIUM
+
+failure_model:
+  trigger: "..."
+  failed_state: "..."
+  propagation: "..."
+  detection_anchor: "..."
+
+recovery_candidates:
+  - id: RC-001
+    mechanism: "..."
+    trigger_condition: "..."
+    guard_condition: "..."
+    expected_behavior: "..."
+    possible_side_effects: []
+    escalation_policy: "..."
+    confidence: MEDIUM
+
+observables:
+  - {type: STATE, anchor: "..."}
+  - {type: MESSAGE, anchor: "..."}
+
+constraints:
+  recovery_latency_budget: "..."
+  reentrancy: "..."
+  concurrency: "..."
+  build_option: "..."
+
+open_items: []</pre>
+
+    <div class="callout">
+      <strong>가장 중요한 규칙:</strong>
+      Fact · Hypothesis · Recovery Candidate를 섞지 않습니다.
+      특히 Hypothesis를 Feature Requirement로 자동 승격하지 않습니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">15 · 도입 전략</div>
+    <h2>처음부터 모든 것을 자동화하지 않는다</h2>
+
+    <table>
+      <tr><th>버전</th><th>구현 범위</th><th>검증하고 싶은 것</th></tr>
+      <tr>
+        <td><b>v0.1</b></td>
+        <td>Recovery Handoff import + BD + Stage/Gate/DoD + SRS/Status</td>
+        <td>데이터 모델이 실제 L1 Recovery Feature를 표현할 수 있는가</td>
+      </tr>
+      <tr>
+        <td><b>v0.2</b></td>
+        <td>코드/HLD/Knowledge/검증 스킬 위임 + Verification Matrix</td>
+        <td>실제 Feature 개발을 끝까지 연결할 수 있는가</td>
+      </tr>
+      <tr>
+        <td><b>v0.3</b></td>
+        <td>자동 Routing + Closeout Learning + 여러 Feature 상태 집계</td>
+        <td>팀 규모로 확장해도 담당자 사용성이 유지되는가</td>
+      </tr>
+    </table>
+
+    <div class="callout green">
+      <strong>권장 파일럿: 현재 진행 중인 Crash/Stuck/WDT 사례 1건을 역등록합니다.</strong>
+      신규 과제를 기다리지 않고 기존 분석·설계·구현·검증 결과를 S0→S5에 역으로 넣어 봅니다.
+      채워지지 않는 필드가 바로 현재 데이터 모델 또는 프로세스의 구멍입니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">16 · 성공 기준</div>
+    <h2>이 스킬이 실제로 가치가 있는지 어떻게 판단할까</h2>
+
+    <div class="kpi">
+      <div class="item"><b>100%</b><span>승인 Feature의 BD가 검증 Evidence와 연결</span></div>
+      <div class="item"><b>0건</b><span>원 요구 없이 존재하는 구현 변경</span></div>
+      <div class="item"><b>0건</b><span>Observable 없이 승인된 Recovery 요구</span></div>
+      <div class="item"><b>1 화면</b><span>현재 단계·Blocker·Next Action 확인</span></div>
+    </div>
+
+    <ul class="checklist">
+      <li>담당자가 바뀌어도 동일 Feature를 이어서 진행할 수 있는가</li>
+      <li>SRS 요구 하나를 선택하면 설계·코드·시험 Evidence까지 따라갈 수 있는가</li>
+      <li>현재 Blocker를 담당자가 별도 설명하지 않아도 시스템이 계산하는가</li>
+      <li>과제 종료 후 새 지식 후보가 자동으로 도출되는가</li>
+      <li>과거 Fix를 그대로 복제하지 않고 현재 Evidence와 비교해 사용하는가</li>
+    </ul>
+
+    <div class="callout red">
+      <strong>실패 기준도 미리 정합니다.</strong>
+      <code>feature status</code>가 담당자가 이미 알고 있던 내용을 보기 좋게 다시 보여주는 수준이라면 충분하지 않습니다.
+      “어느 BD가 어떤 이유로 막혔는지”와 “다음 무엇을 해야 하는지”를 결정형으로 알려줘야 합니다.
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">17 · 기대 효과</div>
+    <h2>궁극적으로 얻고 싶은 변화</h2>
+
+    <table>
+      <tr><th>현재</th><th>목표 상태</th></tr>
+      <tr><td>담당자가 자신의 방식으로 SRS/HLD/검증 수행</td><td>Stage·Gate·DoD가 동일하고 산출물이 자동 표준화</td></tr>
+      <tr><td>문서와 코드가 시간이 지나며 어긋남</td><td>BD에 설계·코드·Evidence가 함께 연결</td></tr>
+      <tr><td>Recovery 설계가 경험 많은 담당자 의존</td><td>Detection/Guard/Escalation 등 공통 사고 프레임 제공</td></tr>
+      <tr><td>과거 Fix가 개인 기억에 의존</td><td>Reference precedent로 검색하고 현재 Evidence로 재검증</td></tr>
+      <tr><td>과제 종료 후 지식 정리가 별도 업무</td><td>S5에서 지식 후보를 자동 추출하고 승인만 수행</td></tr>
+      <tr><td>팀장이 상태를 담당자에게 물어 취합</td><td>Feature State에서 Blocker와 Next Action을 동일 방식으로 계산</td></tr>
+    </table>
+
+    <div class="callout purple">
+      <strong>최종적으로 l1sw-dev-feature는 “문서를 작성하는 AI 스킬”이 아니라 “L1 Feature 개발 방법을 실행 가능한 프로세스로 만드는 스킬”이 되어야 합니다.</strong>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">18 · 용어 정리</div>
+    <h2>처음 보는 사람을 위한 핵심 용어</h2>
+
+    <table>
+      <tr><th>용어</th><th>쉽게 설명하면</th></tr>
+      <tr><td><b>SRS</b></td><td>무엇을 만들어야 하는지를 정리한 요구 명세</td></tr>
+      <tr><td><b>HLD</b></td><td>어떤 구조와 절차로 만들 것인지 정리한 상위 설계</td></tr>
+      <tr><td><b>Behavior Delta (BD)</b></td><td>Feature 적용 전후에 시스템 행위가 어떻게 달라지는지 기록한 한 건</td></tr>
+      <tr><td><b>Observable</b></td><td>변경 성공 여부를 실제로 확인할 수 있는 메시지·상태·로그·타이밍 등</td></tr>
+      <tr><td><b>Gate</b></td><td>사람이 승인해야 다음 단계로 넘어갈 수 있는 지점</td></tr>
+      <tr><td><b>DoD</b></td><td>“이 단계가 끝났다”고 판정하기 위한 객관적 완료 조건</td></tr>
+      <tr><td><b>Fault Injection</b></td><td>장애 조건을 의도적으로 만들어 Recovery 동작을 검증하는 방법</td></tr>
+      <tr><td><b>Escalation</b></td><td>작은 Recovery가 실패했을 때 더 큰 Recovery 단계로 올리는 정책</td></tr>
+      <tr><td><b>SSOT</b></td><td>같은 사실을 여러 곳에 중복 저장하지 않고 하나를 공식 원본으로 사용하는 원칙</td></tr>
+      <tr><td><b>STALE Approval</b></td><td>승인 후 승인 대상 내용이 바뀌어 기존 승인이 더 이상 유효하지 않은 상태</td></tr>
+      <tr><td><b>Closeout / 환류</b></td><td>과제를 끝내면서 배운 것을 다음 과제에서 쓸 수 있는 조직 지식으로 남기는 단계</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="eyebrow">19 · 권고 결론</div>
+    <h2>다음 설계 작업의 우선순위</h2>
+
+    <p class="lead">
+      지금 단계에서는 SKILL.md 전체를 먼저 만드는 것보다 <strong>두 데이터 계약을 먼저 고정</strong>하는 것이 중요합니다.
+      데이터 모델이 맞으면 SRS/HLD/구현/검증 workflow는 그 위에 안정적으로 올라갈 수 있습니다.
+    </p>
+
+    <div class="grid2">
+      <div class="card" style="background:var(--soft-orange)">
+        <h3>1순위 · recovery_feature_handoff.yaml</h3>
+        <p>L1 Recovery에서 Feature Dev로 넘길 Fact / Hypothesis / Candidate / Observable / Constraint 계약</p>
+      </div>
+      <div class="card" style="background:var(--soft-blue)">
+        <h3>2순위 · behavior_delta.yaml</h3>
+        <p>S0~S5 동안 하나의 BD가 어떤 필드를 얻고 어떤 Gate/DoD를 만족해야 하는지 정의</p>
+      </div>
+    </div>
+
+    <div class="callout green">
+      <strong>권장 검증 방법</strong>
+      현재 개발 중인 L1 Crash/Stuck/WDT 실제 사례 하나를 선택해 기존 결과를 역등록하고,
+      두 데이터 계약만으로 S0→S5를 재구성할 수 있는지 확인합니다.
+      재구성되지 않는 지점이 다음 버전의 설계 입력입니다.
+    </div>
+  </div>
+
+  <div class="foot">
+    l1sw-dev-feature × L1 Recovery · Concept Proposal v0.2 · 2026-08-19<br>
+    기존 l1sw-feature-dev 설계 제안 v0.1 및 설계 컨셉 v0.1을 기반으로 L1 Recovery 연계를 확장한 문서
+  </div>
+
+</div>
+</body>
+</html>
