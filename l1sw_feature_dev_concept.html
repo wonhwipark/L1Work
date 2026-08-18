@@ -397,6 +397,65 @@ section{padding:64px 0;border-top:1px solid var(--rule);}
 .cons .ok{color:var(--s5);}
 .cons .wn{color:var(--gate);}
 
+/* ---------- dev direction ---------- */
+.dev{border:1px solid var(--rule);background:var(--surface);margin-top:26px;}
+.dev .d{display:grid;grid-template-columns:58px 1fr;border-bottom:1px solid var(--rule-soft);}
+.dev .d:last-child{border-bottom:0;}
+.dev .n{
+  font-family:var(--mono);font-size:18px;color:var(--rule);
+  padding:19px 0 0 18px;letter-spacing:-.02em;
+}
+.dev .c{padding:18px 20px 18px 0;}
+.dev .c b{
+  display:block;font-family:var(--disp);font-size:16px;letter-spacing:-.02em;
+  color:var(--ink);margin-bottom:6px;
+}
+.dev .c p{font-size:13.5px;margin:0;line-height:1.65;}
+.dev .c .pt{
+  margin-top:10px;font-family:var(--mono);font-size:11.5px;
+  color:var(--gate);line-height:1.55;
+}
+@media (max-width:600px){
+  .dev .d{grid-template-columns:44px 1fr;}
+  .dev .n{padding-left:14px;font-size:16px;}
+  .dev .c{padding-right:16px;}
+}
+
+/* ---------- rollout ---------- */
+.roll{border:1px solid var(--rule);background:var(--surface);margin-top:26px;}
+.roll .row{display:grid;grid-template-columns:130px 1fr 1fr;border-bottom:1px solid var(--rule-soft);}
+.roll .row:last-child{border-bottom:0;}
+.roll .row.hd{background:#F5F7F9;}
+.roll .row.hd div{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:11px 16px;
+}
+.roll .row > div{padding:14px 16px;font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.roll .who{font-family:var(--mono);font-size:13px;color:var(--ink);}
+.roll .ask{color:var(--ink);}
+@media (max-width:700px){
+  .roll .row{grid-template-columns:1fr;}
+  .roll .row.hd{display:none;}
+  .roll .row > div{padding:8px 16px;}
+  .roll .who{padding-top:16px !important;}
+  .roll .row > div:last-child{padding-bottom:16px;}
+}
+
+/* ---------- criterion ---------- */
+.crit{
+  border:1px solid var(--gate);background:var(--gate-soft);
+  padding:20px 22px;margin-top:26px;max-width:700px;
+}
+.crit .ck{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--gate);display:block;margin-bottom:9px;
+}
+.crit b{
+  display:block;font-family:var(--disp);font-size:17px;letter-spacing:-.02em;
+  color:var(--ink);line-height:1.45;margin-bottom:9px;
+}
+.crit p{margin:0;font-size:13.5px;color:var(--ink2);line-height:1.65;}
+
 /* ---------- glossary ---------- */
 .gloss{
   display:grid;grid-template-columns:1fr 1fr;gap:2px;
@@ -455,7 +514,7 @@ section{padding:64px 0;border-top:1px solid var(--rule);}
       <span class="pk">처음 보시는 분께</span>
       <p>L1 SW 개발이 처음이어도 읽을 수 있도록 배경과 용어를 함께 담았습니다.
       회색 상자는 배경 설명이니 이미 아는 내용이면 건너뛰셔도 됩니다.
-      모르는 낱말은 맨 아래 <strong>09 용어 정리</strong>에 모아 뒀습니다.</p>
+      모르는 낱말은 맨 아래 <strong>10 용어 정리</strong>에 모아 뒀습니다.</p>
     </div>
   </header>
 
@@ -869,7 +928,117 @@ section{padding:64px 0;border-top:1px solid var(--rule);}
   </section>
 
   <section>
-    <div class="eyebrow">09 &nbsp;&nbsp;용어 정리</div>
+    <div class="eyebrow">09 &nbsp;&nbsp;개발 방향</div>
+    <h2>어떻게 만들 것인가</h2>
+    <p class="lead" style="max-width:680px;">
+      프로세스 도구는 대개 “단계를 자동화”하는 순서로 만들어집니다.
+      <strong>그러면 틀린 게이트가 자동화됩니다.</strong> 순서를 뒤집습니다.
+    </p>
+
+    <div class="dev">
+      <div class="d">
+        <div class="n">01</div>
+        <div class="c">
+          <b>본체는 판정 엔진이다</b>
+          <p>보통 스킬 개발은 지시문을 잘 쓰는 데 시간을 씁니다. 여기선 반대입니다.
+          “S1이 끝났나”는 프롬프트로 판단할 일이 아니라 <strong>레코드를 세면 나오는 값</strong>입니다.</p>
+          <p class="pt">판정 엔진 약 280줄 · 모델 개입 0 · 지시문은 라우터 역할만</p>
+        </div>
+      </div>
+      <div class="d">
+        <div class="n">02</div>
+        <div class="c">
+          <b>거절 조건부터 만든다</b>
+          <p>상태 기계와 “무엇을 막을 것인가”가 먼저입니다.
+          게이트가 맞으면 수동으로 굴려도 이미 가치가 나오고, 틀렸다면 자동화하기 전에 압니다.</p>
+          <p class="pt">자동 위임은 마지막에 붙인다</p>
+        </div>
+      </div>
+      <div class="d">
+        <div class="n">03</div>
+        <div class="c">
+          <b>모델은 렌더러다</b>
+          <p>계산은 코드가 하고, 모델은 그 결과를 한국어 문장으로 옮기기만 합니다.
+          모든 명령이 같은 모양으로 답하면 — 현재 상태 · 막는 것 · 다음 할 일 —
+          성능이 낮은 모델에서도 동작이 같습니다.</p>
+          <p class="pt">판정을 모델에 맡기면 저사양 환경에서 무너진다</p>
+        </div>
+      </div>
+      <div class="d">
+        <div class="n">04</div>
+        <div class="c">
+          <b>“비어 있음”을 정식 상태로 다룬다</b>
+          <p>학습데이터가 없으면 표시하고 진행합니다. 필드가 안 채워졌으면 미완성이지 오류가 아닙니다.
+          <strong>지식이 갖춰질 때까지 기다리는 설계를 하면 영영 못 씁니다.</strong></p>
+          <p class="pt">빈 슬롯을 들고 출발할 수 있어야 환류가 채울 기회가 생긴다</p>
+        </div>
+      </div>
+      <div class="d">
+        <div class="n">05</div>
+        <div class="c">
+          <b>진행 중 과제를 역등록해 검증한다</b>
+          <p>신규 과제를 기다리면 피드백이 3개월 뒤입니다.
+          지금 S2~S3 구간에 있는 과제를 사후 등록하면 하루면 압니다.</p>
+          <p class="pt">기존 산출물에서 못 채우는 칸이 곧 설계 구멍이다</p>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px;">가장 중요한 장치는 DoD가 아니었다</h3>
+    <p style="max-width:680px;">
+      판정 엔진을 실제로 만들어 보니 핵심은 완료 조건이 아니라 <strong>승인의 신선도</strong>였습니다.
+      승인해 놓고 내용을 고치면 승인만 남는 구멍이 생깁니다.
+      승인 시점의 대상 필드를 해시로 저장해 두고 매번 다시 계산합니다.
+    </p>
+
+    <div class="cons">
+<div><span class="lb">G-SRS 승인</span>        digest 4f2a…c81   <span class="ok">✓ APPROVED</span></div>
+<div>  └ BD-002 target 수정</div>
+<div><span class="lb">G-SRS 재계산</span>      digest 9b70…1e5   <span class="wn">✗ STALE</span>  → 재승인 필요</div>
+<div> </div>
+<div><span class="lb">무관 필드 변경</span>    digest 4f2a…c81   <span class="ok">✓ 그대로</span></div>
+    </div>
+
+    <div class="primer">
+      <span class="pk">왜 이게 없으면 나머지가 무의미한가</span>
+      <p>승인이 한 번 헐거워지면 담당자는 곧 알아챕니다.
+      “승인받고 나서 고치면 된다”가 되는 순간 게이트는 형식이 되고,
+      그 위에 쌓은 단계 관리와 추적성이 전부 장식이 됩니다.</p>
+      <p>대신 <strong>무관한 필드를 고쳤을 때는 흔들리지 않아야</strong> 합니다.
+      그렇지 않으면 재승인 요청이 남발되어 같은 결말에 도달합니다.</p>
+    </div>
+
+    <h3 style="margin-top:44px;">확산은 세 구간, 구간마다 묻는 것이 다르다</h3>
+    <div class="roll">
+      <div class="row hd"><div>구간</div><div>여기서 확인하는 것</div><div>방법</div></div>
+      <div class="row">
+        <div class="who">1명</div>
+        <div class="ask">데이터 모델이 맞는가</div>
+        <div>진행 중 과제 역등록</div>
+      </div>
+      <div class="row">
+        <div class="who">3명</div>
+        <div class="ask">게이트가 견딜 만한가 — 승인 피로</div>
+        <div>신규 과제 병행 적용</div>
+      </div>
+      <div class="row">
+        <div class="who">14명</div>
+        <div class="ask">명령 표면이 충분히 좁은가</div>
+        <div>전면 적용 · 팀 현황 집계</div>
+      </div>
+    </div>
+
+    <div class="crit">
+      <span class="ck">실패 기준 — 시작 전에 정한다</span>
+      <b>진행 현황 출력이 이미 알고 있던 것만 말하면, 설계가 틀린 것이다.</b>
+      <p>프로세스 도구는 항상 쓸모 있어 <em>보입니다.</em>
+      기준을 미리 정해 두지 않으면 효과가 없어도 계속 붙들게 됩니다.
+      막힌 지점을 짚어주지 못하면 데이터 모델을 고치거나 접습니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">10 &nbsp;&nbsp;용어 정리</div>
     <h2>이 문서에 나온 말들</h2>
     <dl class="gloss">
       <div><dt>SRS <s>요구 명세</s></dt><dd>무엇을 만들 것인가를 확정해 적은 것. 어떻게 만들지는 아직 정하지 않습니다.</dd></div>
