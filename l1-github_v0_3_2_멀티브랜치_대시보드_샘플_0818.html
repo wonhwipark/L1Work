@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L1 Git Branch Dashboard</title>
+<style>
+:root{--bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#667085;--line:#d9e1ec;--blue:#315efb;--blue2:#eef3ff;--green:#087f5b;--green2:#edf9f4;--amber:#9a6700;--amber2:#fff7e6;--red:#b42318;--red2:#fff1f0;--shadow:0 12px 32px rgba(30,50,90,.07)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,-apple-system,sans-serif;line-height:1.55}.wrap{max-width:1480px;margin:auto;padding:32px 20px 64px}.hero{background:linear-gradient(135deg,#fff 0%,#f3f6ff 68%,#edf9f4 100%);border:1px solid var(--line);border-radius:24px;padding:28px 30px;box-shadow:var(--shadow)}.eyebrow{font-size:12px;font-weight:850;letter-spacing:.06em;color:var(--blue);margin-bottom:8px}h1{font-size:clamp(30px,4vw,48px);line-height:1.08;letter-spacing:-.035em;margin:0 0 10px}.sub{color:var(--muted);font-size:14px}.summary{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin:18px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 17px;box-shadow:0 6px 18px rgba(30,50,90,.035)}.label{font-size:12px;color:var(--muted);font-weight:750}.value{font-size:28px;line-height:1.1;font-weight:900;letter-spacing:-.03em;margin-top:5px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;margin:16px 0}input,select{border:1px solid var(--line);border-radius:10px;padding:9px 11px;background:#fff;color:var(--text);font:inherit}input{min-width:280px;flex:1}.table-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 24px rgba(30,50,90,.04)}table{width:100%;border-collapse:collapse;min-width:1180px}th,td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{position:sticky;top:0;background:#eff4fa;font-size:12px;color:#475467;z-index:1}tr:last-child td{border-bottom:0}tr:hover td{background:#fbfcff}.badge{display:inline-block;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;letter-spacing:.03em;margin-right:6px}.badge.good{background:var(--green2);color:var(--green)}.badge.info{background:var(--blue2);color:var(--blue)}.badge.warn{background:var(--amber2);color:var(--amber)}.badge.bad{background:var(--red2);color:var(--red)}.badge.muted{background:#f2f4f7;color:#667085}.selected{display:inline-block;background:#172033;color:#fff;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:850}.branch{font-weight:850;white-space:nowrap}.sha,.mini{font-size:11px;color:var(--muted);margin-top:3px}.path{max-width:370px;word-break:break-all;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px}.metric-line{white-space:nowrap}.badtxt{color:var(--red);font-weight:800}.meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}.meta .card{box-shadow:none}.empty{text-align:center;color:var(--muted);padding:34px}.footer{margin-top:18px;color:var(--muted);font-size:12px}.legend{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}@media(max-width:980px){.summary{grid-template-columns:repeat(2,1fr)}.meta{grid-template-columns:1fr 1fr}.wrap{padding:20px 12px 46px}.hero{padding:22px}}@media(max-width:600px){.summary,.meta{grid-template-columns:1fr}input{min-width:100%}}@media print{body{background:#fff}.toolbar{display:none}.hero,.card,.table-wrap{box-shadow:none}.wrap{max-width:none;padding:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero">
+  <div class="eyebrow">L1-GITHUB · MULTI-BRANCH DASHBOARD</div>
+  <h1>L1 Git Branch Dashboard</h1>
+  <div class="sub">Generated 2026-08-18T12:44:00+09:00 · Base pilot · Local-first dashboard</div>
+  <div class="legend"><span class="badge good">READY</span><span class="badge warn">DIRTY</span><span class="badge warn">BEHIND</span><span class="badge bad">CONFLICT</span></div>
+</section>
+<section class="summary">
+  <div class="card"><div class="label">Branches / Worktrees</div><div class="value">4</div></div>
+  <div class="card"><div class="label">Ready / Clean</div><div class="value">2</div></div>
+  <div class="card"><div class="label">Dirty</div><div class="value">1</div></div>
+  <div class="card"><div class="label">Conflicts</div><div class="value">1</div></div>
+  <div class="card"><div class="label">Behind Base</div><div class="value">1</div></div>
+  <div class="card"><div class="label">Selected</div><div class="value" style="font-size:18px">feature/TX-1234-refactor</div></div>
+</section>
+<div class="toolbar">
+  <input id="search" type="search" placeholder="브랜치 이름 또는 경로 검색">
+  <select id="status"><option value="">모든 상태</option><option>READY</option><option>BASE</option><option>DIRTY</option><option>BEHIND</option><option>CONFLICT</option><option>DETACHED</option><option>UNKNOWN</option></select>
+</div>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Status</th><th>Branch</th><th>Worktree Path</th><th>Local Changes</th><th>Base Diff</th><th>Upstream</th><th>Last Commit</th></tr></thead>
+<tbody id="rows">
+        <tr data-status="BASE" data-branch="pilot">
+          <td><span class="badge info">BASE</span></td>
+          <td><div class="branch">pilot</div><div class="sha">a31c2f911a</div></td>
+          <td><div class="path">D:/workspace/smp1900-pilot</div></td>
+          <td><div class="metric-line"><strong>0</strong> changed</div><div class="mini">staged 0 · modified 0 · untracked 0</div></td>
+          <td><div class="metric-line">ahead <strong>0</strong> / behind <strong>0</strong></div><div class="mini">vs origin/pilot</div></td>
+          <td><div>origin/pilot</div><div class="mini">ahead 0 / behind 0</div></td>
+          <td><div>Merge TX config cleanup</div><div class="mini">Kim · 2026-08-18</div></td>
+        </tr>
+
+        <tr data-status="READY" data-branch="feature/tx-1234-refactor">
+          <td><span class="badge good">READY</span><span class="selected">SELECTED</span></td>
+          <td><div class="branch">feature/TX-1234-refactor</div><div class="sha">c82f4c8410</div></td>
+          <td><div class="path">D:/workspace/smp1900-pilot-worktrees/feature_TX-1234</div></td>
+          <td><div class="metric-line"><strong>0</strong> changed</div><div class="mini">staged 0 · modified 0 · untracked 0</div></td>
+          <td><div class="metric-line">ahead <strong>3</strong> / behind <strong>0</strong></div><div class="mini">vs origin/pilot</div></td>
+          <td><div>origin/feature/TX-1234-refactor</div><div class="mini">ahead 0 / behind 0</div></td>
+          <td><div>Refactor Tx state handler</div><div class="mini">Park · 2026-08-18</div></td>
+        </tr>
+
+        <tr data-status="DIRTY" data-branch="fix/tx-5678-crash">
+          <td><span class="badge warn">DIRTY</span></td>
+          <td><div class="branch">fix/TX-5678-crash</div><div class="sha">871ab4d226</div></td>
+          <td><div class="path">D:/workspace/smp1900-pilot-worktrees/fix_TX-5678</div></td>
+          <td><div class="metric-line"><strong>3</strong> changed</div><div class="mini">staged 1 · modified 2 · untracked 0</div></td>
+          <td><div class="metric-line">ahead <strong>1</strong> / behind <strong>0</strong></div><div class="mini">vs origin/pilot</div></td>
+          <td><div>origin/fix/TX-5678-crash</div><div class="mini">ahead 0 / behind 0</div></td>
+          <td><div>Add null guard</div><div class="mini">Lee · 2026-08-18</div></td>
+        </tr>
+
+        <tr data-status="CONFLICT" data-branch="feature/nr-8821-beam">
+          <td><span class="badge bad">CONFLICT</span></td>
+          <td><div class="branch">feature/NR-8821-beam</div><div class="sha">bb21de781f</div></td>
+          <td><div class="path">D:/workspace/smp1900-pilot-worktrees/feature_NR-8821</div></td>
+          <td><div class="metric-line"><strong>0</strong> changed</div><div class="mini">staged 0 · modified 0 · untracked 0</div><div class="mini badtxt">conflict 1</div></td>
+          <td><div class="metric-line">ahead <strong>2</strong> / behind <strong>2</strong></div><div class="mini">vs origin/pilot</div></td>
+          <td><div>origin/feature/NR-8821-beam</div><div class="mini">ahead 0 / behind 0</div></td>
+          <td><div>Update beam selection condition</div><div class="mini">Choi · 2026-08-17</div></td>
+        </tr></tbody>
+</table>
+</div>
+<section class="meta">
+  <div class="card"><div class="label">Repository</div><div>smp1900-pilot</div><div class="mini">D:/workspace/smp1900-pilot</div></div>
+  <div class="card"><div class="label">Remote</div><div>origin</div><div class="mini">https://github.example/org/smp1900-pilot.git</div></div>
+  <div class="card"><div class="label">Access Provider</div><div>token_https</div><div class="mini">Credential stays outside this report</div></div>
+  <div class="card"><div class="label">Remote Ref Freshness</div><div>LOCAL_ONLY</div><div class="mini">remote refs were not refreshed</div></div>
+</section>
+<div class="footer">Generated by <code>scripts/render_branch_dashboard.py</code>. This report is a static modern light-theme HTML file; no external CSS/JS dependency and no credentials are embedded.</div>
+</div>
+<script>
+const search=document.getElementById('search'), status=document.getElementById('status');
+function filterRows(){const q=search.value.trim().toLowerCase(), s=status.value; document.querySelectorAll('#rows tr').forEach(r=>{const okQ=!q||r.innerText.toLowerCase().includes(q); const okS=!s||r.dataset.status===s; r.style.display=(okQ&&okS)?'':'none';})}
+search.addEventListener('input',filterRows); status.addEventListener('change',filterRows);
+</script>
+</body></html>

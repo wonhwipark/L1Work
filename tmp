@@ -1,225 +1,320 @@
-skill-updater 1회 실행 + job-list v0.2.0 Post-Check
+SkillSilent Registry Reconcile 실패 원인 진단
 
-현재 원격 "automation/job-list.json" 준비 및 검증은 완료되었고 이전 단계 결과는 "1 = SUCCESS"였다.
+현재 "autotask-builder v0.4.18" 설치/배포 과정에서 다음 오류가 발생한다.
 
-이제 현재 사내 PC에서 "skill-updater v0.5.11"을 수동으로 정확히 1회 실행하고, 그 실행에서 "job-list v0.2.0" Phase 2-A가 정상 수행됐는지 끝까지 확인해줘.
+skillsilent registry reconcile failed
 
-현재 기준
+이번 작업의 목적은 수정이나 재설치가 아니라 정확한 실패 원인을 진단하는 것이다.
 
-skill-updater = v0.5.11
-skillsilent = v0.2.36
-job-list = v0.2.0
+절대 금지
 
-현재 원격 queue:
+다음 작업은 수행하지 마라.
 
-automation/job-list.json
+- 기존 Skill 삭제
+- "autotask-builder" 재설치
+- "skillsilent" 재설치
+- registry 파일 삭제/초기화
+- 기존 파일 수정
+- "setup --yes" 등 상태를 변경하는 명령 실행
+- Git commit/push
+- 자동 repair
+- "~/.claude/main/"을 active storage/fallback 경로로 사용
+- 임의의 legacy 경로 생성
 
-은 준비 완료 상태다.
-
-이번 작업에서 허용
-
-skill-updater v0.5.11 수동 1회 실행
-→ job_sync
-→ skillsilent
-→ job-list run
-→ Phase 2-A COPY + VERIFY
-→ 결과 확인
-
-이번 작업에서 금지
-
-skill-updater 두 번 이상 실행
-job-list v0.2.1 실행
-Activation
-Skill rename
-기존 source 삭제
-기존 source move
-기존 source rename
-legacy cleanup
-skillsilent 수정/업데이트
-skill-updater 수정/업데이트
-Knowledge migration
-추가 GitHub 변경
+READ-ONLY 진단만 수행한다.
 
 ---
 
-1. Updater 실행
+1. 현재 설치 구조 확인
 
-현재 설치된 "skill-updater v0.5.11"을 기존 사내 정상 실행 방식으로 정확히 한 번만 실행해.
+아래 경로의 존재 여부와 파일 구조를 확인한다.
 
-추가 질문 없이 unattended/yes 성격의 기존 지원 방식이 있으면 해당 정상 인터페이스를 사용해.
+~/.claude/skills/autotask-builder/
+~/l1sw-private-skills/autotask-builder/
 
-임의 명령이나 새로운 실행 방법을 만들지 마.
+~/.claude/skills/skillsilent/
+~/l1sw-private-skills/skillsilent/
 
----
+~/.skillsilent/
 
-2. 실행 흐름 확인
+특히 다음 파일의 실제 위치를 확인한다.
 
-이번 실행에서 다음 흐름이 실제로 이어졌는지 확인해.
+SKILL.md
+skillsilent/manifest.json
+skillsilent/policy.json
+skillsilent/contract.json
 
-skill-updater
-→ job_sync
-→ remote automation/job-list.json fetch
-→ local queue merge
-→ skillsilent v0.2.36
-→ job-list run
-→ built-in safe-migration
+각 파일에 대해 다음을 보고한다.
 
-각 단계의 로그 또는 결과 파일을 근거로 확인해.
-
----
-
-3. job-list v0.2.0 Phase 2-A 확인
-
-다음을 확인해.
-
-MIGRATION
-COPY
-VERIFY
-MANIFEST/SHA256
-SOURCE SAFETY
-ACTIVATION 여부
-
-정상 기준:
-
-MIGRATION = PASS
-COPY = PASS
-VERIFY = PASS
-MANIFEST_MATCH = true
-SOURCE_CHANGED = false
-ACTIVATION_PERFORMED = false
-
-새 target root는:
-
-~/l1sw-skills/private-skills/<skill>/
-
-이다.
-
-단순히 target directory가 생성됐다는 이유로 PASS 처리하지 마.
-
-source/target manifest 또는 SHA256 검증 근거가 있어야 한다.
+- absolute path
+- 존재 여부
+- 파일 크기
+- 수정 시각
+- 동일 이름 파일이 여러 위치에 존재하는지
 
 ---
 
-4. Source 보호 확인
+2. 현재 사용 중인 skillsilent 버전 확인
 
-기존 source에 대해 반드시 확인해.
+실제 실행되고 있는 "skillsilent"의 버전을 확인한다.
 
-삭제 없음
-move 없음
-rename 없음
-content 변경 없음
+가능하면 다음을 확인한다.
 
-기대:
+skillsilent --version
+skillsilent version
 
-SOURCE_CHANGED = false
+명령이 지원되지 않으면 설치된 "SKILL.md", manifest 또는 package metadata에서 버전을 찾는다.
 
-source 변경이 확인되면 즉시 CRITICAL로 판정하고 추가 작업을 하지 마.
+추가로 실제로 실행되는 skillsilent executable/launcher의 absolute path를 확인한다.
 
----
-
-5. Activation 금지 확인
-
-이번 v0.2.0은 PRE-STAGE 단계다.
-
-따라서:
-
-ACTIVATION_PERFORMED = false
-
-여야 한다.
-
-새 implementation root를 실제 runtime으로 전환하면 안 된다.
-
----
-
-6. 결과 위치 확인
-
-가능하면 다음 위치의 최신 결과를 사용해.
-
-~/.claude/main/job-list/output/
-~/.claude/main/job-list/output/actions/
-~/.claude/main/job-list/output/runs/
-~/.claude/main/job-list/history/
-
-필요한 경우 skill-updater의 최신 실행 로그도 함께 확인해.
-
----
-
-7. 최종 판정
-
-다음 중 숫자 하나로 판정해.
-
-1 = PASS
-    updater 실행 성공
-    job_sync 성공
-    migration 실행 성공
-    COPY/VERIFY 성공
-    manifest 일치
-    source 안전
-    Activation 없음
-
-2 = UPDATER_FAIL
-    updater 자체가 정상 완료하지 못함
-
-3 = JOB_SYNC_FAIL
-    updater는 진행했지만 job_sync 단계 실패
-
-4 = RUNNER_FAIL
-    queue merge까지 성공했지만 skillsilent/job-list runner 실행 실패
-
-5 = MIGRATION_FAIL
-    job-list runner는 실행됐지만 migration 실패
-
-6 = FAILED_SAFE
-    migration 실패했지만 기존 source는 완전히 보존됨
-
-7 = VERIFY_FAIL
-    COPY는 수행됐으나 manifest/SHA256 검증 실패
-
-8 = CRITICAL
-    source 변경/삭제/rename 또는 의도하지 않은 Activation 발생
-
-9 = UNKNOWN
-    로그/결과 부족으로 객관적 판정 불가
-
----
-
-8. 답변 형식
-
-첫 줄에는 반드시 숫자 하나만 출력해.
+중복 설치가 있다면 모두 보고한다.
 
 예:
 
-1
+~/.claude/skills/skillsilent/
+~/l1sw-private-skills/skillsilent/
+기타 PATH 상의 skillsilent
 
-그 아래 최대 10줄까지만 출력해.
+어느 것이 실제 실행되는지도 구분한다.
 
-UPDATER=PASS|FAIL|UNKNOWN
-JOB_SYNC=PASS|FAIL|UNKNOWN
-RUNNER=PASS|FAIL|NOT_RUN|UNKNOWN
-MIGRATION=PASS|FAIL|FAILED_SAFE|NOT_RUN|UNKNOWN
-COPY=PASS|FAIL|NOT_RUN|UNKNOWN
-VERIFY=PASS|FAIL|NOT_RUN|UNKNOWN
-MANIFEST_MATCH=true|false|unknown
-SOURCE_CHANGED=true|false|unknown
-ACTIVATION_PERFORMED=true|false|unknown
-NEXT_STEP=V0_2_1_COMPATIBILITY_CHECK|STOP_AND_ANALYZE|STOP_AND_REVIEW
+---
 
-"1"일 때만:
+3. registry 실제 위치와 schema 확인
 
-NEXT_STEP=V0_2_1_COMPATIBILITY_CHECK
+"skillsilent" 코드나 문서를 읽어서 registry의 SSOT가 어디인지 확인한다.
 
-그 외에는:
+추측하지 말고 실제 구현을 근거로 확인한다.
 
-NEXT_STEP=STOP_AND_ANALYZE
+확인할 항목:
 
-단, "8 = CRITICAL"이면:
+registry root
+registry file name
+registry schema/version
+declaration discovery root
+implementation discovery rule
+execution_root 처리 방식
+manifest 필수 필드
+policy 필수 필드
+contract 필수 필드
 
-NEXT_STEP=STOP_AND_REVIEW
+특히 다음 질문에 답한다.
 
-로 출력해.
+A.
+
+"~/.claude/skills/<skill>/skillsilent/manifest.json"이 반드시 필요한가?
+
+B.
+
+manifest의 "execution_root"를 지원하는가?
+
+C.
+
+지원한다면 필드 이름이 정확히 "execution_root"인가?
+
+D.
+
+경로 값으로 아래 표현을 허용하는가?
+
+~/l1sw-private-skills/autotask-builder
+
+아니면 absolute path만 허용하는가?
+
+E.
+
+registry 등록 대상 판정에 필요한 필수 manifest key는 무엇인가?
+
+---
+
+4. autotask-builder declaration 검증
+
+현재 설치된 아래 파일을 읽는다.
+
+~/.claude/skills/autotask-builder/SKILL.md
+~/.claude/skills/autotask-builder/skillsilent/manifest.json
+~/.claude/skills/autotask-builder/skillsilent/policy.json
+~/.claude/skills/autotask-builder/skillsilent/contract.json
+
+그리고 implementation 쪽도 비교한다.
+
+~/l1sw-private-skills/autotask-builder/
+
+다음을 확인한다.
+
+- JSON syntax 정상 여부
+- skillsilent 현재 schema와 일치하는지
+- 필수 필드 누락 여부
+- deprecated field 사용 여부
+- "execution_root" 인식 여부
+- declaration의 skill name과 실제 디렉터리 name 일치 여부
+- version mismatch
+- implementation root 존재 여부
+- referenced 파일 존재 여부
+
+---
+
+5. reconcile 코드 경로 추적
+
+현재 설치된 "autotask-builder v0.4.18"의 "install.py"에서
+
+skillsilent registry reconcile
+
+관련 동작을 찾아라.
+
+다음을 정확히 출력한다.
+
+1. 어떤 skillsilent 명령을 호출하는가
+2. 호출 순서
+3. 각 명령의 arguments
+4. 성공 판정 기준
+5. 실패 판정 기준
+6. stdout/stderr 처리 방식
+7. 어떤 단계에서 최종적으로
+
+skillsilent registry reconcile failed
+
+가 발생하는지
+
+코드를 수정하지 말고 분석만 한다.
+
+---
+
+6. 실제 skillsilent CLI capability 확인
+
+상태 변경 명령은 실행하지 말고 help만 확인한다.
+
+예:
+
+skillsilent --help
+skillsilent setup --help
+skillsilent doctor --help
+skillsilent available --help
+
+현재 v0.4.18 installer가 호출하려는 명령이 현재 skillsilent 버전에서 실제 지원되는지 확인한다.
+
+특히:
+
+skillsilent setup --yes
+skillsilent doctor
+skillsilent available autotask-builder
+
+이 세 명령의 CLI syntax가 정확한지 검증한다.
+
+실제 상태를 변경할 수 있는 "setup" 본 실행은 하지 않는다.
+
+---
+
+7. 기존 실패 로그 확인
+
+다음 위치를 포함하여 관련 로그를 검색한다.
+
+~/l1sw-private-skills/autotask-builder/data/
+~/l1sw-private-skills/autotask-builder/output/
+~/.skillsilent/
+
+다음 문자열을 우선 검색한다.
+
+registry reconcile failed
+autotask-builder
+skillsilent
+registry
+manifest
+execution_root
+schema
+invalid
+missing
+not found
+doctor
+available
+setup
+
+가장 최초의 root error와 최종 wrapper error를 구분한다.
+
+---
+
+8. 원인 분류
+
+최종 원인을 아래 중 하나 이상으로 분류한다.
+
+A. autotask-builder manifest/schema 오류
+B. skillsilent 버전 incompatibility
+C. skillsilent CLI command mismatch
+D. declaration root 탐색 실패
+E. execution_root 해석 실패
+F. registry 자체 손상/미생성
+G. skillsilent 설치 중복 또는 잘못된 executable 실행
+H. 권한 문제
+I. 경로 정책 mismatch
+J. installer의 성공/실패 판정 버그
+K. 기타
+
+---
+
+9. 최종 보고 형식
+
+아래 형식으로만 최종 정리한다.
+
+결론
+
+Root Cause:
+Confidence: HIGH / MEDIUM / LOW
+Failure Stage:
+
+실제 오류
+
+가능한 경우 가장 원본에 가까운 오류 메시지를 그대로 제시한다.
+
+...
+
+현재 구조
+
+SkillSilent version:
+SkillSilent executable:
+Registry root:
+Declaration root:
+Autotask implementation root:
+
+불일치 사항
+
+항목| autotask-builder 현재값| skillsilent 요구값| 판정
+...| ...| ...| PASS/FAIL
+
+v0.4.18 실패 흐름
+
+install.py
+  ↓
+...
+  ↓
+실패 지점
+
+수정해야 할 최소 항목
+
+아직 실제 수정하지 말고 다음 형태로만 제안한다.
+
+1.
+2.
+3.
+
+각 항목마다 반드시 근거 파일/코드 위치를 같이 표시한다.
+
+재설치 필요 여부
+
+아래 중 하나를 선택한다.
+
+재설치 불필요
+autotask-builder만 재설치 필요
+skillsilent만 수정 필요
+둘 다 수정 필요
+판단 불가
+
+---
 
 중요
 
-결과가 "1"이어도 이번 작업에서 "job-list v0.2.1"은 실행하지 마.
+이번 진단에서는 문제를 발견해도 수정하지 않는다.
 
-v0.2.1은 결과를 사용자가 확인한 뒤 별도 단계에서 수행한다.
+특히 registry를 강제로 만들거나 기존 데이터를 삭제해서 증상을 숨기지 마라.
+
+우리가 필요한 것은:
+
+«"skillsilent registry reconcile failed"라는 wrapper 오류가 아니라
+그 바로 아래의 최초 root cause와 현재 skillsilent가 요구하는 실제 registry contract이다.»
