@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>l1sw-feature-dev · 설계 컨셉</title>
+<style>
+:root{
+  --ground:#E9ECF0;
+  --surface:#FFFFFF;
+  --ink:#10161E;
+  --ink2:#41505F;
+  --muted:#7C8794;
+  --rule:#CBD3DC;
+  --rule-soft:#E1E6EC;
+
+  --s1:#1B3A6B;
+  --s2:#22557E;
+  --s3:#2A7285;
+  --s4:#2F8B7E;
+  --s5:#3AA36F;
+
+  --gate:#D6116B;
+  --gate-soft:#FCE7F0;
+  --absent:#9AA3AE;
+
+  --mono:Consolas,"SF Mono",Menlo,"DejaVu Sans Mono",monospace;
+  --body:"Malgun Gothic","Apple SD Gothic Neo","Segoe UI",system-ui,sans-serif;
+  --disp:"Segoe UI",-apple-system,"Malgun Gothic",sans-serif;
+}
+
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:15px;
+  line-height:1.7;
+  letter-spacing:-.005em;
+}
+
+.wrap{max-width:1080px;margin:0 auto;padding:0 22px 100px;}
+
+/* ---------- lifeline ---------- */
+.lifeline{
+  position:fixed;left:26px;top:0;bottom:0;width:1px;
+  background:var(--rule);z-index:5;
+}
+.lifeline i{
+  position:absolute;left:-3px;width:7px;height:7px;border-radius:50%;
+  background:var(--ground);border:1px solid var(--muted);
+}
+@media (max-width:1180px){.lifeline{display:none;}}
+
+/* ---------- shared type ---------- */
+.eyebrow{
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:10px;margin:0 0 14px;
+}
+.eyebrow::after{content:"";flex:1;height:1px;background:var(--rule);}
+
+h2{
+  font-family:var(--disp);font-weight:700;
+  font-size:clamp(25px,4.2vw,38px);line-height:1.18;
+  letter-spacing:-.03em;margin:0 0 14px;
+}
+h3{
+  font-family:var(--disp);font-weight:700;font-size:17px;
+  letter-spacing:-.02em;margin:0 0 8px;
+}
+p{margin:0 0 14px;color:var(--ink2);}
+p.lead{font-size:17px;color:var(--ink);line-height:1.65;}
+strong{color:var(--ink);font-weight:700;}
+code{font-family:var(--mono);font-size:.9em;background:#DFE4EA;padding:1px 5px;border-radius:3px;color:var(--ink);}
+
+section{padding:64px 0;border-top:1px solid var(--rule);}
+
+/* ---------- primer ---------- */
+.primer{
+  background:#F2F5F8;border-left:3px solid var(--muted);
+  padding:16px 18px 15px;margin:22px 0;max-width:700px;
+}
+.primer .pk{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);display:block;margin-bottom:7px;
+}
+.primer p{margin:0;font-size:13.5px;line-height:1.72;color:var(--ink2);}
+.primer p + p{margin-top:9px;}
+
+/* ---------- hero ---------- */
+.hero{padding:70px 0 60px;}
+.hero .tag{
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--gate);border:1px solid var(--gate);border-radius:2px;
+  padding:4px 9px;display:inline-block;margin-bottom:26px;
+}
+.hero h1{
+  font-family:var(--disp);font-weight:700;
+  font-size:clamp(38px,8vw,74px);line-height:1.02;letter-spacing:-.045em;
+  margin:0 0 22px;
+}
+.hero h1 em{font-style:normal;color:var(--gate);}
+.hero .sub{font-size:17px;max-width:640px;color:var(--ink2);line-height:1.65;}
+
+.verdict{
+  margin-top:38px;border-left:3px solid var(--s3);
+  padding:2px 0 2px 18px;max-width:640px;
+}
+.verdict b{display:block;font-family:var(--disp);font-size:16px;letter-spacing:-.02em;margin-bottom:4px;}
+.verdict span{font-size:14px;color:var(--ink2);}
+
+/* ---------- background ---------- */
+.bg{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--rule);border:1px solid var(--rule);margin-top:26px;}
+.bg article{background:var(--surface);padding:24px 22px;}
+.bg .said{
+  font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:-.02em;
+  color:var(--ink);line-height:1.4;margin-bottom:11px;
+}
+.bg .said::before{content:"\201C";color:var(--absent);}
+.bg .said::after{content:"\201D";color:var(--absent);}
+.bg p{font-size:13.5px;margin:0;line-height:1.65;}
+.bg .cause{
+  margin-top:13px;padding-top:11px;border-top:1px solid var(--rule-soft);
+  font-family:var(--mono);font-size:11.5px;color:var(--gate);line-height:1.55;
+}
+@media (max-width:760px){.bg{grid-template-columns:1fr;}}
+
+/* ---------- spine compare ---------- */
+.spines{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--rule);border:1px solid var(--rule);margin-top:26px;}
+.spine{background:var(--surface);padding:26px 22px;}
+.spine .lbl{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;
+}
+.spine.old .lbl{color:var(--absent);}
+.spine.new .lbl{color:var(--gate);}
+.spine h3{margin-bottom:14px;}
+.spine.old h3{color:var(--absent);}
+.stack{font-family:var(--mono);font-size:12.5px;line-height:1.95;color:var(--ink2);}
+.stack .arrow{color:var(--muted);}
+.spine.old .stack{color:var(--absent);}
+.spine .note{margin-top:16px;font-size:13px;color:var(--muted);line-height:1.6;}
+@media (max-width:720px){.spines{grid-template-columns:1fr;}}
+
+/* ---------- signature: BD record ---------- */
+.sig{background:var(--surface);border:1px solid var(--rule);margin-top:28px;}
+
+.stepper{
+  display:grid;grid-template-columns:repeat(5,1fr);
+  border-bottom:1px solid var(--rule);
+}
+.step{
+  appearance:none;background:var(--surface);border:0;
+  border-right:1px solid var(--rule-soft);
+  padding:15px 8px 14px;cursor:pointer;text-align:left;
+  font-family:var(--mono);color:var(--muted);
+  transition:background .18s ease,color .18s ease;
+  position:relative;
+}
+.step:last-child{border-right:0;}
+.step:hover{background:#F3F6F9;}
+.step .sid{font-size:15px;font-weight:700;letter-spacing:-.01em;display:block;}
+.step .snm{font-family:var(--body);font-size:11.5px;display:block;margin-top:1px;}
+.step .sgate{
+  font-size:9.5px;letter-spacing:.05em;display:block;margin-top:7px;
+  color:var(--absent);
+}
+.step[data-on="1"]{color:var(--ink);}
+.step[data-on="1"] .sgate{color:var(--gate);}
+.step[data-on="1"]::before{
+  content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--bar);
+}
+.step:focus-visible{outline:2px solid var(--gate);outline-offset:-3px;}
+
+.recwrap{display:grid;grid-template-columns:1fr 268px;}
+@media (max-width:820px){.recwrap{grid-template-columns:1fr;}}
+
+.record{
+  font-family:var(--mono);font-size:12.5px;line-height:1.85;
+  padding:24px 22px 26px;overflow-x:auto;
+}
+.record .ln{white-space:pre;display:block;transition:opacity .3s ease;}
+.record .k{color:var(--ink);}
+.record .v{color:var(--s2);}
+.record .st{color:var(--s5);}
+.record .hd{color:var(--ink);font-weight:700;}
+.record .ln[data-fill="0"]{opacity:.34;}
+.record .ln[data-fill="0"] .k,
+.record .ln[data-fill="0"] .v,
+.record .ln[data-fill="0"] .st{color:var(--absent);}
+.record .ln[data-fill="1"]{opacity:1;}
+.record .ln.justin{animation:fillin .42s ease both;}
+@keyframes fillin{from{opacity:0;transform:translateX(-5px);}to{opacity:1;transform:none;}}
+
+.recside{
+  border-left:1px solid var(--rule);padding:24px 20px;background:#F5F7F9;
+}
+@media (max-width:820px){.recside{border-left:0;border-top:1px solid var(--rule);}}
+.recside .cap{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:12px;
+}
+.meter{display:flex;gap:3px;margin-bottom:8px;}
+.meter b{flex:1;height:6px;background:var(--rule);border-radius:1px;}
+.meter b.on{background:var(--bar);}
+.recside .cnt{font-family:var(--mono);font-size:22px;letter-spacing:-.02em;color:var(--ink);}
+.recside .cnt s{text-decoration:none;color:var(--muted);font-size:14px;}
+.recside .exp{font-size:13px;color:var(--ink2);line-height:1.65;margin-top:14px;}
+.recside .gatebox{
+  margin-top:18px;border:1px solid var(--gate);background:var(--gate-soft);
+  padding:11px 12px;border-radius:2px;
+}
+.recside .gatebox .gk{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--gate);
+  text-transform:uppercase;display:block;margin-bottom:3px;
+}
+.recside .gatebox .gv{font-family:var(--mono);font-size:13px;color:var(--ink);line-height:1.5;}
+
+.sigfoot{
+  border-top:1px solid var(--rule);padding:14px 22px;
+  font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap;
+}
+.sigfoot span{display:flex;align-items:center;gap:7px;}
+.sigfoot i{width:9px;height:9px;border-radius:1px;display:inline-block;}
+.sigfoot i.f{background:var(--s2);}
+.sigfoot i.e{background:var(--absent);opacity:.45;}
+
+/* ---------- observable ---------- */
+.obs{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--rule);border:1px solid var(--rule);margin-top:26px;}
+.obs > div{background:var(--surface);padding:24px 22px;}
+.obs .oh{
+  font-family:var(--mono);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+  margin-bottom:14px;display:flex;align-items:center;gap:8px;
+}
+.obs .no .oh{color:var(--absent);}
+.obs .yes .oh{color:var(--s5);}
+.obs .oh b{font-size:14px;}
+.obs ul{margin:0;padding:0;list-style:none;}
+.obs li{
+  font-family:var(--mono);font-size:12.5px;line-height:1.6;
+  padding:9px 0;border-bottom:1px solid var(--rule-soft);
+}
+.obs li:last-child{border-bottom:0;}
+.obs .no li{color:var(--absent);}
+.obs .yes li{color:var(--ink2);}
+.obs .yes li em{font-style:normal;color:var(--s5);}
+.obs .why{margin-top:15px;font-size:13px;line-height:1.6;color:var(--muted);margin-bottom:0;}
+@media (max-width:760px){.obs{grid-template-columns:1fr;}}
+
+/* ---------- chain vs record ---------- */
+.chain{
+  background:var(--surface);border:1px solid var(--rule);
+  padding:26px 22px;margin-top:26px;
+}
+.chain + .chain{margin-top:14px;}
+.chain .ttl{
+  font-family:var(--mono);font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+  margin-bottom:16px;
+}
+.chain.bad .ttl{color:var(--absent);}
+.chain.good .ttl{color:var(--s3);}
+.links{display:flex;flex-wrap:wrap;align-items:stretch;}
+.lk{
+  border:1px solid var(--rule);background:#F5F7F9;
+  padding:7px 10px 6px;min-width:80px;
+}
+.lk b{font-family:var(--mono);font-size:12.5px;display:block;color:var(--ink2);letter-spacing:-.01em;}
+.lk s{
+  text-decoration:none;font-size:9.5px;letter-spacing:.03em;
+  color:var(--absent);display:block;margin-top:2px;
+}
+.brk{
+  display:flex;align-items:center;justify-content:center;
+  width:26px;color:var(--gate);font-family:var(--mono);font-size:13px;font-weight:700;
+}
+.chain .cap{margin-top:16px;font-size:13.5px;color:var(--ink2);margin-bottom:0;}
+.one{
+  border:1px solid var(--s3);background:#EEF7F3;
+  padding:11px 14px;display:inline-block;
+}
+.one b{font-family:var(--mono);font-size:14px;color:var(--ink);letter-spacing:-.01em;}
+.one s{text-decoration:none;font-family:var(--mono);font-size:9.5px;letter-spacing:.05em;color:var(--s3);display:block;margin-top:2px;}
+
+/* ---------- phases ---------- */
+.ph{border:1px solid var(--rule);background:var(--surface);margin-top:26px;}
+.ph .row{display:grid;grid-template-columns:118px 1fr 1fr 108px;border-bottom:1px solid var(--rule-soft);}
+.ph .row:last-child{border-bottom:0;}
+.ph .row.hd{background:#F5F7F9;}
+.ph .row.hd div{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:11px 16px;
+}
+.ph .row > div{padding:15px 16px;font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.ph .st{position:relative;font-family:var(--mono);color:var(--ink);}
+.ph .st::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bar);}
+.ph .st b{font-size:14px;display:block;letter-spacing:-.01em;}
+.ph .st em{font-style:normal;font-family:var(--body);font-size:12px;color:var(--muted);}
+.ph .dod{color:var(--ink);}
+.ph .gt{text-align:right;}
+.ph .gt span{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+  background:var(--gate-soft);color:var(--gate);border:1px solid var(--gate);
+  padding:2px 7px;border-radius:2px;display:inline-block;white-space:nowrap;
+}
+@media (max-width:800px){
+  .ph .row{grid-template-columns:1fr;}
+  .ph .row.hd{display:none;}
+  .ph .row > div{padding:8px 16px;}
+  .ph .st{padding-top:16px !important;}
+  .ph .gt{text-align:left;padding-bottom:16px !important;}
+}
+
+/* ---------- layers ---------- */
+.lay{border:1px solid var(--rule);background:var(--surface);margin-top:26px;}
+.lay .row{display:grid;grid-template-columns:210px 1fr;border-bottom:1px solid var(--rule-soft);}
+.lay .row:last-child{border-bottom:0;}
+.lay .row.top{background:#F5F7F9;}
+.lay .row > div{padding:16px;font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.lay .nm{font-family:var(--mono);font-size:13.5px;color:var(--ink);font-weight:700;}
+.lay .nm em{
+  font-style:normal;display:block;font-family:var(--body);font-size:10.5px;font-weight:400;
+  color:var(--gate);letter-spacing:.04em;margin-top:3px;
+}
+@media (max-width:700px){
+  .lay .row{grid-template-columns:1fr;}
+  .lay .row > div{padding:8px 16px;}
+  .lay .nm{padding-top:16px !important;}
+  .lay .row > div:last-child{padding-bottom:16px;}
+}
+
+/* ---------- deliverables ---------- */
+.dlv{border:1px solid var(--rule);background:var(--surface);margin-top:26px;}
+.dlv .row{display:grid;grid-template-columns:118px 1fr 214px;border-bottom:1px solid var(--rule-soft);}
+.dlv .row:last-child{border-bottom:0;}
+.dlv .row.hd{background:#F5F7F9;}
+.dlv .row.hd div{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:11px 16px;
+}
+.dlv .row > div{padding:15px 16px;font-size:13.5px;color:var(--ink2);line-height:1.55;}
+.dlv .st{position:relative;font-family:var(--mono);color:var(--ink);}
+.dlv .st::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bar);}
+.dlv .st b{font-size:14px;display:block;letter-spacing:-.01em;}
+.dlv .st em{font-style:normal;font-family:var(--body);font-size:12px;color:var(--muted);}
+.dlv .what{color:var(--ink);}
+.dlv .by{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.6;}
+.dlv .by.hand{color:var(--gate);}
+@media (max-width:800px){
+  .dlv .row{grid-template-columns:1fr;}
+  .dlv .row.hd{display:none;}
+  .dlv .row > div{padding:8px 16px;}
+  .dlv .st{padding-top:16px !important;}
+  .dlv .by{padding-bottom:16px !important;}
+}
+
+/* ---------- knowledge data ---------- */
+.kd{border:1px solid var(--rule);background:var(--surface);margin-top:26px;}
+.kd .row{display:grid;grid-template-columns:118px 1fr 1fr;border-bottom:1px solid var(--rule-soft);}
+.kd .row:last-child{border-bottom:0;}
+.kd .row.hd{background:#F5F7F9;}
+.kd .row.hd div{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:11px 16px;
+}
+.kd .row > div{padding:15px 16px;font-size:13.5px;color:var(--ink2);line-height:1.6;}
+.kd .st{position:relative;font-family:var(--mono);color:var(--ink);}
+.kd .st::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--bar);}
+.kd .st b{font-size:14px;display:block;letter-spacing:-.01em;}
+.kd .st em{font-style:normal;font-family:var(--body);font-size:12px;color:var(--muted);}
+.kd .give{color:var(--s3);border-left:1px solid var(--rule-soft);}
+.kd .seed{
+  display:inline-block;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
+  border:1px solid var(--gate);color:var(--gate);border-radius:2px;
+  padding:0 5px;margin-left:5px;vertical-align:1px;
+}
+@media (max-width:800px){
+  .kd .row{grid-template-columns:1fr;}
+  .kd .row.hd{display:none;}
+  .kd .row > div{padding:8px 16px;}
+  .kd .st{padding-top:16px !important;}
+  .kd .give{border-left:0;padding-bottom:16px !important;}
+}
+
+/* ---------- console ---------- */
+.cons{
+  border:1px solid var(--rule);background:var(--surface);margin-top:26px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.95;
+  padding:20px 22px;overflow-x:auto;
+}
+.cons div{white-space:pre;}
+.cons .pr{color:var(--muted);}
+.cons .nm2{color:var(--ink);font-weight:700;}
+.cons .lb{color:var(--muted);}
+.cons .ok{color:var(--s5);}
+.cons .wn{color:var(--gate);}
+
+/* ---------- glossary ---------- */
+.gloss{
+  display:grid;grid-template-columns:1fr 1fr;gap:2px;
+  background:var(--rule);border:1px solid var(--rule);margin:26px 0 0;
+}
+.gloss > div{background:var(--surface);padding:15px 18px;}
+.gloss dt{
+  font-family:var(--mono);font-size:13px;color:var(--ink);font-weight:700;
+  letter-spacing:-.01em;margin-bottom:4px;
+}
+.gloss dt s{
+  text-decoration:none;font-family:var(--body);font-weight:400;font-size:11.5px;
+  color:var(--muted);margin-left:7px;letter-spacing:0;
+}
+.gloss dd{margin:0;font-size:13px;line-height:1.6;color:var(--ink2);}
+@media (max-width:760px){.gloss{grid-template-columns:1fr;}}
+
+/* ---------- close ---------- */
+.close blockquote{
+  margin:0;border-left:3px solid var(--gate);padding:4px 0 4px 20px;
+  font-size:18px;line-height:1.6;color:var(--ink);max-width:660px;font-weight:700;
+  font-family:var(--disp);letter-spacing:-.02em;
+}
+.close p{margin-top:20px;max-width:660px;}
+
+.foot{
+  margin-top:56px;padding-top:20px;border-top:1px solid var(--rule);
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important;}
+}
+</style>
+</head>
+<body>
+
+<div class="lifeline" id="lifeline"></div>
+
+<div class="wrap">
+
+  <header class="hero">
+    <span class="tag">l1sw-feature-dev · 설계 컨셉</span>
+    <h1>요구가 아니라<br><em>행위 차이</em>를 관리한다</h1>
+    <p class="sub">
+      피처 개발 과제를 담당자마다 다른 방식이 아니라 하나의 프로세스로 굴리기 위한 설계안입니다.
+      단계는 SRS · HLD · 구현 · 검증 · 환류 다섯. 그 위에서 관리하는 것은
+      문서 묶음이 아니라 <strong>레코드 하나</strong>입니다.
+    </p>
+    <div class="verdict">
+      <b>산출물을 늘리지 않는 것이 설계 목표입니다</b>
+      <span>단계마다 새 문서를 만들면 담당자는 문서를 맞추는 데 시간을 씁니다. 같은 레코드가 단계마다 채워지면, 진행 상태와 추적성이 부산물로 따라옵니다.</span>
+    </div>
+    <div class="primer">
+      <span class="pk">처음 보시는 분께</span>
+      <p>L1 SW 개발이 처음이어도 읽을 수 있도록 배경과 용어를 함께 담았습니다.
+      회색 상자는 배경 설명이니 이미 아는 내용이면 건너뛰셔도 됩니다.
+      모르는 낱말은 맨 아래 <strong>09 용어 정리</strong>에 모아 뒀습니다.</p>
+    </div>
+  </header>
+
+  <section>
+    <div class="eyebrow">00 &nbsp;&nbsp;배경</div>
+    <h2>왜 프로세스를 만드나</h2>
+    <p class="lead" style="max-width:680px;">
+      피처 하나를 개발하면 요구 · 설계 · 코드 · 시험이 각각 다른 곳에 남습니다.
+      Jira 코멘트, Confluence 문서, 코드 리뷰, 개인 메모.
+      <strong>성실하게 일해도 이것들은 저절로 이어지지 않습니다.</strong>
+      아래 네 장면은 개인 역량 문제가 아니라 기록 구조 문제입니다.
+    </p>
+
+    <div class="bg">
+      <article>
+        <div class="said">이거 원래 뭘 하려던 거였죠?</div>
+        <p>과제 시작 3개월 뒤 리뷰. 원래 요구가 Jira 코멘트와 메일에 흩어져 있어 아무도 정확히 재구성하지 못합니다.</p>
+        <div class="cause">요구가 한 곳에 확정되지 않음</div>
+      </article>
+      <article>
+        <div class="said">문서는 그런데 코드는 다른데요</div>
+        <p>설계서는 첫 작성 이후 갱신되지 않았습니다. 누가 언제 왜 바꿨는지 추적할 방법이 없습니다.</p>
+        <div class="cause">문서와 코드가 서로 모름</div>
+      </article>
+      <article>
+        <div class="said">돌아가는 건 확인했습니다</div>
+        <p>빌드되고 눈으로 봤다는 뜻입니다. 무엇을 어떤 기준으로 확인했는지는 남지 않아 다음 사람이 처음부터 다시 확인합니다.</p>
+        <div class="cause">검증 기준이 기록되지 않음</div>
+      </article>
+      <article>
+        <div class="said">그건 그분이 아셨는데…</div>
+        <p>왜 그렇게 설계했는지, 어떤 예외를 피해 갔는지가 담당자 머릿속에만 있었습니다. 인수인계로는 옮겨지지 않습니다.</p>
+        <div class="cause">배운 것이 조직에 남지 않음</div>
+      </article>
+    </div>
+
+    <div class="primer">
+      <span class="pk">그래서 뭘 하자는 건가</span>
+      <p>새 문서를 더 쓰자는 게 아닙니다. 정반대입니다.
+      <strong>과제 하나에 대해 딱 하나의 기록을 두고, 단계가 진행될 때마다 그 기록에 칸을 채워 나가자</strong>는 제안입니다.</p>
+      <p>그러면 “지금 어디까지 왔나”, “이 요구가 구현됐나”, “뭘 확인하고 넘어갔나”가
+      따로 정리하지 않아도 그 기록 하나만 열면 보입니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">01 &nbsp;&nbsp;기준</div>
+    <h2>문서가 아니라 행위</h2>
+    <p class="lead" style="max-width:660px;">
+      L1에서 오래 가는 진실은 문서가 아니라 <strong>메시지 시퀀스와 상태 전이</strong>입니다.
+      인터페이스 계약도, 동작 확인도, HLD 시나리오 절도, UT assertion도 전부 절차 단위로 서 있습니다.
+    </p>
+
+    <div class="primer">
+      <span class="pk">메시지 · 절차란</span>
+      <p>모뎀 소프트웨어의 모듈들은 함수를 직접 부르기보다 <strong>메시지</strong>를 주고받으며 동작합니다.
+      상위 계층에서 “이 설정으로 바꿔라”가 내려오고, L1이 “적용했다”를 올리는 식입니다.</p>
+      <p>이런 메시지들이 <strong>하나의 목적을 위해 정해진 순서로 오가는 묶음</strong>이 절차(procedure)입니다.
+      예를 들어 TX 안테나 전환 절차는 요청 · 판단 · 적용 · 완료 보고가 정해진 순서로 이어집니다.</p>
+      <p>코드는 리팩토링으로 바뀌고 문서는 낡지만,
+      <strong>이 메시지 순서는 규격이 바뀌지 않는 한 그대로</strong>입니다. 그래서 여기에 기준을 두자는 것입니다.</p>
+    </div>
+
+    <div class="spines">
+      <div class="spine old">
+        <div class="lbl">문서 중심</div>
+        <h3>설계서가 기준이다</h3>
+        <div class="stack">
+설계서 (손으로 관리)<br>
+<span class="arrow">└→</span> 코드가 따르는지 비교<br>
+<span class="arrow">&nbsp;&nbsp;&nbsp;&nbsp;└→</span> 차이를 구현<br>
+<span class="arrow">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└→</span> 다시 어긋남
+        </div>
+        <p class="note">
+          문서와 코드가 어긋난다는 전제가 깔려 있습니다.
+          어긋남을 상시 감시하는 비용이 계속 듭니다.
+        </p>
+      </div>
+      <div class="spine new">
+        <div class="lbl">행위 중심</div>
+        <h3>절차 타임라인이 기준이다</h3>
+        <div class="stack">
+절차 / 메시지 타임라인<br>
+<span class="arrow">├─</span> 코드 &nbsp;&nbsp;&nbsp;구현하는 심볼<br>
+<span class="arrow">├─</span> HLD &nbsp;&nbsp;&nbsp;&nbsp;서술하는 절<br>
+<span class="arrow">├─</span> UT &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;검증하는 케이스<br>
+<span class="arrow">└─</span> 로그 &nbsp;&nbsp;&nbsp;런타임 증거
+        </div>
+        <p class="note">
+          피처 = 이 타임라인에 대한 <strong>delta</strong>.
+          문서는 척추에 매달린 뷰 하나가 됩니다.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">02 &nbsp;&nbsp;단위</div>
+    <h2>레코드 하나가 필드를 얻어간다</h2>
+    <p class="lead" style="max-width:660px;">
+      단계를 눌러보세요. 새 문서가 생기지 않습니다. <strong>같은 레코드가 채워질 뿐</strong>입니다.
+    </p>
+
+    <div class="primer">
+      <span class="pk">Behavior Delta가 뭔가</span>
+      <p>우리말로는 <strong>행위 차이</strong>입니다. “이 과제를 하고 나면 제품이 어떻게 달라지는가”를
+      한 건씩 적은 것이고, 형식은 늘 같습니다 —
+      <strong>어떤 조건에서 · 지금은 이렇게 하는데 · 앞으로는 이렇게 한다.</strong></p>
+      <p>피처 하나에 보통 BD가 여러 건 나옵니다. 그 BD 하나하나가 아래처럼 단계를 거치며 칸을 채웁니다.
+      새 문서가 생기는 게 아니라 <strong>같은 칸에 값이 들어차는 것</strong>이 핵심입니다.</p>
+    </div>
+
+    <div class="sig">
+      <div class="stepper" id="stepper"></div>
+      <div class="recwrap">
+        <div class="record" id="record"></div>
+        <aside class="recside" id="recside"></aside>
+      </div>
+      <div class="sigfoot">
+        <span><i class="f"></i> 채워진 필드</span>
+        <span><i class="e"></i> 비어 있는 필드 — 끊긴 링크가 아니라 <em>미완성</em></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">03 &nbsp;&nbsp;핵심 규칙</div>
+    <h2>관측할 수 있게 쓴다</h2>
+    <p class="lead" style="max-width:680px;">
+      앞의 레코드에서 <code>observable</code> 칸이 S1에 있었습니다.
+      <strong>“이 변경이 일어났는지 밖에서 어떻게 확인하는가”</strong>를 적는 칸이고, 비워둘 수 없습니다.
+    </p>
+
+    <div class="obs">
+      <div class="no">
+        <div class="oh"><b>✕</b> 등록되지 않는 요구</div>
+        <ul>
+          <li>TX switch가 정상 동작할 것</li>
+          <li>성능 저하가 없을 것</li>
+          <li>ULCA 관련 문제 개선</li>
+          <li>안정성 향상</li>
+        </ul>
+        <p class="why">
+          틀린 말은 아니지만 <strong>확인할 방법이 없습니다.</strong>
+          검증 단계에 가서야 “그래서 뭘 봐야 하죠?”가 시작되고, 사람마다 다른 걸 봅니다.
+        </p>
+      </div>
+      <div class="yes">
+        <div class="oh"><b>✓</b> 등록되는 요구</div>
+        <ul>
+          <li><em>MESSAGE</em> · TX_SWITCH_REQ 수신 후 pending 상태에서 CMD_TX_SWITCH가 발행되지 않는다</li>
+          <li><em>TIMING</em> · 요청부터 완료 보고까지 2 slot을 넘지 않는다</li>
+          <li><em>STATE</em> · ULCA 활성 중 SAR backoff 적용 시 Pcmax가 재계산된다</li>
+        </ul>
+        <p class="why">
+          무엇을 보면 되는지가 문장 안에 이미 있습니다.
+          <strong>검증 항목을 따로 설계할 필요가 없어집니다.</strong>
+        </p>
+      </div>
+    </div>
+
+    <div class="primer">
+      <span class="pk">왜 이 규칙 하나가 중요한가</span>
+      <p>검증이 부실해지는 흔한 이유는 담당자가 게을러서가 아니라,
+      <strong>요구가 흐릿하게 적혀 있어 무엇을 확인할지 검증 시점에 다시 정해야 하기 때문</strong>입니다.
+      그때는 이미 일정이 촉박합니다.</p>
+      <p>요구를 쓰는 순간에 확인 방법까지 정하게 하면 검증 단계는 정해진 것을 실행하기만 하면 됩니다.
+      일이 늘어난 게 아니라 <strong>앞으로 옮겨진 것</strong>입니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">04 &nbsp;&nbsp;대조</div>
+    <h2>번역 6회 vs 번역 0회</h2>
+    <p style="max-width:660px;">
+      단계마다 산출물을 따로 만들면 추적은 <strong>산출물을 잇는 체인</strong>이 됩니다.
+      경계마다 ID가 번역되고, 번역되는 곳마다 끊깁니다.
+    </p>
+
+    <div class="chain bad">
+      <div class="ttl">산출물 체인 &nbsp;/&nbsp; 끊길 수 있는 지점 6곳</div>
+      <div class="links" id="chainA"></div>
+      <p class="cap">
+        하나라도 누락되면 “이 요구가 구현·검증됐는가”를 사람이 산출물 네 개를 열어 대조해야 합니다.
+        시간이 지나면 아무도 안 합니다.
+      </p>
+    </div>
+
+    <div class="chain good">
+      <div class="ttl">Behavior Delta 레코드 1개</div>
+      <div class="one">
+        <b>BD-001</b>
+        <s>ONE RECORD · ONE LIFECYCLE</s>
+      </div>
+      <p class="cap">
+        설계 항목 번호, 차이 목록 ID, 작업 번호, 변경 번호는 <strong>체인의 링크가 아니라 BD의 필드</strong>가 됩니다.
+        추적 계산 로직이 필요 없어집니다 — 레코드를 읽으면 그게 추적입니다.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">05 &nbsp;&nbsp;단계</div>
+    <h2>다섯 단계, 여섯 게이트</h2>
+    <p style="max-width:660px;">
+      단계 전이는 사람이 승인합니다. 완료 조건은 사람이 판단하지 않고 <strong>레코드에서 계산</strong>합니다.
+    </p>
+
+    <div class="primer">
+      <span class="pk">게이트와 완료 조건</span>
+      <p><strong>게이트</strong>는 사람이 승인해야 다음 단계로 넘어갈 수 있는 지점입니다.
+      되돌리기 어렵거나 이후 모든 작업의 기준이 되는 판단에만 둡니다. 읽기만 하는 작업은 묻지 않습니다.</p>
+      <p><strong>완료 조건(DoD)</strong>은 “다 했다”의 기준입니다. 느낌으로 판단하지 않고 레코드를 세어서 판정합니다.
+      예를 들어 S1은 “관측 앵커가 빈 BD가 0건인가”만 보면 됩니다.
+      그래서 <strong>담당자마다 기준이 달라지지 않습니다.</strong></p>
+    </div>
+
+    <div class="ph">
+      <div class="row hd"><div>단계</div><div>하는 일</div><div>완료 조건</div><div>게이트</div></div>
+      <div class="row">
+        <div class="st" style="--bar:#1B3A6B"><b>S1</b><em>요구</em></div>
+        <div>행위 차이를 BD로 등록. 조건 · 현재 · 목표 · 관측 앵커</div>
+        <div class="dod">모든 BD에 관측 앵커가 있다</div>
+        <div class="gt"><span>G-SRS</span></div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#22557E"><b>S2</b><em>설계</em></div>
+        <div>어느 절차의 delta인지, 어느 모듈이 소유하는지 확정</div>
+        <div class="dod">모든 BD가 절차와 소유 모듈에 매핑된다</div>
+        <div class="gt"><span>G-HLD</span></div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#2A7285"><b>S3</b><em>구현</em></div>
+        <div>범위를 봉인하고, 봉인된 범위 안에서만 변경</div>
+        <div class="dod">모든 BD에 변경 식별자가 붙는다</div>
+        <div class="gt"><span>G-SCOPE</span><br><span style="margin-top:4px;">G-DIFF</span></div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#2F8B7E"><b>S4</b><em>검증</em></div>
+        <div>S1의 관측 앵커대로 증거를 수집. 새로 설계하지 않음</div>
+        <div class="dod">전건 PASS 또는 사유 있는 WAIVED<br>+ 신규 순환 의존 0건</div>
+        <div class="gt"><span>G-VER</span></div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#3AA36F"><b>S5</b><em>환류</em></div>
+        <div>레코드에서 지식 후보를 추출. 사람은 승인/거절만</div>
+        <div class="dod">모든 후보가 판정을 받는다</div>
+        <div class="gt"><span>G-CLOSE</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">06 &nbsp;&nbsp;산출물</div>
+    <h2>과제가 끝나면 뭐가 남나</h2>
+    <p class="lead" style="max-width:680px;">
+      “산출물을 늘리지 않는다”가 <strong>아무것도 안 남긴다는 뜻은 아닙니다.</strong>
+      남는 것은 그대로인데, <strong>손으로 쓰는 것은 하나</strong>로 줄어듭니다.
+    </p>
+
+    <div class="dlv">
+      <div class="row hd"><div>단계</div><div>남는 산출물</div><div>만드는 방식</div></div>
+      <div class="row">
+        <div class="st" style="--bar:#1B3A6B"><b>S1</b><em>요구</em></div>
+        <div class="what">요구 명세 — BD 목록과 요약 1장</div>
+        <div class="by hand">사람이 작성<br>← 손으로 쓰는 유일한 산출물</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#22557E"><b>S2</b><em>설계</em></div>
+        <div class="what">절차 매핑표 · 설계 문서 시나리오 절 · MSC</div>
+        <div class="by">BD에서 생성<br>+ 설계 의도만 사람이 보강</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#2A7285"><b>S3</b><em>구현</em></div>
+        <div class="what">변경 diff · 변경 번호 · 봉인 범위 기록</div>
+        <div class="by">작업 결과가 BD에 기록됨</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#2F8B7E"><b>S4</b><em>검증</em></div>
+        <div class="what">검증 매트릭스 — BD × 증거 × 판정</div>
+        <div class="by">BD에서 생성</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#3AA36F"><b>S5</b><em>환류</em></div>
+        <div class="what">종료 보고 1장 · 조직 지식 등록분</div>
+        <div class="by">BD에서 생성</div>
+      </div>
+    </div>
+
+    <div class="primer">
+      <span class="pk">왜 담당자마다 산출물이 달라지지 않나</span>
+      <p>양식을 강제해서가 아닙니다. <strong>전부 같은 레코드에서 나오기 때문</strong>입니다.
+      양식을 지키라고 하면 지키는 사람과 안 지키는 사람이 갈리지만,
+      생성되는 것은 갈릴 수가 없습니다.</p>
+      <p>과제 리뷰나 상위 보고에 필요한 자료도 따로 만들지 않습니다 —
+      검증 매트릭스와 종료 보고가 그 자리에 그대로 들어갑니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">07 &nbsp;&nbsp;학습데이터</div>
+    <h2>단계마다 무엇을 알아야 하나</h2>
+    <p class="lead" style="max-width:680px;">
+      같은 단계라도 <strong>아는 만큼 결과가 달라집니다.</strong>
+      그 “아는 것”이 개인 경험에만 있으면 담당자마다 산출물 품질이 갈립니다.
+      단계별로 필요한 지식을 정리해 두고, 과제가 끝날 때 새로 배운 것을 되돌려 넣습니다.
+    </p>
+
+    <div class="kd">
+      <div class="row hd"><div>단계</div><div>필요한 지식 — 들어가는 것</div><div>남기는 지식 — 나오는 것</div></div>
+      <div class="row">
+        <div class="st" style="--bar:#1B3A6B"><b>S1</b><em>요구</em></div>
+        <div>도메인별 관측 앵커 패턴 — 이 도메인은 뭘 보면 확인되나<span class="seed">우선</span><br>
+        요구 작성 템플릿 · 도메인별 필수 제약(타이밍 · 전력 · 메모리)<br>
+        L1 책임 경계 — 어디까지가 우리 몫인가</div>
+        <div class="give">새로 쓰인 관측 앵커 패턴</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#22557E"><b>S2</b><em>설계</em></div>
+        <div>절차 목록과 모듈 소유 맵<span class="seed">우선</span><br>
+        설계 관례 — 공용 클래스 네이밍·배치, 명령 전달 구조<br>
+        브랜치 간 구조 차이 · 알려진 예외</div>
+        <div class="give">새 절차 · 갱신된 MSC</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#2A7285"><b>S3</b><em>구현</em></div>
+        <div>빌드 옵션 의미와 조합 규칙<br>
+        구현 관용구 — 이 팀은 이런 상황을 이렇게 쓴다<br>
+        금지 패턴 — 하면 안 되는 것과 그 이유</div>
+        <div class="give">새 구현 관용구</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#2F8B7E"><b>S4</b><em>검증</em></div>
+        <div>시험 코드 구조 — 어디에 어떤 형태로 쓰는가<br>
+        정상 절차 기준선 — 로그가 이렇게 나와야 정상이다<br>
+        알려진 실패 모드와 증상</div>
+        <div class="give">새 실패 모드 · 새 기준선</div>
+      </div>
+      <div class="row">
+        <div class="st" style="--bar:#3AA36F"><b>S5</b><em>환류</em></div>
+        <div>등록 판정 기준 — 무엇이 조직 지식이 될 자격이 있나</div>
+        <div class="give">앞 네 단계의 출력을 확정</div>
+      </div>
+    </div>
+
+    <div class="primer">
+      <span class="pk">처음부터 다 있어야 하는 게 아니다</span>
+      <p>위 지식이 갖춰져야 시작할 수 있다면 이 프로세스는 영영 시작되지 않습니다.
+      <strong>비어 있으면 “아직 없음”으로 표시만 하고 그대로 진행</strong>합니다.
+      담당자는 그 자리에서 자기 판단으로 채우고, S5가 그것을 후보로 올립니다.</p>
+      <p>즉 <strong>과제를 한 건 돌 때마다 다음 과제가 쉬워지는 구조</strong>입니다.
+      지식 정리를 위한 별도 활동이 없다는 점이 중요합니다 — 별도 활동은 늘 뒤로 밀립니다.</p>
+      <p><span class="seed">우선</span> 표시 두 가지만 먼저 채우면 시작할 수 있습니다.
+      도메인별 관측 앵커 패턴과 절차 · 소유 맵입니다. 나머지는 과제가 채웁니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">08 &nbsp;&nbsp;구성</div>
+    <h2>담당자가 만지는 건 하나</h2>
+    <p style="max-width:660px;">
+      뒤에 네 겹이 더 있지만 담당자는 부르지 않습니다.
+      <strong>어떤 도구를 언제 부를지 판단해야 하는 순간, 프로세스 표준화는 실패합니다.</strong>
+    </p>
+    <div class="lay">
+      <div class="row top">
+        <div class="nm">l1sw-feature<em>담당자가 만지는 유일한 표면</em></div>
+        <div>생명주기 SSOT · 단계 · 게이트 · BD 레코드.<br>
+        명령은 <code>new</code> <code>srs</code> <code>plan</code> <code>status</code> <code>next</code> <code>verify</code> <code>close</code> 일곱 개.</div>
+      </div>
+      <div class="row">
+        <div class="nm">facts</div>
+        <div>코드 · 빌드옵션 · 로그에서 사실만 추출. 판정하지 않는다</div>
+      </div>
+      <div class="row">
+        <div class="nm">docs</div>
+        <div>문서 생성 · 부분 갱신 · 변환. 생성 구간과 작성 구간을 분리한다</div>
+      </div>
+      <div class="row">
+        <div class="nm">change</div>
+        <div>봉인된 범위 안의 편집과 형상 등록. 위험하므로 격리한다</div>
+      </div>
+      <div class="row">
+        <div class="nm">knowledge</div>
+        <div>장기 지식. <strong>쓰기 경로는 S5 환류 하나뿐</strong></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px;">단계 관리는 물어보면 나온다</h3>
+    <p style="max-width:660px;">
+      진행 현황을 따로 정리하지 않습니다. 레코드에서 계산되므로 언제 물어도 같은 답이 나옵니다.
+    </p>
+
+    <div class="cons">
+<div><span class="pr">$</span> feature status</div>
+<div> </div>
+<div><span class="nm2">FT-1900-TXSW-001</span>  ULCA 조건부 TX switch 지연 개선</div>
+<div><span class="lb">단계</span>   S3 구현      <span class="lb">승인</span>  G-SRS <span class="ok">✓</span>   G-HLD <span class="ok">✓</span>   G-SCOPE <span class="ok">✓</span></div>
+<div><span class="lb">BD</span>     7건          완료 5 · 진행 2 · 미착수 0</div>
+<div><span class="lb">DoD</span>    <span class="wn">S3 미충족</span>   BD-006 변경 식별자 없음</div>
+<div><span class="lb">다음</span>   BD-006 구현, 또는 범위 제외 사유 등록</div>
+    </div>
+
+    <div class="primer">
+      <span class="pk">팀장 관점</span>
+      <p>같은 계산을 과제 여러 건에 돌리면 팀 현황이 됩니다.
+      “진행률 몇 %”처럼 주관적인 숫자가 아니라
+      <strong>어느 과제의 어느 BD가 어떤 조건 때문에 막혀 있는지</strong>가 나옵니다.
+      담당자에게 상태를 물어 취합하는 일이 없어집니다.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="eyebrow">09 &nbsp;&nbsp;용어 정리</div>
+    <h2>이 문서에 나온 말들</h2>
+    <dl class="gloss">
+      <div><dt>SRS <s>요구 명세</s></dt><dd>무엇을 만들 것인가를 확정해 적은 것. 어떻게 만들지는 아직 정하지 않습니다.</dd></div>
+      <div><dt>HLD <s>상위 설계</s></dt><dd>어떻게 만들 것인가를 구조 수준에서 적은 것. 어느 모듈이 무엇을 맡고 어떤 순서로 동작하는지.</dd></div>
+      <div><dt>메시지</dt><dd>모듈이나 계층 사이에 오가는 신호. L1 내부 CMD, L1과 상위 계층 사이의 primitive 등.</dd></div>
+      <div><dt>절차 <s>procedure</s></dt><dd>하나의 목적을 위해 정해진 순서로 오가는 메시지 묶음. 예: TX 안테나 전환 절차.</dd></div>
+      <div><dt>BD <s>Behavior Delta</s></dt><dd>행위 차이 한 건. 어떤 조건에서 · 지금은 이렇게 · 앞으로는 이렇게.</dd></div>
+      <div><dt>관측 앵커</dt><dd>변경이 실제로 일어났는지 밖에서 확인할 수 있는 지점. 특정 메시지, 상태 값, 로그, 타이밍 등.</dd></div>
+      <div><dt>게이트</dt><dd>사람이 승인해야 다음으로 넘어가는 지점. 되돌리기 어려운 판단에만 둡니다.</dd></div>
+      <div><dt>DoD <s>완료 조건</s></dt><dd>다 했다고 말할 수 있는 기준. 느낌이 아니라 레코드를 세어서 판정합니다.</dd></div>
+      <div><dt>봉인 <s>seal</s></dt><dd>손댈 수 있는 범위를 미리 확정하고 그 밖은 잠그는 것. 작업이 번지는 것을 막습니다.</dd></div>
+      <div><dt>SSOT</dt><dd>단일 진실 원천. 같은 사실을 여러 곳에 복사해 두지 않고 한 곳만 정답으로 둡니다.</dd></div>
+      <div><dt>순환 의존</dt><dd>A가 B를 참조하고 B가 다시 A를 참조하는 구조. 쌓이면 부분만 떼어 고치거나 시험하기 어려워집니다.</dd></div>
+      <div><dt>WAIVED</dt><dd>검증하지 못했지만 사유와 승인자를 남기고 넘어간 상태. 그냥 빠뜨린 것과 구분됩니다.</dd></div>
+      <div><dt>UT <s>단위 시험</s></dt><dd>모듈을 따로 떼어 자동으로 돌리는 시험. 사람이 눈으로 보지 않아도 결과가 남습니다.</dd></div>
+      <div><dt>환류</dt><dd>과제에서 배운 것을 조직 지식으로 되돌려 넣는 단계. 다음 과제가 같은 고생을 반복하지 않게 합니다.</dd></div>
+    </dl>
+  </section>
+
+  <section class="close">
+    <div class="eyebrow">원칙</div>
+    <blockquote>
+      관측할 수 없는 요구는 등록되지 않는다.
+    </blockquote>
+    <p>
+      “정상 동작할 것”, “성능 저하 없을 것” 같은 문장은 S1에서 거부됩니다.
+      어떤 메시지가, 어떤 상태가, 어떤 로그가 달라지는지 쓸 수 없다면 그건 아직 요구가 아닙니다.
+      이 한 줄이 S4를 실제로 작동하게 만듭니다 — 검증 단계에서 “무엇을 확인할 것인가”를
+      다시 고민할 필요가 없어지기 때문입니다.
+    </p>
+    <div class="foot">
+      <span>l1sw-feature-dev · concept v0.1</span>
+      <span>S1 요구 → S2 설계 → S3 구현 → S4 검증 → S5 환류</span>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const STAGES=[
+ {id:"S1",nm:"요구",gate:"G-SRS",  bar:"#1B3A6B",note:"요구가 아니라 <b>행위 차이</b>로 씁니다. 관측 앵커가 없으면 레코드가 만들어지지 않습니다."},
+ {id:"S2",nm:"설계",gate:"G-HLD",  bar:"#22557E",note:"어느 절차의 delta인지, 누가 소유하는지가 붙습니다. 문서의 절은 참조일 뿐 별도 산출물이 아닙니다."},
+ {id:"S3",nm:"구현",gate:"G-SCOPE · G-DIFF",bar:"#2A7285",note:"범위를 먼저 봉인하고, 봉인 밖은 건드리지 않습니다. 변경 식별자가 레코드에 붙습니다."},
+ {id:"S4",nm:"검증",gate:"G-VER",  bar:"#2F8B7E",note:"S1의 관측 앵커가 그대로 증거 형식이 됩니다. 검증 항목을 새로 설계하지 않습니다."},
+ {id:"S5",nm:"환류",gate:"G-CLOSE",bar:"#3AA36F",note:"레코드에 이미 절차·증거·실패모드가 있습니다. 후보를 자동 추출하고 사람은 승인만 합니다."}
+];
+
+const LINES=[
+ {s:1,t:'<span class="hd">behavior_delta:</span>'},
+ {s:1,t:'  <span class="k">id:</span> <span class="st">BD-001</span>'},
+ {s:1,t:'  <span class="k">condition:</span>   <span class="v">"ULCA 활성 + TX switch pending"</span>'},
+ {s:1,t:'  <span class="k">current:</span>     <span class="v">"재진입 CMD 발행"</span>'},
+ {s:1,t:'  <span class="k">target:</span>      <span class="v">"재진입 CMD 억제"</span>'},
+ {s:1,t:'  <span class="k">source_ref:</span>  <span class="v">"L1-12345 / TS 38.213 §7.x"</span>'},
+ {s:1,t:'  <span class="k">observable:</span>'},
+ {s:1,t:'    <span class="k">type:</span> <span class="st">MESSAGE</span>'},
+ {s:1,t:'    <span class="k">anchor:</span> <span class="v">"TX_SWITCH_REQ 이후 CMD_TX_SWITCH 미발행"</span>'},
+ {s:2,t:'  <span class="k">procedure:</span>    <span class="v">proc_periodic_tx_switch</span>'},
+ {s:2,t:'  <span class="k">owner_module:</span> <span class="v">TxSwitchMngr</span>'},
+ {s:2,t:'  <span class="k">doc_anchor:</span>   <span class="v">"#scenario-proc_periodic_tx_switch"</span>'},
+ {s:3,t:'  <span class="k">code_refs:</span>    <span class="v">["tx_switch_mngr.cpp:412"]</span>'},
+ {s:3,t:'  <span class="k">change_id:</span>    <span class="v">"CL 123456"</span>'},
+ {s:4,t:'  <span class="k">evidence:</span>'},
+ {s:4,t:'    <span class="v">- {type: UT,  ref: "ut_tx_switch.cpp::PendingNoReentry", result:</span> <span class="st">PASS</span><span class="v">}</span>'},
+ {s:4,t:'    <span class="v">- {type: LOG, ref: "slte_20260814_1420.sdm",          result:</span> <span class="st">PASS</span><span class="v">}</span>'},
+ {s:4,t:'  <span class="k">verdict:</span>      <span class="st">PASS</span>'},
+ {s:5,t:'  <span class="k">knowledge_out:</span>'},
+ {s:5,t:'    <span class="v">- {type: MESSAGE_PROCEDURE,    id: MP-088, status:</span> <span class="st">APPROVED</span><span class="v">}</span>'},
+ {s:5,t:'    <span class="v">- {type: IMPLEMENTATION_IDIOM, id: II-014, status:</span> <span class="st">APPROVED</span><span class="v">}</span>'}
+];
+
+const CHAIN=[
+ {id:"요구 ID",own:"요구서"},{id:"수용기준",own:"요구서"},{id:"설계 항목",own:"설계서"},
+ {id:"시나리오",own:"설계서"},{id:"차이 ID",own:"차이목록"},{id:"작업 ID",own:"작업목록"},
+ {id:"변경 번호",own:"형상관리"},{id:"시험 ID",own:"시험서"}
+];
+
+let active=1, prev=0;
+
+const stepper=document.getElementById("stepper");
+STAGES.forEach((s,i)=>{
+  const b=document.createElement("button");
+  b.className="step"; b.type="button";
+  b.style.setProperty("--bar",s.bar);
+  b.innerHTML='<span class="sid">'+s.id+'</span><span class="snm">'+s.nm+'</span><span class="sgate">'+s.gate+'</span>';
+  b.addEventListener("click",()=>render(i+1));
+  stepper.appendChild(b);
+});
+
+const chainA=document.getElementById("chainA");
+CHAIN.forEach((c,i)=>{
+  if(i>0){const d=document.createElement("div");d.className="brk";d.textContent="✕";chainA.appendChild(d);}
+  const e=document.createElement("div");
+  e.className="lk";
+  e.innerHTML="<b>"+c.id+"</b><s>"+c.own+"</s>";
+  chainA.appendChild(e);
+});
+
+function render(n){
+  prev=active; active=n;
+  const st=STAGES[n-1];
+
+  [...stepper.children].forEach((b,i)=>b.dataset.on = i<n ? "1":"0");
+
+  const rec=document.getElementById("record");
+  rec.innerHTML="";
+  LINES.forEach(l=>{
+    const d=document.createElement("span");
+    d.className="ln"+((l.s>prev && l.s<=n && n>prev)?" justin":"");
+    d.dataset.fill = l.s<=n ? "1":"0";
+    d.innerHTML=l.t;
+    rec.appendChild(d);
+  });
+
+  const filled=LINES.filter(l=>l.s<=n).length;
+  document.getElementById("recside").innerHTML=
+    '<div class="cap">레코드 완성도</div>'+
+    '<div class="meter" style="--bar:'+st.bar+'">'+
+      STAGES.map((_,i)=>'<b class="'+(i<n?"on":"")+'"></b>').join("")+
+    '</div>'+
+    '<div class="cnt">'+filled+' <s>/ '+LINES.length+' 필드</s></div>'+
+    '<p class="exp">'+st.note+'</p>'+
+    '<div class="gatebox"><span class="gk">사람 게이트</span><span class="gv">'+st.gate+'</span></div>';
+}
+
+render(1);
+
+const ll=document.getElementById("lifeline");
+if(ll){
+  document.querySelectorAll("section").forEach(sec=>{
+    const t=document.createElement("i");
+    t.style.top=(sec.offsetTop+70)+"px";
+    ll.appendChild(t);
+  });
+}
+</script>
+</body>
+</html>
