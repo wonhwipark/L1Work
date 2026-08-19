@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fork Workflow — Git CLI 가이드 (VS Code / PowerShell)</title>
+<style>
+:root{
+  --bg:#0F1620;
+  --surface:#17202C;
+  --surface-2:#1D2836;
+  --line:#2A3849;
+  --line-soft:#212D3C;
+  --ink:#E6EDF4;
+  --ink-2:#A9BCD0;
+  --ink-3:#7A8FA6;
+
+  --local:#F2A65A;   /* 내 PC */
+  --fork:#7CC5A0;    /* 내 Fork (origin) */
+  --up:#6BA5F0;      /* 정식 (upstream) */
+  --warn:#E8756F;
+
+  --mono:"Cascadia Code","Cascadia Mono",Consolas,"D2Coding","Courier New",monospace;
+  --sans:"Segoe UI","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px}
+
+/* ---------- masthead ---------- */
+.masthead{padding:72px 0 40px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:12px;letter-spacing:.18em;
+  color:var(--ink-3);text-transform:uppercase;margin:0 0 18px;
+}
+h1{
+  font-family:var(--mono);font-weight:700;font-size:clamp(28px,4.6vw,46px);
+  line-height:1.15;letter-spacing:-.02em;margin:0 0 20px;
+}
+h1 em{font-style:normal;color:var(--fork)}
+.lede{max-width:64ch;color:var(--ink-2);font-size:17px;margin:0}
+.lede strong{color:var(--ink);font-weight:600}
+.meta{
+  margin-top:28px;font-family:var(--mono);font-size:12.5px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:8px 20px;
+}
+
+/* ---------- signal chain (signature) ---------- */
+.chain-dock{
+  position:sticky;top:0;z-index:50;
+  background:rgba(15,22,32,.94);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.chain{display:flex;align-items:stretch;gap:0;padding:12px 0}
+.node{
+  flex:1;padding:9px 12px;border:1px solid var(--line-soft);border-radius:7px;
+  background:var(--surface);transition:border-color .25s,background .25s,opacity .25s;
+  opacity:.42;min-width:0;
+}
+.node .nlabel{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--ink-3);display:block;margin-bottom:3px;
+}
+.node .nname{font-size:14px;font-weight:600;display:block;line-height:1.35}
+.node .nsub{font-family:var(--mono);font-size:11px;color:var(--ink-3);display:block}
+.node[data-n="local"].on{opacity:1;border-color:var(--local);background:#231C14}
+.node[data-n="local"].on .nlabel{color:var(--local)}
+.node[data-n="fork"].on{opacity:1;border-color:var(--fork);background:#152420}
+.node[data-n="fork"].on .nlabel{color:var(--fork)}
+.node[data-n="up"].on{opacity:1;border-color:var(--up);background:#141F2E}
+.node[data-n="up"].on .nlabel{color:var(--up)}
+.link{
+  flex:0 0 44px;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:15px;color:var(--ink-3);opacity:.4;
+  transition:opacity .25s,color .25s;
+}
+.link.on{opacity:1;color:var(--ink-2)}
+
+/* ---------- sections ---------- */
+section{padding:64px 0;border-bottom:1px solid var(--line-soft)}
+.shead{display:flex;gap:18px;align-items:baseline;margin-bottom:8px}
+.snum{
+  font-family:var(--mono);font-size:13px;font-weight:700;color:var(--ink-3);
+  letter-spacing:.08em;flex:0 0 auto;padding-top:6px;
+}
+h2{
+  font-family:var(--mono);font-weight:700;font-size:clamp(20px,2.8vw,27px);
+  letter-spacing:-.01em;margin:0;line-height:1.3;
+}
+.sdek{color:var(--ink-2);max-width:66ch;margin:14px 0 30px 44px}
+@media(max-width:640px){.sdek{margin-left:0}}
+p{max-width:66ch}
+h3{
+  font-family:var(--mono);font-size:14.5px;font-weight:700;letter-spacing:.02em;
+  margin:34px 0 12px;color:var(--ink);
+}
+
+/* ---------- terminal blocks ---------- */
+.term{
+  background:#0B1119;border:1px solid var(--line);border-radius:9px;
+  margin:16px 0;overflow:hidden;
+}
+.term-bar{
+  display:flex;align-items:center;gap:9px;padding:7px 13px;
+  background:var(--surface);border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;
+}
+.dot{width:8px;height:8px;border-radius:50%;background:#33465C;flex:0 0 auto}
+.term-body{padding:14px 16px;font-family:var(--mono);font-size:13.5px;line-height:1.85;overflow-x:auto}
+.term-body .ln{white-space:pre;display:block}
+.ps{color:var(--ink-3)}
+.cmd{color:var(--ink);font-weight:600}
+.out{color:var(--ink-3)}
+.hi-local{color:var(--local)}
+.hi-fork{color:var(--fork)}
+.hi-up{color:var(--up)}
+.hi-warn{color:var(--warn)}
+.cmt{color:#6C8299}
+
+/* touch indicator under a command block */
+.touch{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  margin:-8px 0 22px;padding:9px 14px;background:var(--surface);
+  border:1px solid var(--line-soft);border-top:none;border-radius:0 0 9px 9px;
+  font-size:13px;color:var(--ink-2);
+}
+.term + .touch{margin-top:-17px}
+.pill{
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 8px;border-radius:20px;border:1px solid;
+}
+.pill.local{color:var(--local);border-color:#5A4326;background:#231C14}
+.pill.fork{color:var(--fork);border-color:#2E4E40;background:#152420}
+.pill.up{color:var(--up);border-color:#2A4160;background:#141F2E}
+
+/* vscode check row */
+.vs{
+  display:grid;grid-template-columns:auto 1fr;gap:10px 14px;align-items:start;
+  margin:14px 0 0;padding:13px 16px;border-left:2px solid var(--up);
+  background:var(--surface);border-radius:0 7px 7px 0;font-size:14.5px;color:var(--ink-2);
+}
+.vs b{color:var(--ink);font-weight:600}
+.vs .vlabel{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--up);white-space:nowrap;padding-top:4px;
+}
+
+/* callouts */
+.note{
+  margin:26px 0;padding:16px 18px;border:1px solid var(--line);
+  border-radius:9px;background:var(--surface);font-size:14.5px;color:var(--ink-2);
+}
+.note.warn{border-color:#5C3330;background:#231617}
+.note .ntitle{
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-3);display:block;margin-bottom:8px;
+}
+.note.warn .ntitle{color:var(--warn)}
+.note p{margin:0 0 8px}
+.note p:last-child{margin-bottom:0}
+.note code,p code,li code,td code,.vs code{
+  font-family:var(--mono);font-size:.9em;background:#0B1119;
+  border:1px solid var(--line-soft);border-radius:4px;padding:1px 5px;color:var(--ink);
+}
+
+/* tables */
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14.5px}
+th{
+  text-align:left;font-family:var(--mono);font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:600;
+  padding:9px 12px;border-bottom:1px solid var(--line);
+}
+td{padding:11px 12px;border-bottom:1px solid var(--line-soft);color:var(--ink-2);vertical-align:top}
+td:first-child{color:var(--ink);white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+
+/* misconception list */
+.myth{margin:0;padding:0;list-style:none}
+.myth li{
+  padding:18px 0;border-bottom:1px solid var(--line-soft);
+}
+.myth li:last-child{border-bottom:none}
+.myth .m-wrong{
+  font-family:var(--mono);font-size:14px;color:var(--warn);display:block;margin-bottom:7px;
+}
+.myth .m-wrong::before{content:"✕  ";opacity:.75}
+.myth .m-right{color:var(--ink-2);font-size:15px;display:block;max-width:66ch}
+.myth .m-right b{color:var(--ink);font-weight:600}
+
+/* three-repo cards in §1 */
+.repos{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:26px 0}
+@media(max-width:760px){.repos{grid-template-columns:1fr}}
+.repo{padding:18px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+.repo.local{border-top:3px solid var(--local)}
+.repo.fork{border-top:3px solid var(--fork)}
+.repo.up{border-top:3px solid var(--up)}
+.repo .rname{font-weight:700;font-size:16px;display:block;margin-bottom:2px}
+.repo .ralias{font-family:var(--mono);font-size:12px;display:block;margin-bottom:11px}
+.repo.local .ralias{color:var(--local)}
+.repo.fork .ralias{color:var(--fork)}
+.repo.up .ralias{color:var(--up)}
+.repo p{font-size:14px;color:var(--ink-2);margin:0 0 9px}
+.repo .rrule{
+  font-family:var(--mono);font-size:11.5px;color:var(--ink-3);
+  padding-top:9px;border-top:1px solid var(--line-soft);display:block;
+}
+
+/* steps */
+.steps{counter-reset:s;margin:26px 0 0;padding:0;list-style:none}
+.steps > li{
+  counter-increment:s;position:relative;padding:0 0 8px 46px;margin-bottom:26px;
+}
+.steps > li::before{
+  content:counter(s);position:absolute;left:0;top:1px;
+  width:28px;height:28px;border-radius:50%;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink-2);
+  font-family:var(--mono);font-size:12.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.steps > li > .stitle{font-weight:600;font-size:16.5px;display:block;margin-bottom:4px}
+.steps > li > p{margin:0;color:var(--ink-2);font-size:14.5px}
+@media(max-width:640px){.steps > li{padding-left:38px}}
+
+footer{padding:52px 0 76px;color:var(--ink-3);font-size:13.5px}
+footer p{max-width:66ch;margin:0 0 10px}
+a{color:var(--up)}
+:focus-visible{outline:2px solid var(--fork);outline-offset:3px;border-radius:3px}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .node,.link{transition:none}
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <p class="eyebrow">L1SW · Perforce → GitHub Enterprise</p>
+    <h1>Fork Workflow<br><em>Git CLI 가이드</em></h1>
+    <p class="lede">VS Code 터미널(PowerShell)에서 <strong>git 명령만으로</strong> 한 사이클을 끝내는 법.
+      스킬 없이 혼자 할 수 있게 되는 것이 목표입니다. 도구가 막히거나, 결과가 이상하거나,
+      아무도 없을 때 빠져나오는 길이 여기 있습니다.</p>
+    <div class="meta">
+      <span>대상 · GitHub 처음</span>
+      <span>환경 · Windows / VS Code / PowerShell</span>
+      <span>소요 · 통독 25분</span>
+    </div>
+  </div>
+</header>
+
+<div class="chain-dock">
+  <div class="wrap">
+    <div class="chain">
+      <div class="node on" data-n="local">
+        <span class="nlabel">내 PC</span>
+        <span class="nname">작업 폴더</span>
+        <span class="nsub">working tree</span>
+      </div>
+      <div class="link" data-l="l-f">→</div>
+      <div class="node" data-n="fork">
+        <span class="nlabel">origin</span>
+        <span class="nname">내 Fork</span>
+        <span class="nsub">내가 push하는 곳</span>
+      </div>
+      <div class="link" data-l="f-u">→</div>
+      <div class="node" data-n="up">
+        <span class="nlabel">upstream</span>
+        <span class="nname">정식 저장소</span>
+        <span class="nsub">팀 공용 · PR 대상</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- 00 -->
+<section data-on="local">
+  <div class="shead"><span class="snum">00</span><h2>시작 전에</h2></div>
+  <p class="sdek">터미널을 열고, 딱 두 줄만 설정하고, 규칙 하나를 정합니다.</p>
+
+  <h3>터미널 열기</h3>
+  <p><b>Ctrl + `</b> (백틱, 숫자 1 왼쪽). VS Code 아래쪽에 터미널이 열립니다.
+     오른쪽 위에 <code>powershell</code> 또는 <code>pwsh</code>라고 떠 있으면 맞습니다.</p>
+
+  <h3>최초 1회 설정</h3>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git config --global core.autocrlf true</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git config --global core.quotepath false</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git config --global user.name "홍길동"</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git config --global user.email "gildong.hong@samsung.com"</span></span>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--ink-2)">
+    <code>autocrlf</code>는 Windows 줄바꿈(CRLF)을 저장소에는 LF로 넣어 줍니다. 빼면 파일 전체가 바뀐 것처럼 보입니다.
+    <code>quotepath false</code>는 한글 파일명이 <code>\355\225\234</code>처럼 깨져 보이는 것을 막습니다.
+  </p>
+
+  <div class="note warn">
+    <span class="ntitle">규칙 하나</span>
+    <p>왼쪽 <b>Source Control 패널은 보는 용도</b>로만 씁니다. 조작은 터미널에서 합니다.</p>
+    <p>특히 <code>Sync Changes</code> 버튼을 누르지 마세요. pull과 push를 한꺼번에 하기 때문에
+       의도하지 않은 merge commit이 생기고, 지금 무슨 일이 벌어졌는지 알 수 없게 됩니다.
+       익숙해진 뒤에 다시 쓰면 됩니다.</p>
+  </div>
+</section>
+
+<!-- 01 -->
+<section data-on="local fork up" data-links="l-f f-u">
+  <div class="shead"><span class="snum">01</span><h2>저장소가 3개다</h2></div>
+  <p class="sdek">P4는 서버 하나였습니다. Git Fork 방식은 셋입니다.
+     헷갈리는 거의 모든 문제가 <b>"지금 어느 저장소를 건드리고 있는가"</b>를 놓쳐서 생깁니다.</p>
+
+  <div class="repos">
+    <div class="repo local">
+      <span class="rname">내 PC</span>
+      <span class="ralias">작업 폴더</span>
+      <p>파일을 실제로 고치는 곳. 여기서 한 일은 아직 아무도 못 봅니다.</p>
+      <span class="rrule">commit해도 여기까지</span>
+    </div>
+    <div class="repo fork">
+      <span class="rname">내 Fork</span>
+      <span class="ralias">origin</span>
+      <p>서버에 있는 <b>내 전용</b> 복사본. 마음대로 push해도 팀에 영향이 없습니다.</p>
+      <span class="rrule">push 대상 · 항상 여기</span>
+    </div>
+    <div class="repo up">
+      <span class="rname">정식 저장소</span>
+      <span class="ralias">upstream</span>
+      <p>팀 공용. 여기로는 직접 push하지 않습니다. PR로만 들어갑니다.</p>
+      <span class="rrule">읽기 · branch 기준 · PR 대상</span>
+    </div>
+  </div>
+
+  <p>이름이 헷갈릴 수 있는데, <b>origin이 정식 저장소가 아닙니다.</b>
+     Fork를 clone했기 때문에 origin은 내 Fork를 가리킵니다. 정식은 별도로 <code>upstream</code>이라는 이름을 붙여 씁니다.</p>
+
+  <table>
+    <thead><tr><th>하고 싶은 일</th><th>어디를 건드리나</th></tr></thead>
+    <tbody>
+      <tr><td>새 branch 만들기</td><td>기준은 <b>upstream</b>, 만들어지는 곳은 내 PC</td></tr>
+      <tr><td>commit</td><td>내 PC만</td></tr>
+      <tr><td>push</td><td>내 PC → <b>origin</b>(내 Fork)</td></tr>
+      <tr><td>PR 올리기</td><td>origin → <b>upstream</b></td></tr>
+      <tr><td>최신 코드 받기</td><td><b>upstream</b> → 내 PC</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 02 -->
+<section data-on="local fork up" data-links="f-u">
+  <div class="shead"><span class="snum">02</span><h2>최초 1회 설정</h2></div>
+  <p class="sdek">저장소를 처음 받을 때 한 번만 합니다. 이미 폴더가 있으면 remote 확인만 하세요.</p>
+
+  <p>먼저 GitHub 웹에서 정식 저장소로 가서 오른쪽 위 <b>Fork</b>를 누릅니다. 내 계정 밑에 복사본이 생깁니다.
+     그다음 <b>내 Fork 주소</b>를 clone합니다.</p>
+
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">cd D:\workspace</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git clone https://slsi.github.samsungds.net/<span class="hi-fork">gildong.hong</span>/smp1900-pilot.git</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">cd smp1900-pilot</span></span>
+    </div>
+  </div>
+  <div class="touch"><span class="pill fork">origin</span> 내 Fork를 내 PC로 복사</div>
+
+  <p>이 시점에 <code>origin</code>은 자동으로 등록됩니다. 정식 저장소는 직접 붙여야 합니다.</p>
+
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git remote add upstream https://slsi.github.samsungds.net/<span class="hi-up">cpswdev-team</span>/smp1900-pilot.git</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git remote -v</span></span>
+<span class="ln"><span class="out">origin    .../<span class="hi-fork">gildong.hong</span>/smp1900-pilot.git (fetch)</span></span>
+<span class="ln"><span class="out">origin    .../<span class="hi-fork">gildong.hong</span>/smp1900-pilot.git (push)</span></span>
+<span class="ln"><span class="out">upstream  .../<span class="hi-up">cpswdev-team</span>/smp1900-pilot.git (fetch)</span></span>
+<span class="ln"><span class="out">upstream  .../<span class="hi-up">cpswdev-team</span>/smp1900-pilot.git (push)</span></span>
+    </div>
+  </div>
+  <div class="touch"><span class="pill up">upstream</span> 정식 저장소를 이름으로 등록 (아직 통신 안 함)</div>
+
+  <div class="note">
+    <span class="ntitle">확인</span>
+    <p><code>git remote -v</code>에서 <b>origin은 내 계정</b>, <b>upstream은 팀 계정</b>이면 맞습니다.
+       둘 다 팀 계정이면 Fork가 아니라 정식을 clone한 것입니다. 이 상태로 진행하면 push가 거부됩니다.</p>
+  </div>
+</section>
+
+<!-- 03 -->
+<section data-on="local fork" data-links="l-f">
+  <div class="shead"><span class="snum">03</span><h2>매일 쓰는 5단계</h2></div>
+  <p class="sdek">작업 하나를 시작해서 PR 직전까지. 이 다섯 개가 전부입니다.</p>
+
+  <ol class="steps">
+    <li>
+      <span class="stitle">정식 최신 상태를 받고, 거기서 branch를 판다</span>
+      <p>branch 기준은 항상 <b>upstream</b>입니다. 내 Fork는 뒤처져 있을 수 있습니다.</p>
+      <div class="term">
+        <div class="term-bar"><span class="dot"></span>PowerShell</div>
+        <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git fetch upstream</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git switch -c feature/ABC-123-tx-fix upstream/pilot</span></span>
+<span class="ln"><span class="out">Switched to a new branch 'feature/ABC-123-tx-fix'</span></span>
+        </div>
+      </div>
+      <div class="touch"><span class="pill up">upstream</span> 최신 상태를 읽어와서 <span class="pill local">내 PC</span> 에 branch 생성</div>
+      <div class="vs">
+        <span class="vlabel">VS Code</span>
+        <span>좌하단 상태바의 branch 이름이 <b>feature/ABC-123-tx-fix</b>로 바뀝니다. 이게 지금 내가 서 있는 자리입니다.</span>
+      </div>
+    </li>
+
+    <li>
+      <span class="stitle">코드를 고치고, 올릴 파일을 고른다</span>
+      <p>P4에 없던 단계입니다. 고친 파일 중 <b>이번 commit에 넣을 것만</b> 따로 지정합니다.</p>
+      <div class="term">
+        <div class="term-bar"><span class="dot"></span>PowerShell</div>
+        <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git status</span></span>
+<span class="ln"><span class="out">        modified:   src/TxSwitchMngr.cpp</span></span>
+<span class="ln"><span class="out">        modified:   debug_temp.log</span></span>
+<span class="ln"></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git add src/TxSwitchMngr.cpp</span></span>
+        </div>
+      </div>
+      <div class="touch"><span class="pill local">내 PC</span> 아직 아무 데도 안 나갑니다</div>
+      <div class="vs">
+        <span class="vlabel">VS Code</span>
+        <span>Source Control 패널에서 <b>TxSwitchMngr.cpp가 Changes에서 Staged Changes로 이동</b>합니다.
+              <code>debug_temp.log</code>는 Changes에 그대로 남습니다 — 이게 "고른다"의 의미입니다.
+              눈으로 한 번 보면 개념이 잡힙니다.</span>
+      </div>
+    </li>
+
+    <li>
+      <span class="stitle">commit — 내 PC에 기록</span>
+      <p><b>commit은 제출이 아닙니다.</b> 아직 내 PC 밖으로 한 발자국도 안 나갔습니다.</p>
+      <div class="term">
+        <div class="term-bar"><span class="dot"></span>PowerShell</div>
+        <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git commit -m "ABC-123 TxSwitchMngr null check 추가"</span></span>
+<span class="ln"><span class="out">[feature/ABC-123-tx-fix 0501410] ABC-123 TxSwitchMngr null check 추가</span></span>
+        </div>
+      </div>
+      <div class="touch"><span class="pill local">내 PC</span> 기록 완료 · 서버는 아직 모름</div>
+      <div class="vs">
+        <span class="vlabel">VS Code</span>
+        <span>Staged Changes가 비워지고, 좌하단 branch 이름 옆에 <b>↑1</b>이 생깁니다.
+              "서버에 안 보낸 commit 1개"라는 뜻입니다.</span>
+      </div>
+    </li>
+
+    <li>
+      <span class="stitle">push — 내 Fork로 보낸다</span>
+      <p>처음 한 번만 <code>-u origin &lt;branch&gt;</code>를 붙입니다. 그다음부터는 <code>git push</code>만으로 됩니다.</p>
+      <div class="term">
+        <div class="term-bar"><span class="dot"></span>PowerShell</div>
+        <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git push -u origin feature/ABC-123-tx-fix</span></span>
+<span class="ln"><span class="out">... * [new branch]  feature/ABC-123-tx-fix -&gt; feature/ABC-123-tx-fix</span></span>
+        </div>
+      </div>
+      <div class="touch"><span class="pill local">내 PC</span> → <span class="pill fork">origin</span> commit된 것만 갑니다</div>
+      <div class="vs">
+        <span class="vlabel">VS Code</span>
+        <span>좌하단 <b>↑1이 사라집니다.</b> 아직 ↑가 남아 있으면 안 올라간 commit이 있는 겁니다.</span>
+      </div>
+    </li>
+
+    <li>
+      <span class="stitle">PR — 정식 저장소로 요청</span>
+      <p>여기부터는 웹입니다. GitHub에서 내 Fork로 가면 방금 push한 branch에 대해
+         <b>Compare &amp; pull request</b> 버튼이 떠 있습니다.</p>
+      <div class="touch"><span class="pill fork">origin</span> → <span class="pill up">upstream</span> base가 <code>pilot</code>인지 반드시 확인</div>
+      <div class="note">
+        <span class="ntitle">확인</span>
+        <p>PR 화면 위쪽이 <code>cpswdev-team/smp1900-pilot : pilot ← gildong.hong/smp1900-pilot : feature/...</code>
+           형태여야 합니다. 왼쪽(base)이 내 계정으로 되어 있으면 내 Fork 안에서만 도는 PR입니다.</p>
+      </div>
+    </li>
+  </ol>
+</section>
+
+<!-- 04 -->
+<section data-on="local up" data-links="f-u">
+  <div class="shead"><span class="snum">04</span><h2>정식이 앞서갔을 때</h2></div>
+  <p class="sdek">리뷰 도중 다른 사람 코드가 먼저 merge되는 상황. Fork 방식에서 가장 자주 하게 될 작업입니다.</p>
+
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git fetch upstream</span></span>
+<span class="ln"><span class="out">   e4483cb..2463939  pilot -&gt; upstream/pilot</span></span>
+<span class="ln"></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git merge upstream/pilot</span></span>
+<span class="ln"><span class="out">Merge made by the 'ort' strategy.</span></span>
+<span class="ln"></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git push</span></span>
+    </div>
+  </div>
+  <div class="touch"><span class="pill up">upstream</span> → <span class="pill local">내 PC</span> → <span class="pill fork">origin</span></div>
+
+  <p><b>왜 <code>git pull</code>이 아닌가.</b> <code>pull</code>은 fetch와 merge를 한 번에 합니다.
+     편하지만 초보자에게는 "무엇을 가져왔는지" 볼 기회가 사라집니다. 나눠서 하면
+     <code>fetch</code> 출력에서 정식이 얼마나 앞서갔는지 먼저 확인하고 merge할 수 있습니다.
+     그리고 <code>pull</code>은 기본적으로 origin(내 Fork)을 봅니다 — 여기서 원하는 건 upstream입니다.</p>
+
+  <div class="note">
+    <span class="ntitle">먼저 확인하고 싶다면</span>
+    <p><code>git log --oneline HEAD..upstream/pilot</code> — 정식에는 있고 내게는 없는 commit 목록.</p>
+    <p><code>git log --oneline -10</code> — 최근 10개. <b>화면 아래에 <code>:</code>만 뜨고 멈추면 <code>q</code>를 누르세요.</b>
+       고장난 게 아니라 페이지 넘김 모드입니다.</p>
+  </div>
+</section>
+
+<!-- 05 -->
+<section data-on="local">
+  <div class="shead"><span class="snum">05</span><h2>충돌(conflict)</h2></div>
+  <p class="sdek">같은 줄을 나와 다른 사람이 동시에 고쳤을 때. 겁먹을 일이 아니라 그냥 손으로 고르는 작업입니다.</p>
+
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git merge upstream/pilot</span></span>
+<span class="ln"><span class="hi-warn">CONFLICT (content): Merge conflict in src/TxSwitchMngr.cpp</span></span>
+<span class="ln"><span class="out">Automatic merge failed; fix conflicts and then commit the result.</span></span>
+    </div>
+  </div>
+
+  <p>파일을 열면 이렇게 되어 있습니다.</p>
+
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>src/TxSwitchMngr.cpp</div>
+    <div class="term-body">
+<span class="ln"><span class="out">    if (pCtx == nullptr) {</span></span>
+<span class="ln"><span class="hi-warn">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span></span>
+<span class="ln"><span class="hi-local">        return TX_ERR_NULL_CTX;        ← 내가 쓴 것</span></span>
+<span class="ln"><span class="hi-warn">=======</span></span>
+<span class="ln"><span class="hi-up">        LOG_ERR("null ctx"); return -1; ← 정식에 들어온 것</span></span>
+<span class="ln"><span class="hi-warn">&gt;&gt;&gt;&gt;&gt;&gt;&gt; upstream/pilot</span></span>
+<span class="ln"><span class="out">    }</span></span>
+    </div>
+  </div>
+
+  <div class="vs">
+    <span class="vlabel">VS Code</span>
+    <span>이 마커를 손으로 지우지 마세요. 파일 위쪽에 뜨는 <b>Resolve in Merge Editor</b> 버튼을 누르면
+          왼쪽/오른쪽/결과 3분할 화면이 열립니다. 체크박스로 고르면 마커가 알아서 정리됩니다.
+          마커는 <b>"이게 보이면 아직 해결 안 된 것"</b> 정도로만 알아두면 충분합니다.</span>
+  </div>
+
+  <p>고르고 나면 나머지는 평소와 같습니다.</p>
+
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git add src/TxSwitchMngr.cpp</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git commit</span><span class="out">          </span><span class="cmt"># 메시지는 자동으로 채워짐</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git push</span></span>
+    </div>
+  </div>
+  <div class="touch"><span class="pill local">내 PC</span> → <span class="pill fork">origin</span></div>
+
+  <div class="note warn">
+    <span class="ntitle">중간에 그만두고 싶다면</span>
+    <p><code>git merge --abort</code> — merge 시작 전 상태로 완전히 되돌아갑니다.
+       충돌이 너무 커서 정리가 안 될 때 언제든 쓰세요. <b>잃는 것은 없습니다.</b></p>
+  </div>
+
+  <div class="note">
+    <span class="ntitle">텍스트가 합쳐졌다고 끝이 아닙니다</span>
+    <p>git은 줄 단위로만 봅니다. 위 예에서 양쪽을 다 남기면 문법은 맞지만 동작은 틀립니다.
+       <b>합친 뒤에는 반드시 빌드하고 동작을 확인하세요.</b> 이건 git이 대신해 주지 않습니다.</p>
+  </div>
+</section>
+
+<!-- 06 -->
+<section data-on="local">
+  <div class="shead"><span class="snum">06</span><h2>되돌리기</h2></div>
+  <p class="sdek">이 절이 이 문서에서 가장 중요합니다. 되돌릴 수 있다는 걸 알면 나머지를 겁 없이 시도할 수 있습니다.</p>
+
+  <h3>아직 commit 안 한 수정을 버리고 싶다</h3>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git restore src/TxSwitchMngr.cpp</span><span class="out">      </span><span class="cmt"># 파일 하나</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git restore .</span><span class="out">                        </span><span class="cmt"># 전부</span></span>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--ink-2)">이건 <b>진짜로 사라집니다.</b> commit 안 한 것은 git이 기억하지 못합니다.
+     확신이 없으면 아래 <code>stash</code>를 쓰세요.</p>
+
+  <h3>add를 잘못했다 (staged에서 빼기)</h3>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git restore --staged debug_temp.log</span></span>
+    </div>
+  </div>
+  <div class="vs"><span class="vlabel">VS Code</span><span>Staged Changes → Changes로 다시 내려옵니다. 수정 내용은 그대로 있습니다.</span></div>
+
+  <h3>방금 commit을 취소하고 싶다 (내용은 남기고)</h3>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git reset --soft HEAD~1</span></span>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--ink-2)">commit 기록만 없어지고 <b>고친 내용은 staged 상태로 그대로 남습니다.</b>
+     메시지를 잘못 썼거나, 파일을 하나 빠뜨렸을 때 쓰면 됩니다.
+     <b>이미 push한 commit에는 쓰지 마세요.</b></p>
+
+  <h3>잠깐 치워두고 다른 일 하기</h3>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git stash</span><span class="out">        </span><span class="cmt"># 현재 수정을 안전하게 치움 (작업 폴더 깨끗해짐)</span></span>
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git stash pop</span><span class="out">    </span><span class="cmt"># 다시 꺼냄</span></span>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--ink-2)">P4의 shelve와 가장 비슷합니다. 다만 <b>서버로 가지 않고 내 PC에만</b> 있습니다.</p>
+
+  <h3>뭔가 크게 잘못됐다</h3>
+  <div class="term">
+    <div class="term-bar"><span class="dot"></span>PowerShell</div>
+    <div class="term-body">
+<span class="ln"><span class="ps">PS&gt; </span><span class="cmd">git reflog</span></span>
+<span class="ln"><span class="out">0522a5c HEAD@{0}: reset: moving to HEAD~1</span></span>
+<span class="ln"><span class="out">4a851e5 HEAD@{1}: commit: ABC-123 null check</span></span>
+<span class="ln"><span class="out">2463939 HEAD@{2}: merge upstream/pilot</span></span>
+    </div>
+  </div>
+  <p style="font-size:14.5px;color:var(--ink-2)">
+    <b>한 번이라도 commit한 것은 거의 다 여기 남아 있습니다.</b> 삭제한 branch도 마찬가지입니다.
+    돌아가고 싶은 줄의 앞 번호를 찾아서 <code>git reset --hard 4a851e5</code>.
+  </p>
+  <div class="note">
+    <span class="ntitle">막혔을 때</span>
+    <p>reflog까지 봤는데 모르겠으면 <b>거기서 멈추고 물어보세요.</b>
+       추가로 명령을 던지는 것보다, 현재 <code>git status</code>와 <code>git reflog</code> 출력을 그대로
+       복사해서 보여주는 편이 훨씬 빨리 풀립니다.</p>
+  </div>
+</section>
+
+<!-- 07 -->
+<section data-on="local fork up">
+  <div class="shead"><span class="snum">07</span><h2>자주 하는 착각</h2></div>
+  <p class="sdek">P4 감각이 그대로 넘어와서 생기는 것들입니다. 여기만 넘기면 나머지는 쉽습니다.</p>
+
+  <ul class="myth">
+    <li>
+      <span class="m-wrong">commit했으니 제출된 거다</span>
+      <span class="m-right">commit은 <b>내 PC에만</b> 기록됩니다. push해야 내 Fork로 가고, PR을 올려야 팀이 봅니다.
+        P4의 submit은 이 셋을 한 번에 하던 것이라 감각이 다릅니다.</span>
+    </li>
+    <li>
+      <span class="m-wrong">고친 파일이 있으니 push하면 올라간다</span>
+      <span class="m-right">push는 <b>commit된 것만</b> 보냅니다. 고쳐만 놓고 commit 안 한 파일은
+        push해도 그대로 내 PC에 남습니다. 성공 메시지가 떠도 마찬가지입니다.
+        올리기 전에 <code>git status</code>로 확인하는 습관을 들이세요.</span>
+    </li>
+    <li>
+      <span class="m-wrong">origin이 정식 저장소다</span>
+      <span class="m-right">Fork를 clone했으므로 <b>origin은 내 Fork</b>입니다. 정식은 <code>upstream</code>입니다.
+        branch를 팔 때 <code>origin/pilot</code>을 기준으로 삼으면 내 Fork의 오래된 상태에서 시작하게 됩니다.</span>
+    </li>
+    <li>
+      <span class="m-wrong">branch를 만드는 건 큰일이다</span>
+      <span class="m-right">git branch는 <b>사실상 공짜</b>입니다. 파일 복사가 일어나지 않습니다.
+        작업 하나에 branch 하나가 정상이고, 하루에 여러 개 만들어도 됩니다.</span>
+    </li>
+    <li>
+      <span class="m-wrong">pull이 최신 코드 받는 명령이다</span>
+      <span class="m-right">Fork 방식에서 <code>git pull</code>은 기본적으로 <b>내 Fork(origin)</b>를 봅니다.
+        내 Fork는 자동으로 갱신되지 않으므로 오래된 상태일 수 있습니다.
+        정식 최신은 <code>git fetch upstream</code> → <code>git merge upstream/pilot</code>입니다.</span>
+    </li>
+    <li>
+      <span class="m-wrong">충돌이 났으니 뭔가 망가졌다</span>
+      <span class="m-right">충돌은 <b>정상적인 상태</b>입니다. 같은 줄을 두 사람이 고쳤으니 어느 쪽을 쓸지
+        사람이 정해달라는 뜻일 뿐입니다. <code>git merge --abort</code>로 언제든 시작 전으로 돌아갈 수 있습니다.</span>
+    </li>
+  </ul>
+</section>
+
+<!-- 08 -->
+<section data-on="local fork up">
+  <div class="shead"><span class="snum">08</span><h2>P4 ↔ Git 대응표</h2></div>
+  <p class="sdek">완전히 같은 것은 없습니다. "대충 이 자리" 정도로만 쓰세요.</p>
+
+  <table>
+    <thead><tr><th>P4</th><th>Git</th><th>다른 점</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>p4 sync</td><td>git fetch upstream<br>git merge upstream/pilot</td>
+        <td>git은 받아오기(fetch)와 합치기(merge)가 분리되어 있습니다.</td>
+      </tr>
+      <tr>
+        <td>p4 edit</td><td>—</td>
+        <td>필요 없습니다. 파일을 그냥 고치면 git이 알아서 감지합니다.</td>
+      </tr>
+      <tr>
+        <td>p4 add</td><td>git add</td>
+        <td>이름은 같지만 역할이 다릅니다. git add는 <b>매번</b> 합니다 — 이번 commit에 넣을 파일을 고르는 것입니다.</td>
+      </tr>
+      <tr>
+        <td>p4 revert</td><td>git restore</td>
+        <td>거의 같습니다. 둘 다 commit 안 한 수정을 버립니다.</td>
+      </tr>
+      <tr>
+        <td>p4 shelve</td><td>git stash</td>
+        <td><b>stash는 서버로 안 갑니다.</b> 내 PC에만 남으므로 남에게 보여줄 수 없습니다.
+            공유가 목적이면 branch를 파서 push하세요.</td>
+      </tr>
+      <tr>
+        <td>p4 submit</td><td>git commit<br>git push<br>PR</td>
+        <td>P4의 한 동작이 git에서는 세 단계입니다. 가장 크게 다른 부분입니다.</td>
+      </tr>
+      <tr>
+        <td>changelist</td><td>commit</td>
+        <td>commit은 번호가 아니라 해시(<code>0501410</code>)로 식별됩니다.</td>
+      </tr>
+      <tr>
+        <td>p4 opened</td><td>git status</td>
+        <td>가장 자주 쓰게 될 명령입니다. 막히면 일단 이것부터 치세요.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- 09 -->
+<section data-on="local">
+  <div class="shead"><span class="snum">09</span><h2>PowerShell 주의사항</h2></div>
+  <p class="sdek">git 자체와는 상관없지만 모르면 시간을 잡아먹는 것들입니다.</p>
+
+  <table>
+    <thead><tr><th>상황</th><th>이렇게 하세요</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>명령 연결</td>
+        <td>Windows PowerShell 5.1에서는 <code>&amp;&amp;</code>가 <b>동작하지 않습니다.</b>
+            <code>git add . &amp;&amp; git commit -m "x"</code> 같은 건 쓰지 말고 <b>한 줄씩</b> 치세요.
+            어차피 한 줄씩 치는 편이 결과를 확인할 수 있어 낫습니다.</td>
+      </tr>
+      <tr>
+        <td>메시지에 따옴표</td>
+        <td>큰따옴표를 쓰세요. 메시지 안에 큰따옴표가 필요하면 작은따옴표로 감싸면 됩니다.</td>
+      </tr>
+      <tr>
+        <td>경로 자동완성</td>
+        <td><b>Tab</b> 키가 됩니다. <code>src/Tx</code>까지 치고 Tab.</td>
+      </tr>
+      <tr>
+        <td>이전 명령</td>
+        <td><b>↑</b> 키. <code>git status</code>를 반복해서 칠 일이 많으니 익혀두면 편합니다.</td>
+      </tr>
+      <tr>
+        <td>화면이 멈춘 것 같다</td>
+        <td>왼쪽 아래에 <code>:</code>만 있으면 페이지 넘김 모드입니다. <b>q</b>를 누르세요.
+            텍스트 편집기(vim)가 열렸다면 <b>Esc</b> → <code>:wq</code> → <b>Enter</b>.</td>
+      </tr>
+      <tr>
+        <td>여러 branch 동시 작업</td>
+        <td>한 창에서 <code>switch</code>로 왔다 갔다 하지 말고, <b>VS Code 창을 따로</b> 여세요.
+            어느 저장소를 건드리는지 감각이 무너지지 않습니다.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+</main>
+
+<footer class="wrap">
+  <p><b>막혔을 때 순서</b> — ① <code>git status</code> ② <code>git remote -v</code>
+     ③ <code>git log --oneline -5</code> ④ 그래도 모르겠으면 이 셋의 출력을 복사해서 물어보기.</p>
+  <p style="margin-top:18px">이 문서는 순수 git CLI만 다룹니다. 실제 업무는 도구로 하더라도,
+     도구가 무엇을 대신하고 있는지는 여기 있는 명령들로 설명됩니다.</p>
+</footer>
+
+<script>
+(function(){
+  var sections = Array.prototype.slice.call(document.querySelectorAll('section[data-on]'));
+  var nodes = {};
+  document.querySelectorAll('.node').forEach(function(n){ nodes[n.dataset.n] = n; });
+  var links = {};
+  document.querySelectorAll('.link').forEach(function(l){ links[l.dataset.l] = l; });
+
+  function apply(sec){
+    var on = (sec.dataset.on || '').split(/\s+/).filter(Boolean);
+    var lk = (sec.dataset.links || '').split(/\s+/).filter(Boolean);
+    Object.keys(nodes).forEach(function(k){ nodes[k].classList.toggle('on', on.indexOf(k) !== -1); });
+    Object.keys(links).forEach(function(k){ links[k].classList.toggle('on', lk.indexOf(k) !== -1); });
+  }
+
+  if (!('IntersectionObserver' in window)) { return; }
+  var current = null;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if (e.isIntersecting) { current = e.target; apply(current); }
+    });
+  }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+  sections.forEach(function(s){ io.observe(s); });
+})();
+</script>
+</body>
+</html>
