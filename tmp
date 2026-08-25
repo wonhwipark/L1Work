@@ -1,320 +1,357 @@
-SkillSilent Registry Reconcile 실패 원인 진단
+l1-knowledge-manager 기존 영구지식 포팅 작업
 
-현재 "autotask-builder v0.4.18" 설치/배포 과정에서 다음 오류가 발생한다.
+기존 "slte-knowledge-manager"의 영구 지식을 새 "l1-knowledge-manager"로 안전하게 포팅해줘.
 
-skillsilent registry reconcile failed
+1. 목적
 
-이번 작업의 목적은 수정이나 재설치가 아니라 정확한 실패 원인을 진단하는 것이다.
+기존 저장소:
 
-절대 금지
+"~/l1sw-private-skills/slte-knowledge-manager/"
 
-다음 작업은 수행하지 마라.
+에서 사용하던 영구 Knowledge 영역을
 
-- 기존 Skill 삭제
-- "autotask-builder" 재설치
-- "skillsilent" 재설치
-- registry 파일 삭제/초기화
-- 기존 파일 수정
-- "setup --yes" 등 상태를 변경하는 명령 실행
-- Git commit/push
-- 자동 repair
-- "~/.claude/main/"을 active storage/fallback 경로로 사용
-- 임의의 legacy 경로 생성
+"~/l1sw-private-skills/l1-knowledge-manager/"
 
-READ-ONLY 진단만 수행한다.
+로 이전한다.
 
----
+중요 원칙:
 
-1. 현재 설치 구조 확인
-
-아래 경로의 존재 여부와 파일 구조를 확인한다.
-
-~/.claude/skills/autotask-builder/
-~/l1sw-private-skills/autotask-builder/
-
-~/.claude/skills/skillsilent/
-~/l1sw-private-skills/skillsilent/
-
-~/.skillsilent/
-
-특히 다음 파일의 실제 위치를 확인한다.
-
-SKILL.md
-skillsilent/manifest.json
-skillsilent/policy.json
-skillsilent/contract.json
-
-각 파일에 대해 다음을 보고한다.
-
-- absolute path
-- 존재 여부
-- 파일 크기
-- 수정 시각
-- 동일 이름 파일이 여러 위치에 존재하는지
+- 기존 데이터 절대 삭제 금지
+- 기존 source 수정 금지
+- 먼저 검사 후 migration 수행
+- 동일 파일이 있으면 무조건 overwrite하지 말고 비교
+- migration 완료 후 source/destination 검증
+- 실패 시 기존 지식으로 복구 가능해야 함
+- Git repository/branch 내부로 데이터를 복사하지 말 것
 
 ---
 
-2. 현재 사용 중인 skillsilent 버전 확인
+2. Canonical 경로
 
-실제 실행되고 있는 "skillsilent"의 버전을 확인한다.
+기존 Knowledge Manager
 
-가능하면 다음을 확인한다.
+~/l1sw-private-skills/slte-knowledge-manager/
+├─ data/
+└─ output/
 
-skillsilent --version
-skillsilent version
+신규 Knowledge Manager
 
-명령이 지원되지 않으면 설치된 "SKILL.md", manifest 또는 package metadata에서 버전을 찾는다.
+~/l1sw-private-skills/l1-knowledge-manager/
+├─ data/       # 영구 Knowledge 전용
+└─ output/     # runtime/run artifact 전용
 
-추가로 실제로 실행되는 skillsilent executable/launcher의 absolute path를 확인한다.
+신규 Skill의 SSOT는 반드시:
 
-중복 설치가 있다면 모두 보고한다.
+~/l1sw-private-skills/l1-knowledge-manager/
+
+로 한다.
+
+---
+
+3. 먼저 현재 상태 검사
+
+다음을 실제 filesystem 기준으로 확인해라.
+
+1. 기존 경로 존재 여부
+2. 신규 경로 존재 여부
+3. 기존 "data/" 전체 구조
+4. 신규 "data/" 전체 구조
+5. 기존 "output/" 구조
+6. 파일 수
+7. 디렉터리 수
+8. 전체 크기
+9. manifest/index/current/candidates 등 영구 Knowledge 존재 여부
+10. 기존 data 안에 runtime run artifact가 섞여 있는지
+
+특히 다음 패턴을 확인한다.
+
+data/current/
+data/candidates/
+data/indexes/
+data/inventory/
+data/block_context/
+data/knowledge_manifest.json
+
+실제 설치본에 추가 persistent 영역이 있다면 이름만 보고 제외하지 말고 코드와 schema를 확인해서 분류한다.
+
+---
+
+4. data / output 분류
+
+기존 버전에는 runtime artifact가 "data/" 아래에 저장된 문제가 있었으므로 단순히 "data → data" 전체 복사하지 마라.
+
+다음 run 영역은 영구 Knowledge가 아니라 실행 결과로 취급한다.
+
+data/domain_bootstrap/runs/**
+data/integrated_learning/runs/**
+data/msc-learning/runs/**
+
+또는 이와 동일한 의미의 run/session/temp/report artifact.
+
+이 항목들은 신규 구조에서:
+
+~/l1sw-private-skills/l1-knowledge-manager/output/
+
+아래의 대응 위치로 migration 한다.
 
 예:
 
-~/.claude/skills/skillsilent/
-~/l1sw-private-skills/skillsilent/
-기타 PATH 상의 skillsilent
+OLD:
+slte-knowledge-manager/data/domain_bootstrap/runs/
 
-어느 것이 실제 실행되는지도 구분한다.
+NEW:
+l1-knowledge-manager/output/domain_bootstrap/runs/
 
----
+OLD:
+slte-knowledge-manager/data/integrated_learning/runs/
 
-3. registry 실제 위치와 schema 확인
+NEW:
+l1-knowledge-manager/output/integrated_learning/runs/
 
-"skillsilent" 코드나 문서를 읽어서 registry의 SSOT가 어디인지 확인한다.
+OLD:
+slte-knowledge-manager/data/msc-learning/runs/
 
-추측하지 말고 실제 구현을 근거로 확인한다.
-
-확인할 항목:
-
-registry root
-registry file name
-registry schema/version
-declaration discovery root
-implementation discovery rule
-execution_root 처리 방식
-manifest 필수 필드
-policy 필수 필드
-contract 필수 필드
-
-특히 다음 질문에 답한다.
-
-A.
-
-"~/.claude/skills/<skill>/skillsilent/manifest.json"이 반드시 필요한가?
-
-B.
-
-manifest의 "execution_root"를 지원하는가?
-
-C.
-
-지원한다면 필드 이름이 정확히 "execution_root"인가?
-
-D.
-
-경로 값으로 아래 표현을 허용하는가?
-
-~/l1sw-private-skills/autotask-builder
-
-아니면 absolute path만 허용하는가?
-
-E.
-
-registry 등록 대상 판정에 필요한 필수 manifest key는 무엇인가?
+NEW:
+l1-knowledge-manager/output/msc-learning/runs/
 
 ---
 
-4. autotask-builder declaration 검증
+5. 영구 Knowledge 포팅
 
-현재 설치된 아래 파일을 읽는다.
+영구 Knowledge로 판정된 데이터는:
 
-~/.claude/skills/autotask-builder/SKILL.md
-~/.claude/skills/autotask-builder/skillsilent/manifest.json
-~/.claude/skills/autotask-builder/skillsilent/policy.json
-~/.claude/skills/autotask-builder/skillsilent/contract.json
+OLD
+~/l1sw-private-skills/slte-knowledge-manager/data/
 
-그리고 implementation 쪽도 비교한다.
+에서
 
-~/l1sw-private-skills/autotask-builder/
+NEW
+~/l1sw-private-skills/l1-knowledge-manager/data/
 
-다음을 확인한다.
+로 복사한다.
 
-- JSON syntax 정상 여부
-- skillsilent 현재 schema와 일치하는지
-- 필수 필드 누락 여부
-- deprecated field 사용 여부
-- "execution_root" 인식 여부
-- declaration의 skill name과 실제 디렉터리 name 일치 여부
-- version mismatch
-- implementation root 존재 여부
-- referenced 파일 존재 여부
+대표적인 대상:
 
----
+current/
+candidates/
+indexes/
+inventory/
+block_context/
+knowledge_manifest.json
 
-5. reconcile 코드 경로 추적
+단, 실제 source 구조를 우선한다.
 
-현재 설치된 "autotask-builder v0.4.18"의 "install.py"에서
+새 버전에 동일 파일이 이미 존재할 경우:
 
-skillsilent registry reconcile
+1. source hash
+2. destination hash
+3. modification time
+4. schema/version
+5. content
 
-관련 동작을 찾아라.
+를 비교한다.
 
-다음을 정확히 출력한다.
+동일하면 "SKIP_IDENTICAL".
 
-1. 어떤 skillsilent 명령을 호출하는가
-2. 호출 순서
-3. 각 명령의 arguments
-4. 성공 판정 기준
-5. 실패 판정 기준
-6. stdout/stderr 처리 방식
-7. 어떤 단계에서 최종적으로
+다르면 무조건 덮어쓰지 말고 다음과 같이 처리한다.
 
-skillsilent registry reconcile failed
+CONFLICT
 
-가 발생하는지
+그리고 기존 지식과 신규 지식 중 어느 것을 보존할지 판단할 수 있도록 conflict 목록을 생성한다.
 
-코드를 수정하지 말고 분석만 한다.
+기본 정책은 기존 사용자 Knowledge 보존 우선이다.
 
 ---
 
-6. 실제 skillsilent CLI capability 확인
+6. 안전 백업
 
-상태 변경 명령은 실행하지 말고 help만 확인한다.
+migration 전에 신규 영역의 현재 상태를 backup 한다.
 
 예:
 
-skillsilent --help
-skillsilent setup --help
-skillsilent doctor --help
-skillsilent available --help
+~/l1sw-private-skills/l1-knowledge-manager/
+    migration_backup/
+        <timestamp>/
 
-현재 v0.4.18 installer가 호출하려는 명령이 현재 skillsilent 버전에서 실제 지원되는지 확인한다.
+또는 신규 Skill이 정의한 안전한 backup 영역을 사용한다.
 
-특히:
-
-skillsilent setup --yes
-skillsilent doctor
-skillsilent available autotask-builder
-
-이 세 명령의 CLI syntax가 정확한지 검증한다.
-
-실제 상태를 변경할 수 있는 "setup" 본 실행은 하지 않는다.
+기존 "slte-knowledge-manager" 원본은 절대 변경하거나 삭제하지 않는다.
 
 ---
 
-7. 기존 실패 로그 확인
+7. Rename 참조 검사
 
-다음 위치를 포함하여 관련 로그를 검색한다.
+migration 후 신규 Skill 내부에서 다음 문자열이 runtime SSOT로 남아 있는지 검사한다.
 
-~/l1sw-private-skills/autotask-builder/data/
-~/l1sw-private-skills/autotask-builder/output/
-~/.skillsilent/
+slte-knowledge-manager
+SLTE_KNOWLEDGE_HOME
 
-다음 문자열을 우선 검색한다.
+"slte-knowledge-manager"가 legacy migration/fallback 용도로 사용되는 것은 허용한다.
 
-registry reconcile failed
-autotask-builder
-skillsilent
-registry
-manifest
-execution_root
-schema
-invalid
-missing
-not found
-doctor
-available
-setup
+그러나 신규 정상 동작 경로는 반드시:
 
-가장 최초의 root error와 최종 wrapper error를 구분한다.
+l1-knowledge-manager
+L1_KNOWLEDGE_HOME
+
+이어야 한다.
+
+"SLTE_KNOWLEDGE_HOME"은 backward compatibility 용도 외에는 신규 primary 설정으로 사용하지 않는다.
 
 ---
 
-8. 원인 분류
+8. Migration 검증
 
-최종 원인을 아래 중 하나 이상으로 분류한다.
+migration 후 다음을 자동 검증한다.
 
-A. autotask-builder manifest/schema 오류
-B. skillsilent 버전 incompatibility
-C. skillsilent CLI command mismatch
-D. declaration root 탐색 실패
-E. execution_root 해석 실패
-F. registry 자체 손상/미생성
-G. skillsilent 설치 중복 또는 잘못된 executable 실행
-H. 권한 문제
-I. 경로 정책 mismatch
-J. installer의 성공/실패 판정 버그
-K. 기타
+A. 파일 검증
 
----
+source persistent file과 destination file에 대해 가능한 범위에서 SHA-256을 비교한다.
 
-9. 최종 보고 형식
+결과:
 
-아래 형식으로만 최종 정리한다.
+MATCH
+MISSING
+CONFLICT
+SKIP_IDENTICAL
 
-결론
+로 구분한다.
 
-Root Cause:
-Confidence: HIGH / MEDIUM / LOW
-Failure Stage:
+B. 구조 검증
 
-실제 오류
+신규 구조가 최소 다음 형태인지 확인한다.
 
-가능한 경우 가장 원본에 가까운 오류 메시지를 그대로 제시한다.
+~/l1sw-private-skills/l1-knowledge-manager/
+├─ data/
+│  ├─ current/
+│  ├─ candidates/
+│  └─ ...
+│
+└─ output/
+   ├─ domain_bootstrap/
+   ├─ integrated_learning/
+   └─ msc-learning/
 
-...
+빈 디렉터리는 실제 필요할 때만 생성해도 된다.
 
-현재 구조
+C. 잘못된 run artifact 검사
 
-SkillSilent version:
-SkillSilent executable:
-Registry root:
-Declaration root:
-Autotask implementation root:
+신규:
 
-불일치 사항
+l1-knowledge-manager/data/
 
-항목| autotask-builder 현재값| skillsilent 요구값| 판정
-...| ...| ...| PASS/FAIL
+안에 새로 migration된:
 
-v0.4.18 실패 흐름
+*/runs/
 
-install.py
-  ↓
-...
-  ↓
-실패 지점
+runtime artifact가 없는지 확인한다.
 
-수정해야 할 최소 항목
+runtime 결과는 "output/"에 있어야 한다.
 
-아직 실제 수정하지 말고 다음 형태로만 제안한다.
+D. Knowledge 로딩 검사
 
-1.
-2.
-3.
+가능하면 "l1-knowledge-manager"의 read/status/list/doctor 또는 동등 기능을 실제 호출해서:
 
-각 항목마다 반드시 근거 파일/코드 위치를 같이 표시한다.
+- 기존 Knowledge 조회 가능
+- manifest 읽기 가능
+- current knowledge 접근 가능
+- candidates 접근 가능
+- schema 오류 없음
 
-재설치 필요 여부
+을 확인한다.
 
-아래 중 하나를 선택한다.
-
-재설치 불필요
-autotask-builder만 재설치 필요
-skillsilent만 수정 필요
-둘 다 수정 필요
-판단 불가
+자동 approve는 절대 수행하지 않는다.
 
 ---
 
-중요
+9. Study Runner 연동 확인
 
-이번 진단에서는 문제를 발견해도 수정하지 않는다.
+설치된 "l1-study-runner"가 Knowledge Manager를 다음 이름으로 참조하는지 확인한다.
 
-특히 registry를 강제로 만들거나 기존 데이터를 삭제해서 증상을 숨기지 마라.
+l1-knowledge-manager
 
-우리가 필요한 것은:
+다음 구 이름을 primary provider로 사용하면 오류로 처리한다.
 
-«"skillsilent registry reconcile failed"라는 wrapper 오류가 아니라
-그 바로 아래의 최초 root cause와 현재 skillsilent가 요구하는 실제 registry contract이다.»
+slte-knowledge-manager
+
+Study Runner가 Knowledge Manager의:
+
+data/
+
+를 run output으로 사용하면 안 된다.
+
+정상 역할은:
+
+l1-knowledge-manager/data/
+    = 영구 Knowledge
+
+l1-knowledge-manager/output/
+    = Knowledge learning 실행 결과
+
+이다.
+
+---
+
+10. 실제 수정이 필요한 경우
+
+검사 중 경로나 설정 오류가 발견되면 수정해도 된다.
+
+단 다음 원칙을 지켜라.
+
+- 기존 Knowledge 삭제 금지
+- destructive migration 금지
+- source 원본 수정 금지
+- 신규 데이터 overwrite 전 hash/content 비교
+- Git repository에 persistent Knowledge 저장 금지
+- 인증정보/secret 이동 금지
+- 자동 approve 금지
+
+가능하면 Python 기반으로 deterministic하게 처리하고, LLM이 파일을 하나씩 수동 복사하는 방식은 피한다.
+
+---
+
+11. 최종 보고
+
+작업 완료 후 아래 형식으로 결과를 보여줘.
+
+[MIGRATION RESULT]
+
+Source:
+~/l1sw-private-skills/slte-knowledge-manager/
+
+Destination:
+~/l1sw-private-skills/l1-knowledge-manager/
+
+Persistent Knowledge:
+- migrated:
+- identical/skipped:
+- conflicts:
+- missing:
+- failed:
+
+Runtime artifacts:
+- data → output migrated:
+- skipped:
+- conflicts:
+
+Verification:
+- SHA-256:
+- Knowledge load:
+- manifest:
+- current:
+- candidates:
+- Study Runner provider:
+- data/output separation:
+
+Legacy source:
+PRESERVED / NOT MODIFIED
+
+Final:
+PASS / PASS_WITH_WARNINGS / FAIL
+
+마지막에는 사용자가 바로 판단할 수 있도록 다음 세 가지만 별도로 요약해줘.
+
+1. 기존 지식이 모두 보존됐는가
+2. "l1-knowledge-manager"에서 실제 조회 가능한가
+3. 이제 Study Runner가 새 Knowledge Manager를 정상적으로 사용할 수 있는가
+
+문제가 발생한 경우 임의로 삭제하거나 초기화하지 말고 "FAIL" 또는 "PASS_WITH_WARNINGS"로 종료하고 원인을 구체적으로 표시해라.
