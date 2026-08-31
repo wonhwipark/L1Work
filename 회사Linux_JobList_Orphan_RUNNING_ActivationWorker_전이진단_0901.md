@@ -1,2 +1,2 @@
-python3 /home/whpark/l1sw-private-skills/job-list/scripts/job_core.py status
-cat /home/whpark/l1sw-private-skills/job-list/data/state/activation/latest.json
+python3 ~/l1sw-dispatcher/l1sw_dispatcher.py status
+python3 ~/l1sw-dispatcher/l1sw_dispatcher.py report
