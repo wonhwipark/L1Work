@@ -1,31 +1,126 @@
-l1-sam-fixer 스킬로 MCD 개선 준비 상태를 점검한다.
+# CL-AIT Decision Ledger 1차 검토 + Target HLD Review 요청
 
-[실행 규칙]
-1. 먼저 route를 정확히 1회만 실행한다.
-   skillsilent run l1-sam-fixer route -- --request "MCD 개선 준비 상태 점검" --json
-2. recommended_action이 "mcd-readiness"가 아니면 즉시 중단하고
-   route JSON의 status / route.intent / recommended_action 세 값만 그대로 보고한다.
-3. "mcd-readiness"면 아래 한 줄만 실행한다.
-   skillsilent run l1-sam-fixer mcd-readiness -- --current-score <공식 MCD 점수> --top 5 --json
-   - 공식 점수를 모르면 --current-score를 빼고 실행한다. 절대 추정값을 넣지 않는다.
-4. 위 두 명령 외에 다른 action, python, py, shell, 스크립트 직접 호출을 하지 않는다.
-   실패하면 우회하지 말고 실패 코드와 메시지를 그대로 보고한다.
+hld-composer로 CL-AIT 설계 리뷰를 시작해줘.
 
-[보고 형식]
-아래 필드만 JSON에서 원문 그대로 추출해 출력한다.
-요약·해석·의견·개선 제안 금지. 전체 JSON 덤프 금지.
+work-root는 현재 연 CL-AIT 프로젝트 루트를 사용해.
 
-- readiness_status
-- blockers  (배열 전체, 하나도 빼지 말 것)
-- artifact_coverage : status, cycle_count, penalty_coverage_count,
-  penalty_coverage_complete, unmatched_csv_cycle_count,
-  unmatched_html_cycle_count, reason_code
-- score_model : status, confidence, penalty_sum, expected_current_score,
-  observed_current_score, verification_error
-- code_analyzer : status, ready, edge_properties, quick_win_fact_available
-- knowledge_manager : status, filled_count, candidate_only_count,
-  empty_count, refs, required_now
-- edge_leverage_top : 상위 5건만. 각 건에서
-  edge_id, participating_cycle_count, simulated_resolved_cycle_count,
-  simulation_status, affected_penalty_abs_sum
-- json_file (readiness 결과 파일 경로)
+## 현재 상태
+
+- OpenCode에서는 이미 구현 기반 SLTE OlAitMngr와 legacy CL-AIT를 분석/학습했다.
+- 기존 Phase 1~3 산출물이 존재한다.
+- CL-AIT 기본 Target HLD가 이미 생성되어 있다.
+- DEC002~DEC005를 포함한 기존 Decision Ledger도 사내에서 1차 작성되어 있다.
+- 단, 현재 Decision Ledger가 완전하다고 가정하지 마라.
+
+## 수행 순서
+
+Target HLD 리뷰를 바로 시작하지 말고,
+먼저 기존 Decision Ledger를 1차 검토하라.
+
+### Step 1. Decision Ledger Review
+
+기존 Decision Ledger의 각 Decision에 대해 다음을 확인하라.
+
+1. Decision 내용이 명확하게 확정되어 있는가
+2. Requirement 근거가 있는가
+3. SLTE OlAitMngr 구현/설계 근거와 모순되지 않는가
+4. legacy CL-AIT의 필수 동작 또는 제약을 누락하지 않았는가
+5. 책임/Ownership이 명확한가
+6. Trigger / State / Timer / Interface / OL-CL 상호배제 정책이 명확한가
+7. 구현 사실(Code Fact)과 설계 판단(Design Decision)이 혼재되어 있지 않은가
+8. 서로 다른 Decision 간 충돌이 없는가
+9. Target HLD 작성에 필요한 Decision이 누락되어 있지 않은가
+
+기존 Decision을 처음부터 다시 만들지 말고
+현재 Ledger를 기준으로 VALID / NEEDS_CLARIFICATION / MISSING / CONFLICT 상태로 검토하라.
+
+### Step 2. 기존 분석 결과 우선 활용
+
+Decision 검토에 필요한 사실은 다음 순서로 확인하라.
+
+1. 기존 Phase 1~3 산출물
+2. 기존 OpenCode의 SLTE OlAitMngr 분석/학습 결과
+3. 기존 OpenCode의 legacy CL-AIT 분석/학습 결과
+4. 기존 HLD / SRS / Design Input
+5. 그래도 확인할 수 없는 경우에만 추가 Code Fact 확인
+
+코드를 처음부터 다시 학습하거나 전체 재분석하지 마라.
+
+SLTE OlAitMngr는 Target/reference 구조의 근거로 사용하고,
+legacy CL-AIT는 기존 동작/제약/호환성 확인 근거로 사용하라.
+
+단,
+- legacy CL-AIT 구조를 Target 설계로 그대로 복사하지 마라.
+- OlAitMngr 구조도 CL-AIT Requirement와 충돌하면 그대로 채택하지 마라.
+
+설계 판단은 가능한 한 다음 순서로 검증하라.
+
+Requirement
+→ Code Fact
+→ Design Decision
+
+### Step 3. 사용자 Decision 처리
+
+기존 분석 결과와 Code Fact만으로 확정할 수 없는 설계 사항은
+임의로 추정하거나 자동 확정하지 마라.
+
+사용자 판단이 필요한 경우 WAIT_USER_DECISION으로 전환하라.
+
+질문 규칙:
+- 한 번에 질문 하나
+- 필요한 배경과 현재 확인된 근거를 간결하게 설명
+- 가능하면 A / B / C 선택지 제공
+- 각 선택지의 핵심 차이와 영향만 표시
+- 사용자가 선택하면 Decision Ledger에 확정 기록
+
+Code Fact 자체가 부족한 경우에는
+WAIT_USER_DECISION이 아니라 CODE_FACT_CHECK_REQUIRED로 구분하라.
+
+### Step 4. Decision Ledger 확정
+
+Decision Ledger 리뷰가 끝나기 전에는
+Target HLD 본문 수정을 본격적으로 시작하지 마라.
+
+Decision Ledger의 주요 blocker가 해결되면
+리뷰된 내용을 CL_AIT_HLD_DECISION_LEDGER.md에 반영하고
+이 파일을 이후 Target HLD 리뷰의 확정 설계 기준으로 사용하라.
+
+### Step 5. Target HLD Review
+
+확정/보완된 Decision Ledger를 기준으로
+기존 CL-AIT Target HLD를 Scope별로 리뷰하라.
+
+기존 Phase 1~3 및 기본 Target HLD를 재생성하지 마라.
+
+특히 다음 항목을 검토하라.
+
+- Manager responsibility / ownership
+- CL-AIT Trigger
+- State / lifecycle
+- Periodic timer 및 ownership
+- OL-AIT / CL-AIT mutual exclusion 및 priority
+- Update interface / UpdateCause
+- HAL / AitProc / RF interface
+- Multi-stack / domain 관리
+- Legacy compatibility requirement
+- Failure / recovery
+- Data structure / policy / state ownership
+- Requirement → Scenario → MSC → Verification traceability
+
+근거 있는 변경만 Working HLD에 반영하라.
+
+### Step 6. HLD Gate
+
+모든 Scope 리뷰 후 HLD Gate까지 진행하라.
+
+Gate 전에는 C++ 구현 또는 구현 비교 단계로 넘어가지 마라.
+
+최종적으로 다음을 명확히 보여줘.
+
+- Decision Ledger review 결과
+- 신규/수정된 Decision
+- 아직 열린 Decision
+- Code Fact blocker
+- HLD review 완료 Scope
+- HLD blocker
+- HLD_GATE_CANDIDATE: READY / NOT_READY
