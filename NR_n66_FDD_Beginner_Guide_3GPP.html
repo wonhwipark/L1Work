@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NR n66 FDD 쉽게 이해하기 — DL 90 MHz / UL 70 MHz</title>
+<style>
+:root{
+  --bg:#f5f7fb; --card:#fff; --text:#172033; --muted:#667085;
+  --blue:#2563eb; --blue2:#dbeafe; --green:#059669; --green2:#d1fae5;
+  --orange:#d97706; --orange2:#fff7ed; --red:#b42318; --purple:#7c3aed;
+  --line:#e4e7ec; --dark:#101828;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,"Noto Sans KR","Malgun Gothic",sans-serif;
+  line-height:1.6;
+}
+.wrap{max-width:1120px;margin:auto;padding:34px 20px 70px}
+.hero{
+  background:linear-gradient(135deg,#111827,#263449);
+  color:white;padding:30px;border-radius:22px;margin-bottom:20px;
+}
+.hero h1{font-size:30px;line-height:1.25;margin:0 0 12px}
+.hero p{margin:0;color:#d0d5dd;font-size:17px}
+.badge{
+  display:inline-block;background:#fef3c7;color:#92400e;
+  font-weight:700;border-radius:999px;padding:5px 10px;font-size:13px;margin-bottom:12px;
+}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:18px;
+  padding:24px;margin:18px 0;box-shadow:0 4px 14px rgba(16,24,40,.04)
+}
+h2{font-size:24px;margin:0 0 12px}
+h3{font-size:18px;margin:20px 0 8px}
+p{margin:7px 0}
+.key{
+  font-size:19px;font-weight:700;padding:18px 20px;border-radius:14px;
+  background:#eff6ff;border-left:5px solid var(--blue);margin:14px 0;
+}
+.warn{
+  padding:15px 18px;border-radius:13px;background:#fff7ed;border:1px solid #fed7aa;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mini{
+  padding:17px;border:1px solid var(--line);border-radius:14px;background:#fafafa
+}
+.mini strong{display:block;margin-bottom:4px}
+.num{
+  width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;
+  justify-content:center;color:white;background:var(--dark);font-weight:bold;margin-bottom:9px
+}
+.bandRow{display:grid;grid-template-columns:70px 1fr;gap:12px;align-items:center;margin:17px 0}
+.lab{
+  color:white;font-weight:700;text-align:center;padding:7px 4px;border-radius:8px
+}
+.ul{background:var(--blue)} .dl{background:var(--green)}
+.track{
+  position:relative;height:66px;border-radius:10px;background:#f2f4f7;
+  border:1px solid #d0d5dd;overflow:hidden
+}
+.segment{
+  position:absolute;top:8px;height:30px;color:white;font-size:14px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;border-radius:7px
+}
+.axis{position:absolute;left:8px;right:8px;bottom:5px;display:flex;justify-content:space-between;
+  color:#475467;font-size:12px}
+.extra{background:var(--orange)}
+.center{
+  position:absolute;top:3px;bottom:22px;border-left:3px dashed #111827;
+}
+.center span{
+  position:absolute;top:35px;left:5px;white-space:nowrap;font-size:11px;color:#344054;font-weight:bold;
+}
+.bigArrow{text-align:center;font-size:25px;font-weight:bold;color:#475467;margin:4px 0}
+.calc{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px
+}
+.calc div{
+  background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:13px;text-align:center
+}
+.calc b{font-size:20px;display:block;color:#111827}
+.ok{
+  background:#ecfdf3;border:1px solid #abefc6;color:#05603a;
+  padding:15px 18px;border-radius:13px;font-weight:700;margin-top:14px
+}
+.codeflow{
+  font-family:Consolas,monospace;background:#101828;color:#e5e7eb;padding:18px;
+  border-radius:14px;line-height:1.8;overflow:auto;font-size:14px
+}
+.hl1{color:#93c5fd}.hl2{color:#6ee7b7}.hl3{color:#fbbf24}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid var(--line);padding:12px 13px;text-align:left;vertical-align:top}
+th{background:#f9fafb}
+.spec{
+  border-left:5px solid var(--purple);background:#faf5ff
+}
+.specItem{
+  background:white;border:1px solid #e9d7fe;border-radius:13px;padding:16px;margin:12px 0
+}
+.specItem b{color:#5b21b6}
+a{color:#175cd3;text-decoration:none;font-weight:700}
+a:hover{text-decoration:underline}
+.small{font-size:13px;color:var(--muted)}
+.footer{font-size:13px;color:#667085;margin-top:24px}
+@media(max-width:760px){
+  .grid2,.grid3,.calc{grid-template-columns:1fr}
+  .hero h1{font-size:25px}
+  .bandRow{grid-template-columns:52px 1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section class="hero">
+  <div class="badge">초보자용 설명 + 3GPP 근거</div>
+  <h1>NR n66은 왜 DL 90 MHz / UL 70 MHz인데도 FDD일까?</h1>
+  <p>핵심은 “Band 전체 폭”과 “실제로 사용하는 Carrier 폭”, 그리고 “pair의 기준”을 서로 분리해서 보는 것입니다.</p>
+</section>
+
+<section class="card">
+  <h2>0. 먼저 결론부터</h2>
+  <div class="key">
+    n66의 <b>2200 MHz는 UL과 1:1로 짝을 찾는 주파수가 아니라, DL Operating Band의 끝(edge)</b>입니다.
+  </div>
+  <p>
+    FDD의 pair는 “UL band의 모든 주파수 ↔ DL band의 모든 주파수가 완전히 1:1”이라는 뜻이 아닙니다.
+    실제 NR 통신에서는 <b>UL carrier와 DL carrier</b>를 배치하고, 그 <b>carrier center frequency 사이의 관계</b>가 중요합니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>1. 먼저 n1을 보면 쉬워집니다</h2>
+  <p>n1은 UL과 DL의 전체 폭이 둘 다 60 MHz라서 우리가 흔히 생각하는 “대칭적인 FDD”처럼 보입니다.</p>
+
+  <div class="bandRow">
+    <div class="lab ul">UL</div>
+    <div class="track">
+      <div class="segment ul" style="left:2%;width:96%">60 MHz</div>
+      <div class="axis"><span>1920</span><span>1980 MHz</span></div>
+    </div>
+  </div>
+  <div class="bandRow">
+    <div class="lab dl">DL</div>
+    <div class="track">
+      <div class="segment dl" style="left:2%;width:96%">60 MHz</div>
+      <div class="axis"><span>2110</span><span>2170 MHz</span></div>
+    </div>
+  </div>
+
+  <p class="small">3GPP TS 38.101-1 Table 5.2-1: n1 = UL 1920–1980 MHz / DL 2110–2170 MHz, FDD.</p>
+</section>
+
+<section class="card">
+  <h2>2. n66은 “DL 쪽 땅이 더 넓은 FDD”입니다</h2>
+  <p>n66은 처음부터 3GPP가 아래처럼 비대칭 Operating Band로 정의합니다.</p>
+
+  <div class="bandRow">
+    <div class="lab ul">UL</div>
+    <div class="track">
+      <div class="segment ul" style="left:2%;width:74%">70 MHz</div>
+      <div class="axis"><span>1710</span><span>1780</span><span></span></div>
+    </div>
+  </div>
+  <div class="bandRow">
+    <div class="lab dl">DL</div>
+    <div class="track">
+      <div class="segment dl" style="left:2%;width:74%;border-radius:7px 0 0 7px">2110 ~ 2180</div>
+      <div class="segment extra" style="left:76%;width:22%;border-radius:0 7px 7px 0">+20 MHz</div>
+      <div class="axis"><span>2110</span><span>2180</span><span>2200 MHz</span></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="mini">
+      <span class="num">1</span>
+      <strong>UL Operating Band</strong>
+      1710–1780 MHz = 총 70 MHz
+    </div>
+    <div class="mini">
+      <span class="num">2</span>
+      <strong>DL Operating Band</strong>
+      2110–2200 MHz = 총 90 MHz
+    </div>
+  </div>
+
+  <div class="warn" style="margin-top:15px">
+    <b>중요:</b> “DL 90 MHz”는 한 Cell이 반드시 90 MHz짜리 DL carrier 하나를 쓴다는 뜻이 아닙니다.
+    이것은 <b>n66이라는 Band가 사용할 수 있는 전체 주파수 범위</b>입니다.
+  </div>
+</section>
+
+<section class="card">
+  <h2>3. 그래서 2200 MHz와 pair되는 UL 주파수를 찾으면 안 됩니다</h2>
+
+  <div class="grid2">
+    <div class="mini">
+      <strong style="color:var(--red)">잘못된 생각</strong>
+      “DL 2200 MHz가 있으니 400 MHz를 빼서 UL 1800 MHz가 있어야 한다.”
+    </div>
+    <div class="mini">
+      <strong style="color:var(--green)">올바른 생각</strong>
+      “2200 MHz는 band edge다. 실제 pair 관계는 UL/DL <u>carrier center</u>를 기준으로 본다.”
+    </div>
+  </div>
+
+  <p style="margin-top:15px">
+    3GPP에서 n66의 기본 TX–RX <b>carrier centre frequency separation</b>은 <b>400 MHz</b>입니다.
+    하지만 UL/DL carrier bandwidth가 서로 다르면 이 center separation도 일정 범위 안에서 이동할 수 있습니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>4. 실제 예: DL은 넓게 40 MHz, UL은 좁게 10 MHz</h2>
+  <p>
+    3GPP TS 38.101-1 Table 5.3.6-1은 n66에서 <b>UL 10 MHz + DL 40 MHz</b> 같은 asymmetric 조합을 허용합니다.
+    아래는 n66 상단 edge를 이해하기 위한 간단한 배치 예입니다.
+  </p>
+
+  <h3>UL carrier</h3>
+  <div class="track">
+    <div class="segment ul" style="left:72%;width:25%">UL 10 MHz</div>
+    <div class="center" style="left:84.5%"><span>Fc = 1775</span></div>
+    <div class="axis"><span>1710</span><span>1770</span><span>1780 MHz</span></div>
+  </div>
+
+  <div class="bigArrow">↕ carrier center 관계</div>
+
+  <h3>DL carrier</h3>
+  <div class="track">
+    <div class="segment dl" style="left:55%;width:43%">DL 40 MHz</div>
+    <div class="center" style="left:76.5%"><span>Fc = 2180</span></div>
+    <div class="axis"><span>2110</span><span>2160</span><span>2200 MHz</span></div>
+  </div>
+
+  <div class="calc">
+    <div><span>UL BW</span><b>10 MHz</b></div>
+    <div><span>DL BW</span><b>40 MHz</b></div>
+    <div><span>UL Fc</span><b>1775</b></div>
+    <div><span>DL Fc</span><b>2180</b></div>
+  </div>
+
+  <h3>계산은 이렇게 됩니다</h3>
+  <div class="codeflow">
+    실제 center separation = <span class="hl1">2180 - 1775 = 405 MHz</span><br>
+    n66 default separation = <span class="hl2">400 MHz</span><br><br>
+    asymmetric BW에서 허용되는 최대 deviation<br>
+    ΔF = | (BW_DL - BW_UL) / 2 |<br>
+       = | (40 - 10) / 2 |<br>
+       = <span class="hl3">15 MHz</span><br><br>
+    실제 deviation = |405 - 400| = <span class="hl1">5 MHz</span><br>
+    → 5 MHz ≤ 15 MHz
+  </div>
+
+  <div class="ok">
+    따라서 이 예는 “DL carrier가 2200 MHz edge까지 올라가면서 UL carrier는 1780 MHz 안쪽에 있는” 구조를
+    asymmetric bandwidth 규칙으로 이해할 수 있음을 보여줍니다.
+  </div>
+
+  <p class="small">
+    ※ 위 예는 개념 이해용 edge-aligned 예입니다. 실제 네트워크의 정확한 Fc/Point A/SSB 배치는
+    NR-ARFCN, channel raster, SSB raster, resource-grid 조건 및 UE capability/BCS 조건도 함께 만족해야 합니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>5. 왜 400 MHz가 꼭 고정값이 아닌가?</h2>
+  <p>대칭 carrier라면 이해가 쉽습니다.</p>
+
+  <div class="grid2">
+    <div class="mini">
+      <strong>예: UL 20 / DL 20 MHz</strong>
+      양쪽 폭이 같으므로 중심을 정확히 400 MHz 떨어뜨려 놓는 그림이 자연스럽습니다.
+    </div>
+    <div class="mini">
+      <strong>예: UL 10 / DL 40 MHz</strong>
+      DL이 훨씬 넓기 때문에 carrier edge를 band 안에 넣기 위해 중심 위치가 조금 이동할 수 있습니다.
+    </div>
+  </div>
+
+  <div class="key" style="margin-top:16px">
+    즉, n66의 400 MHz는 <b>default carrier-center separation</b>이고,
+    asymmetric BW에서는 3GPP가 정의한 범위 내의 deviation이 허용됩니다.
+  </div>
+</section>
+
+<section class="card">
+  <h2>6. RRC/L1에서는 어떻게 보이나?</h2>
+  <p>
+    UE가 DL 주파수를 보고 무조건 “-400 MHz” 해서 UL을 만드는 방식으로 이해하면 안 됩니다.
+    NR RRC에는 DL frequency 정보와 UL frequency 정보가 별도 IE로 존재합니다.
+  </p>
+
+  <div class="codeflow">
+    ServingCellConfigCommon<br>
+    ├─ <span class="hl2">downlinkConfigCommon</span><br>
+    │   └─ FrequencyInfoDL<br>
+    │       ├─ frequencyBandList<br>
+    │       ├─ <span class="hl3">absoluteFrequencyPointA</span><br>
+    │       └─ scs-SpecificCarrierList<br>
+    │<br>
+    └─ <span class="hl1">uplinkConfigCommon</span><br>
+        └─ FrequencyInfoUL<br>
+            ├─ frequencyBandList<br>
+            ├─ <span class="hl3">absoluteFrequencyPointA</span><br>
+            └─ scs-SpecificCarrierList
+  </div>
+
+  <p>
+    즉 L1 입장에서는 <b>DL carrier config와 UL carrier config를 각각 해석</b>한 뒤,
+    RF 규격상 n66의 허용 band, bandwidth combination, TX–RX separation 조건을 만족시키는 구조로 보면 됩니다.
+  </p>
+</section>
+
+<section class="card">
+  <h2>7. n1 vs n66 한눈에 정리</h2>
+  <table>
+    <thead>
+      <tr><th>항목</th><th>n1</th><th>n66</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>UL Operating Band</td><td>1920–1980 MHz (60 MHz)</td><td>1710–1780 MHz (70 MHz)</td></tr>
+      <tr><td>DL Operating Band</td><td>2110–2170 MHz (60 MHz)</td><td>2110–2200 MHz (90 MHz)</td></tr>
+      <tr><td>Duplex</td><td>FDD</td><td>FDD</td></tr>
+      <tr><td>Default TX–RX carrier-center separation</td><td>190 MHz</td><td><b>400 MHz</b></td></tr>
+      <tr><td>비대칭 UL/DL BW</td><td>이 설명의 핵심 아님</td><td><b>명시적으로 지원 조합 존재</b></td></tr>
+      <tr><td>2200 MHz 의미</td><td>해당 없음</td><td><b>DL operating band의 upper edge</b></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="card spec">
+  <h2>8. 3GPP 스펙 근거</h2>
+
+  <div class="specItem">
+    <b>① TS 38.101-1, Clause 5.2 / Table 5.2-1 — NR operating bands in FR1</b>
+    <p>
+      Rel-18 V18.12.0 기준으로 n1은 UL 1920–1980 / DL 2110–2170 MHz,
+      n66은 UL 1710–1780 / DL 2110–2200 MHz이며 둘 다 FDD로 정의됩니다.
+      Note 6은 n66 UE가 전체 DL operating band를 수신해야 한다고 명시합니다.
+    </p>
+    <a href="https://www.etsi.org/deliver/etsi_ts/138100_138199/13810101/18.12.00_60/ts_13810101v181200p.pdf" target="_blank">
+      ETSI / 3GPP TS 38.101-1 V18.12.0 PDF 열기
+    </a>
+  </div>
+
+  <div class="specItem">
+    <b>② TS 38.101-1, Clause 5.3.6 / Table 5.3.6-1 — Asymmetric channel bandwidths</b>
+    <p>
+      스펙은 DL과 UL의 UE channel bandwidth가 서로 다를 수 있다고 명시합니다.
+      n66에는 UL 5/10 MHz와 DL 20/40 MHz 등 asymmetric 조합이 정의되어 있습니다.
+    </p>
+    <p><b>공식:</b> ΔF<sub>TX-RX</sub> = |(BW<sub>DL</sub> − BW<sub>UL</sub>)/2|</p>
+  </div>
+
+  <div class="specItem">
+    <b>③ TS 38.101-1, Clause 5.4.4 / Table 5.4.4-1 — UE TX–RX frequency separation</b>
+    <p>
+      n1의 default carrier-center separation은 190 MHz,
+      n66의 default carrier-center separation은 <b>400 MHz</b>로 정의됩니다.
+    </p>
+  </div>
+
+  <div class="specItem">
+    <b>④ TS 38.331 — FrequencyInfoDL / FrequencyInfoUL</b>
+    <p>
+      FrequencyInfoDL은 DL carrier의 기본 파라미터를,
+      FrequencyInfoUL은 UL carrier의 기본 파라미터를 제공합니다.
+      양쪽 모두 Point A 및 SCS-specific carrier 정보를 통해 각 carrier 위치를 표현합니다.
+    </p>
+    <a href="https://www.etsi.org/deliver/etsi_ts/138300_138399/138331/18.06.00_60/ts_138331v180600p.pdf" target="_blank">
+      ETSI / 3GPP TS 38.331 V18.6.0 PDF 열기
+    </a>
+  </div>
+</section>
+
+<section class="card">
+  <h2>9. 이것만 기억하면 됩니다</h2>
+  <div class="grid3">
+    <div class="mini">
+      <span class="num">1</span>
+      <strong>90/70은 Band 전체 폭</strong>
+      하나의 UL/DL carrier BW가 90/70이라는 뜻이 아닙니다.
+    </div>
+    <div class="mini">
+      <span class="num">2</span>
+      <strong>2200은 band edge</strong>
+      2200 MHz 자체와 pair되는 UL 주파수를 찾는 방식이 아닙니다.
+    </div>
+    <div class="mini">
+      <span class="num">3</span>
+      <strong>pair는 carrier 중심 기준</strong>
+      n66 default는 400 MHz이며 asymmetric BW 시 허용 deviation이 있습니다.
+    </div>
+  </div>
+</section>
+
+<div class="footer">
+  검증 기준: 3GPP TS 38.101-1 V18.12.0 (Release 18, ETSI publication 2026-03),
+  3GPP TS 38.331 V18.6.0 (Release 18). 설명은 초보자 이해를 위해 개념을 단순화했으며,
+  실제 구현/시험 시에는 해당 release의 channel raster, SSB raster, BCS/capability 및 관련 조건을 함께 확인해야 합니다.
+</div>
+
+</div>
+</body>
+</html>
