@@ -13,58 +13,9 @@
 | 관측 | 의미 |
 |---|---|
 | `intraDropped=0` (leaf) | SAM이 **export 시점에 이미 동일 폴더 참조를 제외**했다. 가설 확정 |
-| leaf `1 SCC / 46 folders` | 79개 중 **46개 폴더가 하나의 거대 순환**. 이게 MCD 페널티의 실체 |
-| 파일 단위 `5 SCC` | fixer가 보던 것. 규모가 전혀 다르다 |
-| `Utility 46/8` | 46개가 참조, 8개를 되참조. **그 8개가 순환의 원인** |
-| `L1C/Common/Export 29/1` | 되참조 1개 남음. 기존 DB 폴더로 추정 |
-
-### 7단계 `brk=0` 은 잘못 읽힐 수 있다
-
-`brk` 는 **SCC 개수** 감소만 셌다. 46노드 SCC에서 edge를 빼서 30노드로 줄어도
-SCC 개수는 1 그대로라 `brk=0` 이 된다.
-**"단일 edge가 무의미하다"가 아니라 "그 지표가 못 잡는다"였다.**
-
-이 단계는 제대로 된 지표로 다시 센다 — **순환에서 빠져나오는 폴더 수**.
-
----
-
-## 1. 준비물
-
-- `sam_metrics_mcd_detail_mfs_relations.csv` (7단계와 **같은 파일**)
-- Python 3.9+
-
----
-
-## 2. STEP 1 — 스크립트 저장
-
-`mcd_demotion_plan.py` 로 저장. **UTF-8**, 내용은 전부 ASCII.
-
-```python
-#!/usr/bin/env python3
-"""Folder-level demotion planner for SAM MCD.
-
-Read-only. Ranks folder-level actions by REDUCTION IN FOLDERS-IN-CYCLE,
-not by SCC count -- in one dense 46-folder SCC, removing an edge can shrink
-the component a lot while leaving the SCC count at 1.
-
-Produces:
-  P-1  every folder edge in the cycle, ranked by folders freed
-  P-2  demotion simulation: make folder X a pure sink (drop its back-refs)
-  P-3  the actual file references behind each back-edge, so the work is concrete
-
-Usage:
-    python mcd_demotion_plan.py <mfs_relations.csv> [--focus Utility] [--depth leaf]
-"""
-from __future__ import annotations
-
-import argparse
-import csv
-import re
-from collections import defaultdict
-from pathlib import Path
-
+| leaf `1 SCC / 46 folders` | 79개 중 **
 FROM_COLS = ("frompath", "from", "fromentity", "src_path", "srcpath",
-             "source_file", "sourcefile", "sourcepath", "from_path")
+             "source_file", "sourcefile, "sourcepath", "from_path")
 TO_COLS = ("topath", "to", "toentity", "dst_path", "dstpath",
            "target_file", "targetfile", "targetpath", "to_path")
 ENCODINGS = ("utf-8-sig", "cp949", "utf-8", "latin-1")
