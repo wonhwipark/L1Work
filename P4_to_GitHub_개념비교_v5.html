@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P4 → GitHub 개념 비교 + l1-cl2git-merge 가이드 v5</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#475467;--line:#d9e1ec;
+  --blue:#2446c9;--blue-soft:#eef3ff;--green:#087f5b;--green-soft:#edf9f4;
+  --amber:#805500;--amber-soft:#fff7e6;--red:#a51d14;--red-soft:#fff1f0;
+  --shadow:0 12px 30px rgba(30,50,90,.07)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,-apple-system,sans-serif;line-height:1.68;word-break:keep-all;overflow-wrap:anywhere}
+a{color:var(--blue);text-decoration-thickness:1px;text-underline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:42px 20px 72px;min-width:0}
+.hero{background:linear-gradient(135deg,#fff 0%,#f4f7ff 58%,#eefaf5 100%);border:1px solid var(--line);border-radius:26px;padding:38px;box-shadow:var(--shadow)}
+.eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--blue);background:var(--blue-soft);border:1px solid #cbd7ff;border-radius:999px;padding:6px 10px;margin-bottom:14px}
+h1{font-size:clamp(34px,5vw,56px);line-height:1.1;letter-spacing:-.035em;margin:0 0 16px}
+h2{font-size:28px;letter-spacing:-.02em;margin:48px 0 16px;scroll-margin-top:18px}
+h3{font-size:20px;margin:24px 0 10px;scroll-margin-top:18px}
+p{margin:0 0 12px}.lead{font-size:18px;color:#344054;max-width:930px}.muted{color:var(--muted)}.small{font-size:13px}
+.part{margin-top:52px;padding:24px 28px;border:1px solid var(--line);border-radius:22px;background:#172033;color:#fff;box-shadow:var(--shadow)}
+.part h2{margin:0 0 8px;color:#fff;font-size:30px}.part p{margin:0;color:#e4e7ec}.part .audience{display:inline-block;margin-bottom:7px;font-weight:800;color:#c7d7ff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:0 6px 18px rgba(30,50,90,.035);min-width:0}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;border-radius:999px;padding:5px 8px;margin-bottom:10px}
+.tag.p4{color:#704500;background:#fff5dc;border:1px solid #efd39a}.tag.git{color:#2149c6;background:#eef3ff;border:1px solid #cad7ff}.tag.key{color:#087f5b;background:#edf9f4;border:1px solid #bfe3d2}.tag.warn{color:#7a4b00;background:#fff5dc;border:1px solid #efd39a}
+.big{font-size:24px;font-weight:850;letter-spacing:-.02em;margin-bottom:6px}.arrow{color:var(--blue);font-weight:900;padding:0 5px}
+.table-scroll{max-width:100%;overflow-x:auto;border-radius:16px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}table.wide{min-width:790px}
+th,td{padding:14px 15px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}th{background:#eff4fa;font-size:13px}tr:last-child td{border-bottom:none}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f1f4f8;padding:2px 5px;border-radius:5px;word-break:break-word}
+.callout{border-left:4px solid var(--blue);background:var(--blue-soft);border-radius:0 12px 12px 0;padding:16px 18px;margin:16px 0}.callout.green{border-left-color:var(--green);background:var(--green-soft)}.callout.warn{border-left-color:var(--amber);background:var(--amber-soft)}.callout.red{border-left-color:var(--red);background:var(--red-soft)}.kicker{font-weight:850}
+.pill{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;margin:3px 5px 3px 0}.pill.good{background:var(--green-soft);color:var(--green)}.pill.info{background:var(--blue-soft);color:var(--blue)}.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#fbfcfe;border:1px solid var(--line);border-radius:16px;padding:18px;overflow-x:auto;color:#25344d;line-height:1.5;max-width:100%}.diagram{white-space:pre;font-size:13px;word-break:normal;overflow-wrap:normal}
+.vs{display:grid;grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:14px;align-items:stretch}.vs-mid{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#475467}
+.flow4{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr) 42px minmax(0,1fr) 42px minmax(0,1fr);gap:8px;align-items:stretch}.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;min-height:118px;min-width:0}.step .num{font-size:12px;font-weight:900;color:var(--blue);margin-bottom:8px}.step strong{display:block;font-size:17px;margin-bottom:5px}.connector{display:flex;align-items:center;justify-content:center;font-size:28px;color:#475467;font-weight:900}
+.fourbox{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}.fourbox .box{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}.fourbox .box:not(:last-child)::after{content:'→';position:absolute;right:-18px;top:42%;color:var(--blue);font-weight:900;font-size:22px;z-index:2}.fourbox strong{display:block;margin-bottom:6px}.fourbox .cmd{font-size:12px;color:var(--muted)}
+.five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:16px 0}.five .card{padding:16px}.five .n{font-weight:900;color:var(--blue);font-size:12px;margin-bottom:5px}.five strong{display:block}
+.git-concept{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:14px 0 18px}.cmd-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 6px 18px rgba(30,50,90,.035);min-width:0}.cmd-card .cmd{display:inline-block;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:850;background:#172033;color:#fff;border-radius:8px;padding:5px 9px;margin-bottom:10px}.branch-box{border:1px solid var(--line);border-radius:14px;background:#fbfcfe;padding:14px 16px;margin:10px 0;overflow-x:auto}.not-used{border:1px dashed #c78d27;background:#fffaf0}
+.merge-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}.merge-type{border:2px solid var(--line);border-radius:18px;padding:20px;background:#fff}.merge-type.pr{border-color:#bfe3d2;background:#f5fbf8}.merge-type.local{border-color:#cad7ff;background:#f7f9ff}.merge-type .label{font-size:12px;font-weight:900;margin-bottom:7px}.merge-type.pr .label{color:var(--green)}.merge-type.local .label{color:var(--blue)}
+.toc{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.toc strong{display:block;margin-bottom:10px}.toc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px}.toc a{display:block;padding:5px 0}
+.reader-route{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.reader-route .card h3{margin-top:0}
+.canonical-flow{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;margin:16px 0}.skill-node{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:126px;min-width:0}.skill-node:not(:last-child)::after{content:'→';position:absolute;right:-17px;top:43px;color:var(--blue);font-size:22px;font-weight:900;z-index:2}.skill-node strong{display:block;margin-bottom:5px}.scenario-title{display:flex;align-items:center;gap:9px;margin-bottom:10px;font-weight:850;font-size:17px}.scenario-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--blue-soft);color:var(--blue);font-weight:900;font-size:13px;flex:0 0 auto}.result-line{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted)}
+.glossary dt{font-weight:850;margin-top:12px}.glossary dd{margin:4px 0 0 0;color:#344054}
+.cheat{background:linear-gradient(135deg,#eef3ff,#edf9f4);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:26px}.cheat h3{margin-top:0}.footer{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media(max-width:980px){.git-concept,.canonical-flow,.five{grid-template-columns:1fr}.skill-node:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-25px}.five{gap:8px}}
+@media(max-width:850px){.grid,.grid3,.vs,.merge-types,.reader-route,.toc-grid{grid-template-columns:1fr}.vs-mid{padding:2px 0}.flow4{grid-template-columns:1fr}.connector{height:34px}.fourbox{grid-template-columns:1fr}.fourbox .box:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-26px}.wrap{padding:26px 14px 52px}.hero{padding:25px}.part{padding:21px}.part h2{font-size:26px}h2{font-size:24px}.table-scroll{margin-right:0}.diagram{font-size:12px}}
+@media(max-width:420px){.wrap{padding-left:12px;padding-right:12px}.hero{padding:22px 18px;border-radius:20px}h1{font-size:33px}.card,.cmd-card,.merge-type{padding:17px}.mono{padding:14px}.part{padding:18px}.toc{padding:16px}th,td{padding:12px}}
+@media print{body{background:#fff}.hero,.card,.cheat,table,.mono,.step,.callout,.part{box-shadow:none}.hero,.cheat{background:#fff!important}h2{page-break-after:avoid}.card,.callout,.mono,table{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero" id="top">
+  <div class="eyebrow">P4 → GitHub 전환용 빠른 이해 가이드 · v5</div>
+  <h1>P4 사용자 관점에서 이해하는<br>Git Add · Commit · Push · PR · Merge</h1>
+  <p class="lead">가장 먼저 기억할 핵심은 하나입니다. <strong>P4의 Shelve는 Git의 Commit 하나와 같지 않습니다.</strong> 공유·리뷰 관점에서는 <strong>Feature Branch에서 Commit 후 Push</strong>한 상태가 P4 Shelve에 가장 가깝습니다.</p>
+</section>
+
+<section class="reader-route" aria-label="대상 독자별 읽는 순서">
+  <div class="card"><h3>Git을 처음 쓰는 P4 사용자</h3><p><strong>Part A를 먼저 읽으세요.</strong> Add/Commit/Push/PR, 두 종류의 Merge, Fetch/Rebase, VS Code 주의점을 먼저 이해하면 됩니다.</p></div>
+  <div class="card"><h3>CL conflict 처리 담당자</h3><p><strong>Part A의 8~11장 → Part B</strong> 순서가 핵심입니다. Part B는 자동화가 만든 기존 Open PR을 같은 <code>upstream/CL_987654</code>에서 복구하는 특수 흐름입니다. 여기서 <code>upstream/…</code>은 <strong>원격 branch 상태를 가리키는 로컬 사본</strong>(remote-tracking branch)입니다.</p></div>
+</section>
+
+<nav class="toc" aria-label="목차">
+  <strong>목차</strong>
+  <div class="toc-grid">
+    <div><a href="#a1">1. 핵심 대응 관계</a><a href="#a2">2. 작업 폴더 → GitHub</a><a href="#a3">3. P4 ↔ Git/GitHub 비교</a><a href="#a4">4. Commit과 Shelve</a><a href="#a5">5. Shelve와 Push의 이력 차이</a><a href="#a6">6. 기본 작업 흐름</a><a href="#a7">7. Git Stash</a><a href="#a8">8. Merge 두 방향 구분</a><a href="#a9">9. Fetch · Merge · Rebase</a><a href="#a10">10. upstream / local branch</a><a href="#a11">11. Merge와 Rebase</a><a href="#a12">12. base branch 작업 예</a><a href="#a13">13. 최종 치트시트</a></div>
+    <div><a href="#b14">14. 자동화 배경</a><a href="#b15">15. 정본 6단계 흐름</a><a href="#b16">16. 입력과 요청 예</a><a href="#b17">17. 상황별 동작</a><a href="#b18">18. Push 이후 사용자 작업</a><a href="#b19">19. VS Code 주의점</a><a href="#b20">20. 용어집</a><a href="#app-a">부록 A. Fork · origin · upstream</a></div>
+  </div>
+</nav>
+
+<section class="part"><span class="audience">Part A · 전원 대상</span><h2>Git 기본 개념</h2><p>P4 사용자가 Git/GitHub의 저장 위치, 이력, branch와 PR을 헷갈리지 않도록 필요한 개념만 설명합니다.</p></section>
+
+<h2 id="a1">1. 핵심 대응 관계</h2>
+<div class="grid3">
+  <div class="card"><span class="tag p4">P4</span><div class="big">Shelve</div><p>변경을 서버에 올려 보관하거나 리뷰할 수 있게 만드는 상태.</p></div>
+  <div class="card"><span class="tag git">Git / GitHub</span><div class="big">Commit <span class="arrow">+</span> Push</div><p>Feature branch의 변경 기록을 GitHub 서버까지 올린 상태.</p></div>
+  <div class="card"><span class="tag key">핵심</span><div class="big">가장 가까운 대응</div><p><strong>P4 Shelve ≈ Git Feature Branch Commit + Push</strong></p></div>
+</div>
+
+<h2 id="a2">2. 작업 폴더 → Staging → 로컬 저장소 → GitHub</h2>
+<p class="lead" style="font-size:16px">Git은 파일을 수정했다고 바로 서버 이력이 되는 구조가 아닙니다. <code>add</code>, <code>commit</code>, <code>push</code>가 서로 다른 단계입니다.</p>
+<div class="fourbox">
+  <div class="box"><strong>작업 폴더</strong><span>파일을 실제로 수정</span><div class="cmd">Working Tree</div></div>
+  <div class="box"><strong>Staging</strong><span>다음 commit에 넣을 변경 선택</span><div class="cmd">git add</div></div>
+  <div class="box"><strong>로컬 저장소</strong><span>내 PC에 이력으로 저장</span><div class="cmd">git commit</div></div>
+  <div class="box"><strong>GitHub</strong><span>서버의 branch에 업로드</span><div class="cmd">git push</div></div>
+</div>
+<div class="callout"><strong>중요:</strong> <code>git add</code>는 서버에 올리는 동작이 아닙니다. “다음 commit에 포함할 변경을 고르는 단계”입니다.</div>
+
+<h2 id="a3">3. P4 ↔ Git/GitHub 개념 비교</h2>
+<div class="table-scroll"><table class="wide"><thead><tr><th>P4에서 익숙한 개념</th><th>Git / GitHub에서 가까운 개념</th><th>쉽게 설명하면</th></tr></thead><tbody>
+<tr><td>Workspace</td><td>Local Working Tree</td><td>내 PC에서 실제 파일을 수정하는 작업 공간</td></tr>
+<tr><td>Pending CL</td><td>Working Tree + Staging</td><td>아직 commit되지 않은 진행 중 변경. <code>git add</code>한 항목은 Staging에 들어갑니다.</td></tr>
+<tr><td><strong>Shelve</strong></td><td><strong>Feature Branch Commit + Push</strong></td><td>공유·리뷰 관점에서 가장 가까운 상태</td></tr>
+<tr><td>Code Review</td><td>Pull Request(PR) Review</td><td>내 branch 변경을 base branch에 넣기 전 리뷰</td></tr>
+<tr><td><strong>Submit</strong></td><td><strong>PR Merge</strong></td><td>리뷰·검증 완료 후 공식 branch에 실제 반영. 팀에서는 GitHub에서 <strong>Squash and merge</strong>를 직접 클릭합니다.</td></tr>
+<tr><td>Unshelve — 동료 변경 받아보기</td><td>해당 branch <code>fetch</code> 후 <code>switch</code></td><td>동료가 올린 branch 자체를 로컬 작업 branch로 가져와 확인</td></tr>
+<tr><td>Unshelve — 내 작업 위에 특정 변경 겹치기</td><td><code>cherry-pick</code></td><td>특정 commit의 변경만 현재 branch 위에 적용</td></tr>
+<tr><td>CL</td><td>branch + PR</td><td>자동화 예: <code>CL_987654</code> branch와 그 branch의 PR이 한 작업 단위를 이룹니다.</td></tr>
+<tr><td>CL 번호</td><td>commit SHA</td><td>완전히 같은 개념은 아니지만, Git에서 특정 이력을 식별할 때 SHA를 사용합니다.</td></tr>
+<tr><td>Sync / Get Latest</td><td><code>pull</code> (= fetch + merge로 이해)</td><td>일상 작업에서는 pull을 사용할 수 있습니다. 기본 개념은 fetch 후 merge이며, 설정에 따라 rebase 방식이 선택될 수도 있습니다.</td></tr>
+<tr><td>직접 대응 개념 없음</td><td><strong>Fork</strong></td><td>회사 원본 repository를 내 계정 쪽에 만든 별도 repository. 자세한 내용은 부록 A 참조.</td></tr>
+<tr><td>Workspace 생성과 유사</td><td><strong>Clone</strong></td><td>repository를 내 PC로 내려받아 실제 작업 공간을 만듭니다.</td></tr>
+</tbody></table></div>
+
+<h2 id="a4">4. 왜 Commit 하나가 Shelve와 같지 않은가?</h2>
+<div class="vs">
+  <div class="card"><span class="tag p4">P4 Shelve</span><h3>서버에 존재</h3><p>서버에 저장되어 다른 개발자가 확인하거나 리뷰에 활용할 수 있습니다.</p><span class="pill good">서버 저장</span><span class="pill info">공유 가능</span></div>
+  <div class="vs-mid">VS</div>
+  <div class="card"><span class="tag git">Git Commit</span><h3>기본적으로 내 PC에 존재</h3><p><code>git commit</code>만 하면 이력은 로컬 repository에 기록됩니다. 아직 GitHub에는 올라가지 않았습니다.</p><span class="pill warn">로컬 저장</span></div>
+</div>
+<div class="mono diagram">내 PC
+CL_987654
+  └─ commit ABC123
+
+GitHub 서버
+  └─ 아직 없음
+
+        ↓ git push
+
+GitHub 서버
+CL_987654
+  └─ commit ABC123
+
+→ 이 시점부터 공유·리뷰 관점에서 P4 Shelve와 훨씬 비슷해짐</div>
+
+<h2 id="a5">5. Shelve와 Push의 결정적 차이: 이력</h2>
+<div class="grid">
+  <div class="card"><span class="tag p4">P4 Shelve</span><h3>Submit 이력과는 별도</h3><p><strong>Unshelve해도 shelf 자체는 지워지지 않습니다.</strong> shelf는 명시적으로 삭제하거나 다시 shelve해 갱신하기 전까지 남을 수 있습니다. 핵심은 shelf 갱신이 <strong>submit된 depot 이력</strong>으로 쌓이는 것은 아니라는 점입니다.</p></div>
+  <div class="card"><span class="tag git">Push된 Git Commit</span><h3>브랜치 이력에 기록</h3><p>Push된 commit은 해당 branch 이력에 기록됩니다. 리뷰 중 여러 commit을 쌓더라도 팀의 최종 PR 반영은 GitHub에서 <strong>Squash and merge</strong>로 하나의 반영 단위로 정리합니다.</p></div>
+</div>
+<div class="callout green"><strong>팀 운영:</strong> 담당자가 Build·검증·Review를 완료한 뒤 GitHub 사이트에서 직접 <strong>Squash and merge</strong>를 수행합니다.</div>
+
+<h2 id="a6">6. P4 작업 흐름과 GitHub 작업 흐름</h2>
+<h3>P4에서 익숙한 흐름</h3>
+<div class="flow4">
+  <div class="step"><div class="num">1</div><strong>코드 수정</strong><span class="muted">Workspace에서 변경</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">2</div><strong>CL / Shelve</strong><span class="muted">서버 보관 및 리뷰</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">3</div><strong>리뷰 / 수정</strong><span class="muted">필요 시 다시 Shelve</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">4</div><strong>Submit</strong><span class="muted">공식 반영</span></div>
+</div>
+<h3>GitHub에서 대응되는 흐름</h3>
+<div class="flow4">
+  <div class="step"><div class="num">1</div><strong>Branch에서 수정 + Add</strong><span class="muted">다음 commit 변경 선택</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">2</div><strong>Commit + Push</strong><span class="muted">로컬 이력 저장 후 서버 업로드</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">3</div><strong>PR / Review</strong><span class="muted">같은 branch의 추가 push는 기존 PR에 반영</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">4</div><strong>Squash and merge</strong><span class="muted">검증·리뷰 후 공식 branch 반영</span></div>
+</div>
+<div class="callout"><strong>리뷰 중 수정해도 PR을 다시 만들 필요가 없습니다.</strong> 같은 head branch에 commit 후 push하면 기존 Open PR이 갱신됩니다.</div>
+
+<h2 id="a7">7. 가장 많이 헷갈리는 것: Git Stash</h2>
+<div class="grid">
+  <div class="card"><span class="tag p4">P4 Shelve</span><h3>서버 공유·리뷰 가능</h3><p>변경을 서버에 보관하고 다른 사람과 공유하거나 리뷰에 사용할 수 있습니다.</p></div>
+  <div class="card"><span class="tag git">Git Stash</span><h3>내 PC 임시 보관</h3><p>작업 중인 변경을 잠깐 치워두는 로컬 기능입니다. 일반적으로 리뷰나 공유를 위한 기능이 아닙니다.</p></div>
+</div>
+<div class="callout warn"><strong>주의:</strong> 이름이 비슷해 보여도 <code>git stash</code>와 P4 Shelve는 사용 목적이 다릅니다.</div>
+
+<h2 id="a8">8. “Merge”는 두 방향이 완전히 다르다</h2>
+<p class="lead" style="font-size:16px">이 문서에서 가장 중요한 구분입니다. 같은 “merge”라는 단어를 쓰지만 <strong>목적·방향·수행 위치</strong>가 다릅니다.</p>
+<div class="merge-types">
+  <div class="merge-type pr"><div class="label">① PR Merge · 최종 반영</div><h3>내 branch → 공식 branch</h3><p><strong>GitHub 사이트에서 수행</strong>합니다. Build·검증·Review 완료 후 <strong>Squash and merge</strong>를 클릭하며, P4의 Submit에 가장 가깝습니다.</p><div class="mono diagram">CL_987654 ── PR ──► smp1900
+                      ↑
+             GitHub Squash and merge</div></div>
+  <div class="merge-type local"><div class="label">② git merge · 내 작업 최신화/충돌 재현</div><h3>base → 내 CL branch</h3><p><strong>로컬 PC에서 수행</strong>합니다. 최신 base를 내 작업 branch에 합쳐 최신화하거나 conflict를 재현합니다. 최종 PR Merge와 다른 동작입니다.</p><div class="mono diagram">upstream/smp1900 ──► local CL_987654
+                         git merge</div></div>
+</div>
+<div class="callout red"><strong>원칙:</strong> “PR Merge”와 “<code>git merge upstream/smp1900</code>”를 같은 동작으로 읽지 마세요. Part B의 merge는 항상 ②를 뜻하며, 최종 ①은 사용자가 GitHub에서 수행합니다.</div>
+
+<h2 id="a9">9. Git Fetch · Merge · Rebase를 그림으로 이해하기</h2>
+<p class="lead" style="font-size:16px">서버의 최신 상태를 가져오는 것과 그 변경을 현재 branch에 합치는 것은 서로 다른 동작입니다. <a href="#a8">8장의 Merge 두 방향</a> 중 여기의 merge는 ② 로컬 merge입니다.</p>
+<div class="git-concept">
+  <div class="cmd-card"><span class="cmd">git fetch upstream</span><h3>서버 상태만 갱신</h3><p><code>upstream</code>의 최신 commit 정보를 로컬 repository로 가져옵니다. 현재 작업 파일은 바꾸지 않습니다.</p><div class="branch-box small"><div><strong>Before</strong> upstream/smp1900 → A─B</div><div style="text-align:center">↓ fetch</div><div><strong>After</strong> upstream/smp1900 → A─B─C</div></div></div>
+  <div class="cmd-card"><span class="cmd">git merge upstream/smp1900</span><h3>base를 현재 CL branch에 합침</h3><p>현재 <code>CL_987654</code>에 최신 <code>smp1900</code> 변경을 합칩니다. 양쪽이 같은 부분을 바꿨다면 conflict가 발생합니다.</p><div class="branch-box mono diagram">Before
+base      A──B──C
+           \
+CL         └──X
+
+After
+base      A──B──C
+           \    \
+CL         └──X──M
+
+M의 부모 = X와 C</div></div>
+  <div class="cmd-card not-used"><span class="cmd">git rebase upstream/smp1900</span><h3>내 commit을 최신 base 위로 다시 쌓음</h3><p><code>CL_987654</code>의 commit을 최신 base 뒤에 다시 적용합니다. 기존 commit의 SHA가 바뀝니다.</p><div class="branch-box mono diagram">Before   A──B──X
+base     A──B──C
+
+rebase 후 A──B──C──X′
+
+X → X′ : 새 SHA</div></div>
+</div>
+<div class="callout red"><strong>Rebase / force push 주의:</strong> 이미 공유된 branch를 rebase하면 commit SHA가 바뀌며, 원격 branch 갱신에 force push가 필요할 수 있습니다. 다른 사람이 사용하는 branch나 자동화가 만든 기존 Open PR branch에서는 기본 동작으로 사용하지 않습니다.</div>
+<div class="callout warn"><strong><code>pull</code>은 언제 쓰나?</strong> 일상적인 개인 작업에서는 <code>git pull</code>을 사용할 수 있습니다. 다만 Part B의 스킬은 <strong>각 단계와 대상 branch를 검증</strong>해야 하므로 fetch와 merge를 분리합니다.</div>
+
+<h2 id="a10">10. upstream / local branch 관계</h2>
+<p class="lead" style="font-size:16px"><strong><code>upstream/smp1900</code>처럼 보이는 이름은 “원격 branch의 로컬 사본”</strong>이며, 정확한 Git 용어로는 <strong>remote-tracking branch</strong>입니다. <code>fetch</code>가 이 정보를 갱신합니다.</p>
+<div class="mono diagram">회사 GitHub 원본 저장소: SMP1900
+
+upstream/smp1900          A──B──C   ← base의 remote-tracking branch
+upstream/CL_987654        A──B──X   ← 자동화 PR head의 remote-tracking branch
+                              │
+                              │ switch / tracking branch 준비
+                              ▼
+local CL_987654           A──B──X   ← 실제 파일을 수정하는 local branch
+
+※ fetch만 해서는 작업 파일이 바뀌지 않습니다.
+※ local CL_987654로 switch한 뒤 필요한 merge를 수행합니다.</div>
+<div class="grid">
+  <div class="card"><span class="tag git">switch</span><h3>작업 branch 선택</h3><p><code>CL_987654</code>를 현재 local branch로 선택해 실제 conflict를 해결합니다.</p></div>
+  <div class="card"><span class="tag git">tracking branch</span><h3>원격 branch와 연결된 local branch</h3><p>local <code>CL_987654</code>가 어느 원격 branch를 기준으로 fetch/push할지 연결 관계를 가집니다.</p></div>
+</div>
+
+<h2 id="a11">11. Merge와 Rebase 차이</h2>
+<p><a href="#a8">8장의 구분</a>에 따라 여기의 Merge는 <strong>base → 내 branch</strong> 로컬 통합입니다.</p>
+<div class="vs">
+  <div class="card"><span class="tag git">MERGE · Part B 기본 방식</span><h3>기존 commit을 유지하면서 두 이력을 연결</h3><div class="mono diagram">base      A──B──C
+           \    \
+CL         └──X──M
+
+M의 첫 번째 부모 = X
+M의 두 번째 부모 = C
+기존 X는 사라지지 않음</div><p class="small muted">Merge commit M이 X와 C를 모두 부모로 가지므로 기존 CL commit X의 이력을 유지합니다.</p></div>
+  <div class="vs-mid">VS</div>
+  <div class="card not-used"><span class="tag p4">REBASE · Part B 기본 사용 안 함</span><h3>내 commit을 새 base 위에 다시 작성</h3><div class="mono diagram">Before
+base      A──B──C
+CL        A──B──X
+
+After
+base/CL   A──B──C──X′
+
+기존 X → 새로운 X′
+SHA 변경</div><p class="small muted">기존 X가 그대로 이동하는 것이 아니라 같은 변경을 기반으로 새 commit X′가 만들어집니다.</p></div>
+</div>
+
+<h2 id="a12">12. 실제 base branch 작업을 예로 보면</h2>
+<p class="muted small">다른 저장소에서는 공식 branch를 <code>pilot</code> 또는 <code>main</code>처럼 부를 수 있지만, 이 문서의 base 예시는 <code>smp1900</code>으로 통일합니다.</p>
+<div class="mono diagram">smp1900
+   │
+   └── feature branch
+          │
+          ├─ 코드 수정 → git add
+          ├─ commit
+          ├─ push
+          └─ Pull Request
+                │
+                ├─ review / 수정 → commit → push
+                ├─ Build·검증 완료
+                └─ GitHub에서 Squash and merge
+                         ↓
+                    smp1900</div>
+<div class="callout green"><strong>P4 관점 번역:</strong> Feature branch의 Commit + Push는 “공유 가능한 Shelve 상태”에 가깝고, PR 검증·Review 후 GitHub에서 수행하는 Squash and merge는 Submit에 가깝습니다.</div>
+
+<h2 id="a13">13. 최종 치트시트</h2>
+<div class="cheat">
+  <h3>초보자용 5단계</h3>
+  <div class="five">
+    <div class="card"><div class="n">1 · ADD</div><strong>다음 commit에 넣을 변경 선택</strong><span class="muted small">Staging</span></div>
+    <div class="card"><div class="n">2 · COMMIT</div><strong>내 PC에 변경 이력 저장</strong><span class="muted small">Local</span></div>
+    <div class="card"><div class="n">3 · PUSH</div><strong>내 branch를 서버에 업로드</strong><span class="muted small">Remote</span></div>
+    <div class="card"><div class="n">4 · PR</div><strong>공식 branch 반영을 리뷰 요청</strong><span class="muted small">Review</span></div>
+    <div class="card"><div class="n">5 · MERGE</div><strong>검증 후 공식 branch 반영</strong><span class="muted small">Squash and merge</span></div>
+  </div>
+  <p><strong>P4 Shelve ≈ Git Feature Branch의 Commit + Push</strong> · <strong>P4 Submit ≈ GitHub PR Merge</strong></p>
+  <p class="small muted">단, Shelve와 push된 commit의 이력 성격은 다르며, Git Stash는 Shelve가 아니라 로컬 임시 보관 기능에 가깝습니다.</p>
+</div>
+
+<section class="part"><span class="audience">Part B · CL conflict 처리 담당자 대상</span><h2>l1-cl2git-merge 스킬편</h2><p>자동화가 이미 만든 upstream Open PR에서 conflict를 해결하고 같은 branch로 push하는 운영 흐름입니다.</p></section>
+
+<h2 id="b14">14. 자동화가 먼저 만든 Open PR에서 시작한다</h2>
+<p class="lead" style="font-size:16px">일반 개발의 Fork 흐름과 달리 이 스킬은 <strong>이미 회사 upstream 안에 존재하는 자동화 branch와 Open PR</strong>을 이어받습니다.</p>
+<div class="mono diagram">자동화 시스템이 먼저 수행
+
+P4 SMP1800 CL_987654
+        ↓ 자동 반영 시도
+회사 upstream의 CL_987654 branch 생성
+        ↓
+Open PR 생성 (base = smp1900)
+        ↓
+Conflict 발생
+        ↓
+담당자에게 PR URL + upstream/CL_987654 전달
+        ↓
+★ 여기부터 l1-cl2git-merge ★</div>
+<div class="callout"><strong>일반 Fork 개발과 구분:</strong> 일반 개발은 보통 개인 Fork(<code>origin</code>)에 작업 branch를 push하고 upstream으로 PR을 보냅니다. 반면 이 conflict 복구 스킬은 자동화가 만든 <strong>기존 upstream branch 자체</strong>를 사용합니다. 자세한 차이는 <a href="#app-a">부록 A</a>를 참조하세요.</div>
+
+<h2 id="b15">15. 정본: l1-cl2git-merge 6단계 흐름</h2>
+<p class="lead" style="font-size:16px">이 문서에서 스킬의 6단계 정의는 <strong>이 절 하나만 정본</strong>입니다. 다른 절은 이 흐름을 반복하지 않고 여기만 참조합니다.</p>
+<div class="canonical-flow" data-canonical-flow="true">
+  <div class="skill-node"><span class="tag key">1</span><strong>로컬 상태 점검</strong><span class="muted small">현재 repo/branch, 수정 파일, 진행 중 Git 작업, 사용자 변경 보호 여부 확인.</span></div>
+  <div class="skill-node"><span class="tag git">2</span><strong>PR / CL 검증</strong><span class="muted small">PR=OPEN, head=CL_987654, base=smp1900, 회사 upstream인지 확인하고 CL ID·P4 CL 근거를 확보.</span></div>
+  <div class="skill-node"><span class="tag git">3</span><strong>Fetch + branch 준비</strong><span class="muted small">upstream 최신 정보 갱신 후 exact CL branch를 local tracking branch로 준비.</span></div>
+  <div class="skill-node"><span class="tag git">4</span><strong>Base Merge</strong><span class="muted small"><code>upstream/smp1900</code>을 local <code>CL_987654</code>에 merge.</span></div>
+  <div class="skill-node"><span class="tag key">5</span><strong>CL 의도 보존 확인</strong><span class="muted small">Conflict가 있으면 해결하고, 없어도 CASE F 누락 검사를 수행한 뒤 정적 검증.</span></div>
+  <div class="skill-node"><span class="tag git">6</span><strong>Commit + Push + PR 확인</strong><span class="muted small">같은 <code>upstream/CL_987654</code>로 push하고 기존 Open PR 갱신 확인.</span></div>
+</div>
+<div class="mono diagram">STEP 4 Base Merge 완료
+        ↓
+   conflict 발생?
+    ├─ YES → conflict 해결 ──────┐
+    └─ NO ───────────────────────┤
+                                 ↓
+                     CASE F: CL 의도 누락 검사
+                       ├─ 누락 있음 → 보완/분석
+                       └─ 누락 없음
+                                 ↓
+                           정적 검증
+                                 ↓
+                  STEP 6 Commit + Push
+                                 ↓
+                        기존 Open PR 갱신</div>
+<div class="callout red"><strong><a href="#a8">8장의 Merge 구분</a>을 적용하세요.</strong> STEP 4는 “base → 내 CL branch”의 로컬 <code>git merge</code>입니다. 최종 PR Merge는 스킬 범위 밖이며 사용자가 GitHub에서 수행합니다.</div>
+<div class="callout warn"><strong>왜 <code>pull</code> 대신 fetch + merge인가?</strong> 일상 작업에서는 pull을 사용할 수 있지만, 이 스킬은 PR·remote·branch와 각 단계 결과를 검증해야 하므로 fetch와 merge를 분리합니다.</div>
+
+<h2 id="b16">16. 사용자가 주는 입력과 요청 예</h2>
+<div class="grid">
+  <div class="card"><div class="scenario-title"><span class="scenario-num">1</span>Open PR URL</div><p>자동화가 이미 만들어 둔 기존 PR입니다. 스킬이 새 PR을 만들지 않습니다.</p><div class="result-line">예: <code>https://&lt;internal-github&gt;/SMP1900/pull/1234</code></div></div>
+  <div class="card"><div class="scenario-title"><span class="scenario-num">2</span>upstream CL branch</div><p>자동화가 만든 PR의 head branch를 그대로 사용합니다.</p><div class="result-line">예: <code>upstream/CL_987654</code></div></div>
+</div>
+<div class="callout green"><strong>자연어 요청 예:</strong><br>“이 Open PR conflict 해결해서 같은 branch로 push까지 해줘. PR: .../pull/1234, Branch: upstream/CL_987654”</div>
+<p class="muted small">실제 처리는 <a href="#b15">15장의 정본 6단계 흐름</a>을 따릅니다.</p>
+
+<h2 id="b17">17. 상황별로 스킬은 어떻게 행동하나?</h2>
+<div class="grid">
+  <div class="card"><span class="tag key">CASE A</span><h3>로컬에 수정 중인 파일이 있음</h3><p>사용자 작업을 삭제하지 않습니다. 안전하게 보존할 수 있으면 스킬의 안전한 보존 방식으로 보호하고, 불가능하면 사용자에게 확인 후 중단합니다.</p><div class="result-line"><strong>금지:</strong> 임의의 <code>reset --hard</code>, <code>clean -fd</code></div></div>
+  <div class="card"><span class="tag key">CASE B</span><h3>같은 local CL branch가 이미 있음</h3><p>로컬에만 있는 commit이 있는지 먼저 확인합니다. 고유한 미Push commit이 있으면 강제로 지우거나 덮어쓰지 않습니다.</p><div class="result-line">안전할 때만 오래된 local branch를 정리</div></div>
+  <div class="card"><span class="tag warn">CASE C</span><h3>PR / branch 정보가 맞지 않음</h3><p>PR이 OPEN이 아니거나 base/head/upstream 조건이 다르면 진행하지 않습니다.</p><div class="result-line"><strong>BLOCKED:</strong> 임의로 새 branch나 새 PR을 만들어 우회하지 않음</div></div>
+  <div class="card"><span class="tag git">CASE D</span><h3>단순 Conflict</h3><p>라인 이동, include 위치 변경, 명확한 rename/move처럼 CL 의도가 분명한 경우 동일 branch에서 해결합니다.</p><div class="result-line">분류: <strong>SAFE_CONFLICT</strong></div></div>
+  <div class="card"><span class="tag p4">CASE E</span><h3>의미적 Conflict</h3><p>API/signature, class 위치, ownership/control flow 변화 등 텍스트 선택만으로 CL 의도를 보존하기 어려우면 코드 분석이 필요합니다.</p><div class="result-line"><strong>code-analyzer → 필요 시 knowledge → code-fix</strong></div></div>
+  <div class="card"><span class="tag warn">CASE F</span><h3>Conflict 표시는 없지만 CL 일부가 빠짐</h3><p>Git conflict가 없다는 이유만으로 성공 처리하지 않습니다. P4 CL 의도가 target 코드에 모두 대응됐는지 확인합니다.</p><div class="result-line"><strong>INCOMPLETE_PORT</strong> → 누락 해결 후 push</div></div>
+</div>
+<div class="callout"><strong>중요:</strong> CASE F는 conflict가 발생한 경우뿐 아니라 <strong>발생하지 않은 경우에도</strong> <a href="#b15">15장 STEP 5</a>에서 반드시 확인합니다.</div>
+
+<h2 id="b18">18. Push가 끝난 뒤 사용자가 하는 일</h2>
+<p>스킬은 <a href="#b15">15장 정본 흐름</a>의 STEP 6에서 같은 upstream branch push와 기존 PR 갱신까지 수행하고 종료합니다.</p>
+<div class="flow4">
+  <div class="step"><div class="num">SKILL END</div><strong>기존 PR 갱신</strong><span class="muted">upstream/CL_987654 push 완료</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">USER</div><strong>Build / 검증</strong><span class="muted">사내 절차 수행</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">USER</div><strong>Review 완료</strong><span class="muted">최종 반영 조건 확인</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">USER</div><strong>Squash and merge</strong><span class="muted">GitHub 사이트에서 직접 수행</span></div>
+</div>
+<div class="callout green"><strong>책임 경계:</strong> Build·검증·Review·최종 <strong>Squash and merge</strong>는 사용자 작업입니다. <a href="#a8">8장의 PR Merge</a>에 해당합니다.</div>
+
+<h2 id="b19">19. VS Code에서 특히 조심할 버튼</h2>
+<div class="grid3">
+  <div class="card"><span class="tag warn">Smart Commit</span><h3>의도하지 않은 전체 Stage 가능</h3><p>Staged Changes가 비어 있을 때 설정에 따라 전체 변경을 자동 stage하여 commit할 수 있습니다. commit 전 Source Control의 Staged Changes를 확인하세요.</p></div>
+  <div class="card"><span class="tag warn">Sync Changes</span><h3>pull + push가 연속 수행될 수 있음</h3><p>단계별로 fetch/merge/push 대상을 확인해야 하는 Part B 작업에서는 한 번에 실행하지 말고 각 단계를 확인하는 편이 안전합니다.</p></div>
+  <div class="card"><span class="tag warn">Discard Changes</span><h3>작업 파일 변경 폐기</h3><p>Working Tree의 변경을 폐기합니다. 일반적인 Undo로 <strong>되돌릴 수 없다고 보고</strong> 보존이 필요한 변경에는 사용하지 마세요.</p></div>
+</div>
+
+<h2 id="b20">20. 용어집</h2>
+<dl class="glossary">
+  <dt>remote-tracking branch</dt><dd><code>upstream/smp1900</code>처럼 원격 branch의 상태를 로컬 repository 안에서 가리키는 참조. <code>fetch</code>로 갱신됩니다.</dd>
+  <dt>tracking branch</dt><dd>특정 원격 branch와 연결 관계가 설정된 local branch. 예: local <code>CL_987654</code>가 <code>upstream/CL_987654</code>를 추적.</dd>
+  <dt>head / base</dt><dd>PR에서 <strong>head</strong>는 변경을 가져오는 작업 branch, <strong>base</strong>는 변경을 넣으려는 대상 branch입니다.</dd>
+  <dt>SHA</dt><dd>Git commit을 식별하는 해시 값. rebase처럼 commit을 다시 작성하면 SHA도 달라집니다.</dd>
+  <dt>force push</dt><dd>원격 branch 이력을 일반적인 fast-forward 규칙을 무시하고 갱신하는 push 방식. 공유 branch에서는 이력 충돌 위험이 있어 주의가 필요합니다.</dd>
+</dl>
+
+<section class="part" id="app-a"><span class="audience">부록 A</span><h2>Fork · Clone · origin · upstream</h2><p>일반 개발의 Fork 모델과 l1-cl2git-merge의 예외적 upstream 직접 작업을 분리해서 봅니다.</p></section>
+
+<h3 id="app-a1">A-1. 일반 개발: SMP1900을 Fork해서 사용</h3>
+<p>팀의 일반 개발 흐름에서는 회사 원본 repository인 <strong>SMP1900</strong>을 개인 계정으로 Fork해 사용합니다. <code>l1-github fork-setup</code> 기준 역할은 아래와 같습니다.</p>
+<div class="vs">
+  <div class="card"><span class="tag git">upstream</span><h3>회사 원본 / canonical repository</h3><p>base 시작 기준, 최신 base 가져오기, PR target 역할입니다.</p><div class="mono diagram">upstream
+   ↓
+회사 SMP1900</div></div>
+  <div class="vs-mid">VS</div>
+  <div class="card"><span class="tag key">origin</span><h3>내 Fork</h3><p>일반 feature/fix branch를 push하는 개인 작업 repository입니다.</p><div class="mono diagram">origin
+  ↓
+내 Fork of SMP1900</div></div>
+</div>
+<div class="mono diagram">[회사 GitHub]
+upstream = SMP1900
+      │
+      │ Fork
+      ▼
+[내 GitHub]
+origin = 내 SMP1900 Fork
+      │
+      │ clone / feature 작업 / push
+      ▼
+[내 PC]
+local feature branch
+      │
+      └──── PR ────► upstream/smp1900</div>
+<div class="callout warn"><strong>remote 이름은 Git이 강제하는 고정어가 아닙니다.</strong> 다만 팀의 <code>l1-github fork-setup</code>은 <code>upstream = 회사 원본</code>, <code>origin = 개인 Fork</code> 역할로 구성합니다.</div>
+
+<h3 id="app-a2">A-2. l1-cl2git-merge는 일반 Fork 작업과 다르다</h3>
+<p>자동화 conflict 복구에서는 이미 회사 upstream repository 안에 <code>CL_987654</code> branch와 Open PR이 존재합니다. 따라서 개인 Fork에 새 branch를 만들지 않습니다.</p>
+<div class="mono diagram">[회사 upstream SMP1900]
+upstream/smp1900
+      │
+      └── 자동화 생성 ──► upstream/CL_987654
+                              │
+                              ├─ 기존 Open PR
+                              │
+                              └─ 담당자가 같은 branch 이어받음
+                                     ↓
+                              conflict 해결 / commit
+                                     ↓
+                              upstream/CL_987654 push
+                                     ↓
+                              기존 Open PR 갱신
+
+※ 새 개인 Fork branch / 새 PR을 만들지 않음</div>
+<div class="callout red"><strong>Part B 전제:</strong> <code>l1-cl2git-merge</code>는 Git remote 처리 로직을 자체 복제하지 않고 <code>l1-github</code>에 맡깁니다. supplied PR은 <strong>remote=upstream</strong>, <strong>base=smp1900</strong>, <strong>head=CL_987654</strong> 조건을 만족해야 합니다.</div>
+
+<div class="footer">v5 · 단일 HTML · 외부 리소스 없음 · <a href="#top">맨 위로</a></div>
+</div>
+</body>
+</html>
