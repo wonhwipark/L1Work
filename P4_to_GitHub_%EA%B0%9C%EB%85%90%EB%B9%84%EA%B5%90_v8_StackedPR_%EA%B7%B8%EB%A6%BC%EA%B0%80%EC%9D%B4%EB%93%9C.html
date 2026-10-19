@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P4 → GitHub 개념 비교 + Push 보호 + Stacked PR 그림 가이드 v8</title>
+<style>
+:root{
+  --bg:#f5f7fb;--panel:#fff;--text:#172033;--muted:#475467;--line:#d9e1ec;
+  --blue:#2446c9;--blue-soft:#eef3ff;--green:#087f5b;--green-soft:#edf9f4;
+  --amber:#805500;--amber-soft:#fff7e6;--red:#a51d14;--red-soft:#fff1f0;
+  --shadow:0 12px 30px rgba(30,50,90,.07)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Pretendard","Noto Sans KR","Apple SD Gothic Neo",system-ui,-apple-system,sans-serif;line-height:1.68;word-break:keep-all;overflow-wrap:anywhere}
+a{color:var(--blue);text-decoration-thickness:1px;text-underline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding:42px 20px 72px;min-width:0}
+.hero{background:linear-gradient(135deg,#fff 0%,#f4f7ff 58%,#eefaf5 100%);border:1px solid var(--line);border-radius:26px;padding:38px;box-shadow:var(--shadow)}
+.eyebrow{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--blue);background:var(--blue-soft);border:1px solid #cbd7ff;border-radius:999px;padding:6px 10px;margin-bottom:14px}
+h1{font-size:clamp(34px,5vw,56px);line-height:1.1;letter-spacing:-.035em;margin:0 0 16px}
+h2{font-size:28px;letter-spacing:-.02em;margin:48px 0 16px;scroll-margin-top:18px}
+h3{font-size:20px;margin:24px 0 10px;scroll-margin-top:18px}
+p{margin:0 0 12px}.lead{font-size:18px;color:#344054;max-width:930px}.muted{color:var(--muted)}.small{font-size:13px}
+.part{margin-top:52px;padding:24px 28px;border:1px solid var(--line);border-radius:22px;background:#172033;color:#fff;box-shadow:var(--shadow)}
+.part h2{margin:0 0 8px;color:#fff;font-size:30px}.part p{margin:0;color:#e4e7ec}.part .audience{display:inline-block;margin-bottom:7px;font-weight:800;color:#c7d7ff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:0 6px 18px rgba(30,50,90,.035);min-width:0}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.05em;border-radius:999px;padding:5px 8px;margin-bottom:10px}
+.tag.p4{color:#704500;background:#fff5dc;border:1px solid #efd39a}.tag.git{color:#2149c6;background:#eef3ff;border:1px solid #cad7ff}.tag.key{color:#087f5b;background:#edf9f4;border:1px solid #bfe3d2}.tag.warn{color:#7a4b00;background:#fff5dc;border:1px solid #efd39a}
+.big{font-size:24px;font-weight:850;letter-spacing:-.02em;margin-bottom:6px}.arrow{color:var(--blue);font-weight:900;padding:0 5px}
+.table-scroll{max-width:100%;overflow-x:auto;border-radius:16px;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}table.wide{min-width:790px}
+th,td{padding:14px 15px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}th{background:#eff4fa;font-size:13px}tr:last-child td{border-bottom:none}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#f1f4f8;padding:2px 5px;border-radius:5px;word-break:break-word}
+.callout{border-left:4px solid var(--blue);background:var(--blue-soft);border-radius:0 12px 12px 0;padding:16px 18px;margin:16px 0}.callout.green{border-left-color:var(--green);background:var(--green-soft)}.callout.warn{border-left-color:var(--amber);background:var(--amber-soft)}.callout.red{border-left-color:var(--red);background:var(--red-soft)}.kicker{font-weight:850}
+.pill{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;margin:3px 5px 3px 0}.pill.good{background:var(--green-soft);color:var(--green)}.pill.info{background:var(--blue-soft);color:var(--blue)}.pill.warn{background:var(--amber-soft);color:var(--amber)}
+.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#fbfcfe;border:1px solid var(--line);border-radius:16px;padding:18px;overflow-x:auto;color:#25344d;line-height:1.5;max-width:100%}.diagram{white-space:pre;font-size:13px;word-break:normal;overflow-wrap:normal}
+.vs{display:grid;grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:14px;align-items:stretch}.vs-mid{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:#475467}
+.flow4{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr) 42px minmax(0,1fr) 42px minmax(0,1fr);gap:8px;align-items:stretch}.step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px;min-height:118px;min-width:0}.step .num{font-size:12px;font-weight:900;color:var(--blue);margin-bottom:8px}.step strong{display:block;font-size:17px;margin-bottom:5px}.connector{display:flex;align-items:center;justify-content:center;font-size:28px;color:#475467;font-weight:900}
+.fourbox{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}.fourbox .box{position:relative;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}.fourbox .box:not(:last-child)::after{content:'→';position:absolute;right:-18px;top:42%;color:var(--blue);font-weight:900;font-size:22px;z-index:2}.fourbox strong{display:block;margin-bottom:6px}.fourbox .cmd{font-size:12px;color:var(--muted)}
+.five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:16px 0}.five .card{padding:16px}.five .n{font-weight:900;color:var(--blue);font-size:12px;margin-bottom:5px}.five strong{display:block}
+.git-concept{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:14px 0 18px}.cmd-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 6px 18px rgba(30,50,90,.035);min-width:0}.cmd-card .cmd{display:inline-block;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:850;background:#172033;color:#fff;border-radius:8px;padding:5px 9px;margin-bottom:10px}.branch-box{border:1px solid var(--line);border-radius:14px;background:#fbfcfe;padding:14px 16px;margin:10px 0;overflow-x:auto}.not-used{border:1px dashed #c78d27;background:#fffaf0}
+.merge-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:16px 0}.merge-type{border:2px solid var(--line);border-radius:18px;padding:20px;background:#fff}.merge-type.pr{border-color:#bfe3d2;background:#f5fbf8}.merge-type.local{border-color:#cad7ff;background:#f7f9ff}.merge-type .label{font-size:12px;font-weight:900;margin-bottom:7px}.merge-type.pr .label{color:var(--green)}.merge-type.local .label{color:var(--blue)}
+.toc{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px}.toc strong{display:block;margin-bottom:10px}.toc-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 20px}.toc a{display:block;padding:5px 0}
+.reader-route{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:20px}.reader-route .card h3{margin-top:0}
+.canonical-flow{display:grid;grid-template-columns:repeat(6,minmax(120px,1fr));gap:10px;margin:16px 0}.skill-node{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;min-height:126px;min-width:0}.skill-node:not(:last-child)::after{content:'→';position:absolute;right:-17px;top:43px;color:var(--blue);font-size:22px;font-weight:900;z-index:2}.skill-node strong{display:block;margin-bottom:5px}.scenario-title{display:flex;align-items:center;gap:9px;margin-bottom:10px;font-weight:850;font-size:17px}.scenario-num{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;background:var(--blue-soft);color:var(--blue);font-weight:900;font-size:13px;flex:0 0 auto}.result-line{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px;color:var(--muted)}
+.glossary dt{font-weight:850;margin-top:12px}.glossary dd{margin:4px 0 0 0;color:#344054}
+.cheat{background:linear-gradient(135deg,#eef3ff,#edf9f4);border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:26px}.cheat h3{margin-top:0}.footer{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media(max-width:980px){.git-concept,.canonical-flow,.five{grid-template-columns:1fr}.skill-node:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-25px}.five{gap:8px}}
+@media(max-width:850px){.grid,.grid3,.vs,.merge-types,.reader-route,.toc-grid{grid-template-columns:1fr}.vs-mid{padding:2px 0}.flow4{grid-template-columns:1fr}.connector{height:34px}.fourbox{grid-template-columns:1fr}.fourbox .box:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-26px}.wrap{padding:26px 14px 52px}.hero{padding:25px}.part{padding:21px}.part h2{font-size:26px}h2{font-size:24px}.table-scroll{margin-right:0}.diagram{font-size:12px}}
+@media(max-width:420px){.wrap{padding-left:12px;padding-right:12px}.hero{padding:22px 18px;border-radius:20px}h1{font-size:33px}.card,.cmd-card,.merge-type{padding:17px}.mono{padding:14px}.part{padding:18px}.toc{padding:16px}th,td{padding:12px}}
+@media print{body{background:#fff}.hero,.card,.cheat,table,.mono,.step,.callout,.part{box-shadow:none}.hero,.cheat{background:#fff!important}h2{page-break-after:avoid}.card,.callout,.mono,table{page-break-inside:avoid}}
+
+/* Worktree concept comparison (v6) */
+.wt-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:18px 0}
+.wt-panel{border:1px solid var(--line);border-radius:20px;padding:22px;background:#fff;min-width:0;box-shadow:0 6px 18px rgba(30,50,90,.035)}
+.wt-panel.default{border-top:5px solid var(--green)}
+.wt-panel.alternative{border-top:5px solid var(--blue)}
+.wt-panel h3{margin:0 0 5px;font-size:20px}
+.wt-sub{font-size:13px;color:var(--muted);margin-bottom:18px}
+.wt-kicker{display:block;font-size:11px;letter-spacing:.065em;font-weight:900;color:var(--muted);margin-bottom:6px}
+.wt-graphic{background:#f8faff;border:1px solid #dbe3f3;border-radius:16px;padding:18px 14px;min-height:270px;display:flex;flex-direction:column;justify-content:center}
+.wt-graphic.one{background:#f4fbf7;border-color:#cee7d9}
+.wt-folder{border:2px solid #a2b6da;border-radius:13px;padding:13px;background:#fff;min-width:0;box-shadow:0 3px 8px rgba(30,50,90,.04)}
+.wt-folder.primary{border-color:#68b399}
+.wt-folder .wt-name{font-size:14px;font-weight:850;line-height:1.45;overflow-wrap:anywhere}
+.wt-folder .wt-path{font-size:11px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Consolas,monospace;line-height:1.5;margin-top:3px;overflow-wrap:anywhere}
+.wt-branch{display:inline-block;border-radius:7px;background:#edf9f4;color:#087f5b;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:800;font-size:12px;padding:4px 7px;margin-top:9px}
+.wt-folder.secondary .wt-branch{background:#eef3ff;color:#2446c9}
+.wt-direction{text-align:center;font-size:13px;font-weight:800;color:#475467;margin:13px 0 9px}
+.wt-branches{display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}
+.wt-chip{border:1px solid #d7e1ed;background:#fff;padding:6px 9px;font-size:12px;font-weight:800;border-radius:10px;color:#475467}
+.wt-chip.active{border-color:#68b399;background:#edf9f4;color:#087f5b}
+.wt-shared{background:#ebf1ff;border:2px solid #adc1ef;border-radius:12px;text-align:center;padding:12px;color:#1c409f;font-weight:850;font-size:13px;line-height:1.55}
+.wt-shared small{display:block;font-weight:500;font-size:11px;color:#506183}
+.wt-stem{height:23px;width:2px;background:#adc1ef;margin:0 auto;position:relative}
+.wt-stem:after{content:'▼';font-size:11px;position:absolute;left:-5px;bottom:-9px;color:#2446c9}
+.wt-folders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.wt-folders .wt-folder{min-height:120px}
+.wt-note{display:flex;gap:8px;align-items:flex-start;margin-top:12px;font-size:13px;line-height:1.5;color:#344054}
+.wt-note strong{flex:0 0 auto;color:#172033}
+.wt-legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 18px}
+.wt-legend span{border-radius:9px;padding:6px 10px;font-size:12px;font-weight:750;background:#eef3ff;color:#2446c9}
+.wt-legend span:first-child{background:#edf9f4;color:#087f5b}
+.wt-command{font-size:13px;line-height:1.8}
+@media(max-width:850px){.wt-compare{grid-template-columns:1fr}.wt-graphic{min-height:0}}
+@media(max-width:430px){.wt-panel{padding:16px}.wt-graphic{padding:12px}.wt-folders{grid-template-columns:1fr}.wt-folder .wt-name{font-size:13px}}
+
+/* v7: push destination guard & repo onboarding; bright, standalone, responsive */
+@media(min-width:981px){.reader-route,.toc-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.guard-part{margin-top:52px;padding:26px 28px;border:1px solid #cad7ff;border-radius:22px;background:linear-gradient(120deg,#eef3ff,#f5fbf8);box-shadow:var(--shadow)}
+.guard-part h2{margin:0 0 8px;font-size:29px;color:#172033}
+.guard-part p{margin:0;color:#344054}
+.guard-part .audience{font-size:12px;color:var(--blue);font-weight:900;letter-spacing:.08em}
+.guard-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:17px 0}
+.guard-stage{position:relative;background:white;border:1px solid #cbd7e8;border-radius:14px;padding:17px 15px;min-height:132px}
+.guard-stage strong{display:block;font-size:15px;margin:4px 0 6px}
+.guard-stage .mini{color:var(--muted);font-size:12px;line-height:1.5}
+.guard-stage:not(:last-child)::after{content:'→';position:absolute;right:-19px;top:43%;font-size:22px;color:var(--blue);z-index:1;font-weight:bold}
+.guard-branches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin:10px 0 20px}
+.guard-branch{border:1px solid #d5e0ed;border-radius:14px;padding:16px 16px 10px;background:#fff}
+.guard-branch.safe{border-top:4px solid var(--green)}
+.guard-branch.hold{border-top:4px solid var(--amber)}
+.guard-branch.deny{border-top:4px solid var(--red)}
+.guard-branch strong{display:block;margin-bottom:6px}
+.guard-branch p{font-size:13px;color:#344054}
+.guard-path{background:#f8faff;border:1px solid #dbe3f3;border-radius:16px;padding:19px;overflow-x:auto}
+.guard-path-item{background:white;border:1px solid #b9cee3;border-radius:12px;padding:12px 16px;text-align:center;margin:auto;max-width:690px;font-size:15px}
+.guard-path-item strong{display:block}
+.guard-path-down{font-size:20px;font-weight:900;text-align:center;color:var(--blue);line-height:1.7}
+.guard-code{font:12.5px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap;word-break:break-word;background:#f8faff;color:#25344d;border:1px solid #d9e1ec;border-radius:13px;padding:15px;margin:10px 0 17px}
+.guard-table code{font-size:12px}
+.guard-list{margin:0 0 14px;padding-left:23px}
+.guard-list li{margin-bottom:7px}
+.guard-details{border:1px solid #d9e1ec;border-radius:15px;background:#fff;margin:12px 0;overflow:hidden}
+.guard-details summary{cursor:pointer;padding:15px 17px;font-weight:800;background:#f7f9fc}
+.guard-details > div{padding:14px 17px 4px}
+.guard-extra{font-size:12px;color:var(--muted);margin:12px 0}
+.guard-example{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.guard-example .card{box-shadow:none}
+.guard-pair{font-weight:800;color:#344054;margin-bottom:7px}
+@media(max-width:980px){.guard-flow{grid-template-columns:repeat(2,minmax(0,1fr))}.guard-stage::after{display:none}}
+@media(max-width:740px){.guard-flow,.guard-branches,.guard-example{grid-template-columns:1fr}.guard-stage{min-height:0}.guard-part{padding:20px}.guard-part h2{font-size:24px}}
+@media print{.guard-details>div{display:block}.guard-part{background:#fff}}
+
+/* v8 stacked PR graphical explainer: light theme, responsive, standalone */
+@media(min-width:981px){.toc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.sp-toc-heading{display:block!important;margin:4px 0 7px;color:var(--blue);font-size:12px}
+.sp-part{margin-top:48px;border:1px solid #c7d7fb;background:linear-gradient(120deg,#edf3ff 0%,#f3f9ff 60%,#f0faf4 100%);border-radius:24px;padding:28px}
+.sp-part h2{color:var(--text);margin:0 0 8px;font-size:30px}
+.sp-part p{color:#344054;margin:0}
+.sp-eyebrow{font-size:12px;letter-spacing:.07em;color:#284db3;font-weight:900;margin-bottom:9px}
+.sp-takeaway{display:flex;align-items:flex-start;gap:14px;padding:19px 21px;background:#f2faf5;border:1px solid #b6ddc6;border-radius:18px;margin:18px 0}
+.sp-takeaway .sp-stamp{width:40px;height:40px;border-radius:12px;background:#d6f1e1;color:#086949;display:flex;align-items:center;justify-content:center;flex:0 0 auto;font-size:23px;font-weight:900}
+.sp-takeaway strong{font-size:18px;display:block;margin-bottom:5px}
+.sp-quick{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0}
+.sp-quick-card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:20px}
+.sp-quick-card h3{margin:6px 0 8px}
+.sp-quick-card .sp-quick-head{font-size:12px;font-weight:900;color:var(--blue)}
+.sp-labels{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px}
+.sp-chip{font-weight:850;border-radius:9px;padding:5px 10px;font-size:13px;border:1px solid transparent}
+.sp-chip.parent{color:#8d4f05;background:#fff4dc;border-color:#eed4ab}
+.sp-chip.child{color:#2546a8;background:#eaf0ff;border-color:#c9d5ff}
+.sp-chip.squash{color:#057046;background:#e0f7ec;border-color:#b6e5ce}
+.sp-chip.base{color:#42516a;background:#eef2f7;border-color:#d7deea}
+.sp-chip.problem{color:#a51d14;background:#fff0ef;border-color:#edc2c0}
+.sp-chip.soft{color:#546579;background:#f1f5fa;border-color:#e3e9f1}
+.sp-explainer{background:#fff;border:1px solid var(--line);border-radius:20px;padding:22px;margin:17px 0 20px}
+.sp-explainer > h3{margin:0 0 10px}
+.sp-toggle-row{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:18px}
+.sp-toggle{border:1.5px solid #cedaee;background:#fff;border-radius:12px;font:inherit;color:#344054;padding:11px 9px;cursor:pointer;text-align:left;min-height:67px}
+.sp-toggle:hover,.sp-toggle:focus-visible{outline:3px solid #cddcff;outline-offset:1px}
+.sp-toggle[aria-pressed="true"]{background:#ebf1ff;border:2px solid #3154bd;color:#1d3da1}
+.sp-toggle .sp-n{font-size:12px;font-weight:900;display:block}
+.sp-toggle .sp-t{font-size:15px;font-weight:800;display:block}
+.sp-panel{padding:22px;background:#f9fbff;border:1px solid #dde6f4;border-radius:18px;min-height:390px}
+.sp-panel[hidden]{display:none!important}
+.sp-panel-title{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin-bottom:10px}
+.sp-panel-title h4{font-size:21px;line-height:1.4;margin:0}
+.sp-panel-sub{font-size:14px;color:#43536b;margin:0 0 15px}
+.sp-lane{display:grid;grid-template-columns:125px minmax(0,1fr);gap:10px;border:1px solid #dce5f3;border-radius:13px;background:#fff;margin-top:9px;padding:12px 14px;align-items:center}
+.sp-lane-label{font-size:13px;font-weight:900;color:#344054}
+.sp-lane-label small{display:block;font-weight:500;color:#62718a;font-size:11px;margin-top:2px}
+.sp-nodes{display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:0}
+.sp-node{height:38px;min-width:38px;padding:0 7px;border:2px solid transparent;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;letter-spacing:-.01em}
+.sp-node.base{background:#eff2f7;border-color:#cbd3df;color:#48556e}
+.sp-node.parent{background:#fff2da;border-color:#e9bc7e;color:#885005}
+.sp-node.child{background:#eaf0ff;border-color:#adc1ee;color:#214aab}
+.sp-node.squash{background:#dff6e8;border-color:#8dceb0;color:#0d714b}
+.sp-node.blank{background:transparent;border:none;min-width:8px;padding:0}
+.sp-connector{color:#8494ae;font-weight:900;font-size:16px}
+.sp-note{border-radius:12px;background:#eef3fc;padding:11px 13px;font-size:13px;margin-top:12px;color:#3f506a}
+.sp-note.red{background:#fff0ef;color:#84231e;border:1px solid #f1cccb}
+.sp-note.green{background:#e6f8ee;color:#136442;border:1px solid #b7e2cc}
+.sp-node-legend{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0 0;font-size:12px;color:#45556d}
+.sp-legend-dot{display:inline-block;width:12px;height:12px;border-radius:4px;vertical-align:-2px;margin-right:4px}
+.sp-pair{display:grid;grid-template-columns:1fr 74px 1fr;align-items:stretch;gap:12px;margin:19px 0}
+.sp-diff{background:#fff;border:1px solid var(--line);border-radius:18px;padding:19px;min-width:0}
+.sp-diff.before{border-top:5px solid #ce5c53}
+.sp-diff.after{border-top:5px solid #159465}
+.sp-diff h3{margin:0 0 13px;font-size:19px}
+.sp-diff-zone{padding:15px;border-radius:13px;margin-bottom:10px;font-size:14px;font-weight:800}
+.sp-diff-zone.parent{background:#fff1d9;border:1px solid #ead5aa;color:#825009}
+.sp-diff-zone.child{background:#edf3ff;border:1px solid #d0ddf7;color:#284fa6}
+.sp-diff-zone.removed{border:1px dashed #acb9c9;background:#f9fbfe;color:#63738a;text-decoration:line-through}
+.sp-diff-zone .sub{display:block;font-weight:500;font-size:12px;margin-top:4px}
+.sp-big-arrow{align-self:center;text-align:center;font-size:42px;font-weight:900;color:#3154bd}
+.sp-stat{font-size:14px;background:#f8fafd;border-radius:10px;padding:10px;margin-top:10px}
+.sp-stat strong{color:#274ba2}
+.sp-process{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:17px 0}
+.sp-process-card{background:#fff;border:1px solid var(--line);border-top:4px solid #7990c9;border-radius:16px;padding:18px;min-width:0;position:relative}
+.sp-process-card .sp-number{font-size:13px;color:#2446c9;font-weight:900}
+.sp-process-card h3{margin:6px 0 7px;font-size:19px}
+.sp-process-card p{font-size:14px;margin-bottom:10px;color:#3a4a62}
+.sp-process-card .sp-state{display:inline-block;padding:5px 8px;border-radius:7px;background:#eef3ff;color:#2446c9;font-size:11px;font-weight:900}
+.sp-process-card.confirm{border-top-color:#d39832}
+.sp-process-card.approve{border-top-color:#168b5d}
+.sp-detail{border:1px solid #d7e1ed;background:#fff;border-radius:14px;overflow:hidden;margin:15px 0}
+.sp-detail summary{padding:14px 16px;font-weight:850;cursor:pointer;background:#f7f9fc}
+.sp-detail > div{padding:15px 18px}
+.sp-boundary{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin:18px 0}
+.sp-boundary .sp-box{border:1px solid #d7e1ed;border-radius:15px;padding:17px;background:#fff}
+.sp-boundary .sp-box.ok{border-top:4px solid var(--green)}
+.sp-boundary .sp-box.stop{border-top:4px solid var(--red)}
+.sp-example{border:1px solid #b4d9c4;background:#f4fbf7;border-radius:15px;padding:18px 20px;font-size:16px;line-height:1.75}
+.sp-example strong{color:#146f4a}
+.sp-caption{font-size:12px;color:#65758a;margin:10px 0 0}
+@media(max-width:850px){.sp-quick,.sp-pair,.sp-boundary{grid-template-columns:1fr}.sp-pair .sp-big-arrow{transform:rotate(90deg)}.sp-process{grid-template-columns:1fr}.sp-panel{min-height:0}.sp-toggle-row{grid-template-columns:1fr}.sp-toggle{min-height:0;display:flex;gap:8px;align-items:baseline}.sp-toggle .sp-n,.sp-toggle .sp-t{display:inline}}
+@media(max-width:600px){.sp-part{padding:20px 18px}.sp-part h2{font-size:24px}.sp-explainer{padding:14px}.sp-panel{padding:14px}.sp-lane{grid-template-columns:1fr;gap:8px}.sp-node{min-width:31px;height:34px;padding:0 5px;font-size:12px}.sp-connector{font-size:13px}.sp-toggle{padding:10px}.sp-panel-title h4{font-size:18px}.sp-takeaway{padding:15px}}
+@media print{.sp-panel[hidden]{display:block!important;margin-bottom:18px}.sp-toggle-row{display:none}.sp-part,.sp-panel{background:#fff!important}.sp-quick-card,.sp-panel,.sp-process-card,.sp-diff{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<section class="hero" id="top">
+  <div class="eyebrow">P4 → GitHub 전환용 빠른 이해 가이드 · v8</div>
+  <h1>P4 사용자 관점에서 이해하는<br>Git Add · Commit · Push · PR · Merge</h1>
+  <p class="lead">가장 먼저 기억할 핵심은 하나입니다. <strong>P4의 Shelve는 Git의 Commit 하나와 같지 않습니다.</strong> 공유·리뷰 관점에서는 <strong>Feature Branch에서 Commit 후 Push</strong>한 상태가 P4 Shelve에 가장 가깝습니다.</p><p class="muted small">v8 추가: <strong>부모 PR Squash Merge 후 자식 PR 정리</strong>를 단계별 그림으로 설명 · 기존 Push Guard / Worktree 원칙 유지.</p>
+</section>
+
+<section class="reader-route" aria-label="대상 독자별 읽는 순서">
+  <div class="card"><h3>Git을 처음 쓰는 P4 사용자</h3><p><strong>Part A를 먼저 읽으세요.</strong> Add/Commit/Push/PR, 두 종류의 Merge, Fetch/Rebase, VS Code 주의점을 먼저 이해하면 됩니다.</p></div>
+  <div class="card"><h3>CL conflict 처리 담당자</h3><p><strong>Part A의 8~11장 → Part B</strong> 순서가 핵심입니다. Part B는 자동화가 만든 기존 Open PR을 같은 <code>upstream/CL_987654</code>에서 복구하는 특수 흐름입니다. 여기서 <code>upstream/…</code>은 <strong>원격 branch 상태를 가리키는 로컬 사본</strong>(remote-tracking branch)입니다.</p></div>
+  <div class="card"><h3>GitHub Push 대상이 헷갈리는 사용자</h3><p><strong>Part C(21~27장)</strong>를 읽으세요. 코드·그룹 스킬·개인 스킬·Work 문서마다 어느 Repo로 올리는지와 잘못된 Push가 어떻게 보류되는지 그림으로 확인할 수 있습니다.</p></div>
+</section>
+
+<div class="callout green" style="margin-top:18px"><strong>이번에 추가된 그림 바로 보기:</strong> <a href="#d28">Part D · 부모 PR이 Squash Merge되면 왜 내 PR의 Diff가 커지는가?</a> — 동료의 Open PR 위에서 작업할 때 알아야 할 사항을 단계별로 설명합니다.</div>
+
+<nav class="toc" aria-label="목차">
+  <strong>목차</strong>
+  <div class="toc-grid">
+    <div><a href="#a1">1. 핵심 대응 관계</a><a href="#a2">2. 작업 폴더 → GitHub</a><a href="#a3">3. P4 ↔ Git/GitHub 비교</a><a href="#a4">4. Commit과 Shelve</a><a href="#a5">5. Shelve와 Push의 이력 차이</a><a href="#a6">6. 기본 작업 흐름</a><a href="#a7">7. Git Stash</a><a href="#a8">8. Merge 두 방향 구분</a><a href="#a9">9. Fetch · Merge · Rebase</a><a href="#a10">10. upstream / local branch</a><a href="#a10-worktree">10-1. Git Worktree 도식</a><a href="#a11">11. Merge와 Rebase</a><a href="#a12">12. base branch 작업 예</a><a href="#a13">13. 최종 치트시트</a></div>
+    <div><a href="#b14">14. 자동화 배경</a><a href="#b15">15. 정본 6단계 흐름</a><a href="#b16">16. 입력과 요청 예</a><a href="#b17">17. 상황별 동작</a><a href="#b18">18. Push 이후 사용자 작업</a><a href="#b19">19. VS Code 주의점</a><a href="#b20">20. 용어집</a><a href="#app-a">부록 A. Fork · origin · upstream</a></div>
+    <div><a href="#c21">21. 왜 Push 보호가 필요한가</a><a href="#c22">22. 작업별 저장소 매핑</a><a href="#c23">23. Push 보호 도식</a><a href="#c24">24. 신규 Repo 등록·변경</a><a href="#c25">25. CL2Git 특수 Push</a><a href="#c26">26. 사용 예와 명령어</a><a href="#c27">27. 장애·운영 경계</a></div>
+    <div><strong class="sp-toc-heading">Part D · v8 신규 그림 가이드</strong><a href="#d28">28. 내가 겪은 문제 한눈에 보기</a><a href="#d29">29. 버튼으로 보는 3단계 그림</a><a href="#d30">30. PR Diff 정리 전후</a><a href="#d31">31. 스킬은 어떤 일을 하나?</a><a href="#d32">32. 승인·Push 안전장치</a><a href="#d33">33. 차단되는 상황과 범위</a><a href="#d34">34. 실제 요청 문장</a></div>
+  </div>
+</nav>
+
+<section class="part"><span class="audience">Part A · 전원 대상</span><h2>Git 기본 개념</h2><p>P4 사용자가 Git/GitHub의 저장 위치, 이력, branch와 PR을 헷갈리지 않도록 필요한 개념만 설명합니다.</p></section>
+
+<h2 id="a1">1. 핵심 대응 관계</h2>
+<div class="grid3">
+  <div class="card"><span class="tag p4">P4</span><div class="big">Shelve</div><p>변경을 서버에 올려 보관하거나 리뷰할 수 있게 만드는 상태.</p></div>
+  <div class="card"><span class="tag git">Git / GitHub</span><div class="big">Commit <span class="arrow">+</span> Push</div><p>Feature branch의 변경 기록을 GitHub 서버까지 올린 상태.</p></div>
+  <div class="card"><span class="tag key">핵심</span><div class="big">가장 가까운 대응</div><p><strong>P4 Shelve ≈ Git Feature Branch Commit + Push</strong></p></div>
+</div>
+
+<h2 id="a2">2. 작업 폴더 → Staging → 로컬 저장소 → GitHub</h2>
+<p class="lead" style="font-size:16px">Git은 파일을 수정했다고 바로 서버 이력이 되는 구조가 아닙니다. <code>add</code>, <code>commit</code>, <code>push</code>가 서로 다른 단계입니다.</p>
+<div class="fourbox">
+  <div class="box"><strong>작업 폴더</strong><span>파일을 실제로 수정</span><div class="cmd">Working Tree</div></div>
+  <div class="box"><strong>Staging</strong><span>다음 commit에 넣을 변경 선택</span><div class="cmd">git add</div></div>
+  <div class="box"><strong>로컬 저장소</strong><span>내 PC에 이력으로 저장</span><div class="cmd">git commit</div></div>
+  <div class="box"><strong>GitHub</strong><span>서버의 branch에 업로드</span><div class="cmd">git push</div></div>
+</div>
+<div class="callout"><strong>중요:</strong> <code>git add</code>는 서버에 올리는 동작이 아닙니다. “다음 commit에 포함할 변경을 고르는 단계”입니다.</div>
+
+<h2 id="a3">3. P4 ↔ Git/GitHub 개념 비교</h2>
+<div class="table-scroll"><table class="wide"><thead><tr><th>P4에서 익숙한 개념</th><th>Git / GitHub에서 가까운 개념</th><th>쉽게 설명하면</th></tr></thead><tbody>
+<tr><td>Workspace</td><td>Local Working Tree</td><td>내 PC에서 실제 파일을 수정하는 작업 공간</td></tr>
+<tr><td>Pending CL</td><td>Working Tree + Staging</td><td>아직 commit되지 않은 진행 중 변경. <code>git add</code>한 항목은 Staging에 들어갑니다.</td></tr>
+<tr><td><strong>Shelve</strong></td><td><strong>Feature Branch Commit + Push</strong></td><td>공유·리뷰 관점에서 가장 가까운 상태</td></tr>
+<tr><td>Code Review</td><td>Pull Request(PR) Review</td><td>내 branch 변경을 base branch에 넣기 전 리뷰</td></tr>
+<tr><td><strong>Submit</strong></td><td><strong>PR Merge</strong></td><td>리뷰·검증 완료 후 공식 branch에 실제 반영. 팀에서는 GitHub에서 <strong>Squash and merge</strong>를 직접 클릭합니다.</td></tr>
+<tr><td>Unshelve — 동료 변경 받아보기</td><td>해당 branch <code>fetch</code> 후 <code>switch</code></td><td>동료가 올린 branch 자체를 로컬 작업 branch로 가져와 확인</td></tr>
+<tr><td>Unshelve — 내 작업 위에 특정 변경 겹치기</td><td><code>cherry-pick</code></td><td>특정 commit의 변경만 현재 branch 위에 적용</td></tr>
+<tr><td>CL</td><td>branch + PR</td><td>자동화 예: <code>CL_987654</code> branch와 그 branch의 PR이 한 작업 단위를 이룹니다.</td></tr>
+<tr><td>CL 번호</td><td>commit SHA</td><td>완전히 같은 개념은 아니지만, Git에서 특정 이력을 식별할 때 SHA를 사용합니다.</td></tr>
+<tr><td>Sync / Get Latest</td><td><code>pull</code> (= fetch + merge로 이해)</td><td>일상 작업에서는 pull을 사용할 수 있습니다. 기본 개념은 fetch 후 merge이며, 설정에 따라 rebase 방식이 선택될 수도 있습니다.</td></tr>
+<tr><td>직접 대응 개념 없음</td><td><strong>Fork</strong></td><td>회사 원본 repository를 내 계정 쪽에 만든 별도 repository. 자세한 내용은 부록 A 참조.</td></tr>
+<tr><td>Workspace 생성과 유사</td><td><strong>Clone</strong></td><td>repository를 내 PC로 내려받아 실제 작업 공간을 만듭니다.</td></tr>
+</tbody></table></div>
+
+<h2 id="a4">4. 왜 Commit 하나가 Shelve와 같지 않은가?</h2>
+<div class="vs">
+  <div class="card"><span class="tag p4">P4 Shelve</span><h3>서버에 존재</h3><p>서버에 저장되어 다른 개발자가 확인하거나 리뷰에 활용할 수 있습니다.</p><span class="pill good">서버 저장</span><span class="pill info">공유 가능</span></div>
+  <div class="vs-mid">VS</div>
+  <div class="card"><span class="tag git">Git Commit</span><h3>기본적으로 내 PC에 존재</h3><p><code>git commit</code>만 하면 이력은 로컬 repository에 기록됩니다. 아직 GitHub에는 올라가지 않았습니다.</p><span class="pill warn">로컬 저장</span></div>
+</div>
+<div class="mono diagram">내 PC
+CL_987654
+  └─ commit ABC123
+
+GitHub 서버
+  └─ 아직 없음
+
+        ↓ git push
+
+GitHub 서버
+CL_987654
+  └─ commit ABC123
+
+→ 이 시점부터 공유·리뷰 관점에서 P4 Shelve와 훨씬 비슷해짐</div>
+
+<h2 id="a5">5. Shelve와 Push의 결정적 차이: 이력</h2>
+<div class="grid">
+  <div class="card"><span class="tag p4">P4 Shelve</span><h3>Submit 이력과는 별도</h3><p><strong>Unshelve해도 shelf 자체는 지워지지 않습니다.</strong> shelf는 명시적으로 삭제하거나 다시 shelve해 갱신하기 전까지 남을 수 있습니다. 핵심은 shelf 갱신이 <strong>submit된 depot 이력</strong>으로 쌓이는 것은 아니라는 점입니다.</p></div>
+  <div class="card"><span class="tag git">Push된 Git Commit</span><h3>브랜치 이력에 기록</h3><p>Push된 commit은 해당 branch 이력에 기록됩니다. 리뷰 중 여러 commit을 쌓더라도 팀의 최종 PR 반영은 GitHub에서 <strong>Squash and merge</strong>로 하나의 반영 단위로 정리합니다.</p></div>
+</div>
+<div class="callout green"><strong>팀 운영:</strong> 담당자가 Build·검증·Review를 완료한 뒤 GitHub 사이트에서 직접 <strong>Squash and merge</strong>를 수행합니다.</div>
+
+<h2 id="a6">6. P4 작업 흐름과 GitHub 작업 흐름</h2>
+<h3>P4에서 익숙한 흐름</h3>
+<div class="flow4">
+  <div class="step"><div class="num">1</div><strong>코드 수정</strong><span class="muted">Workspace에서 변경</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">2</div><strong>CL / Shelve</strong><span class="muted">서버 보관 및 리뷰</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">3</div><strong>리뷰 / 수정</strong><span class="muted">필요 시 다시 Shelve</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">4</div><strong>Submit</strong><span class="muted">공식 반영</span></div>
+</div>
+<h3>GitHub에서 대응되는 흐름</h3>
+<div class="flow4">
+  <div class="step"><div class="num">1</div><strong>Branch에서 수정 + Add</strong><span class="muted">다음 commit 변경 선택</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">2</div><strong>Commit + Push</strong><span class="muted">로컬 이력 저장 후 서버 업로드</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">3</div><strong>PR / Review</strong><span class="muted">같은 branch의 추가 push는 기존 PR에 반영</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">4</div><strong>Squash and merge</strong><span class="muted">검증·리뷰 후 공식 branch 반영</span></div>
+</div>
+<div class="callout"><strong>리뷰 중 수정해도 PR을 다시 만들 필요가 없습니다.</strong> 같은 head branch에 commit 후 push하면 기존 Open PR이 갱신됩니다.</div>
+
+<h2 id="a7">7. 가장 많이 헷갈리는 것: Git Stash</h2>
+<div class="grid">
+  <div class="card"><span class="tag p4">P4 Shelve</span><h3>서버 공유·리뷰 가능</h3><p>변경을 서버에 보관하고 다른 사람과 공유하거나 리뷰에 사용할 수 있습니다.</p></div>
+  <div class="card"><span class="tag git">Git Stash</span><h3>내 PC 임시 보관</h3><p>작업 중인 변경을 잠깐 치워두는 로컬 기능입니다. 일반적으로 리뷰나 공유를 위한 기능이 아닙니다.</p></div>
+</div>
+<div class="callout warn"><strong>주의:</strong> 이름이 비슷해 보여도 <code>git stash</code>와 P4 Shelve는 사용 목적이 다릅니다.</div>
+
+<h2 id="a8">8. “Merge”는 두 방향이 완전히 다르다</h2>
+<p class="lead" style="font-size:16px">이 문서에서 가장 중요한 구분입니다. 같은 “merge”라는 단어를 쓰지만 <strong>목적·방향·수행 위치</strong>가 다릅니다.</p>
+<div class="merge-types">
+  <div class="merge-type pr"><div class="label">① PR Merge · 최종 반영</div><h3>내 branch → 공식 branch</h3><p><strong>GitHub 사이트에서 수행</strong>합니다. Build·검증·Review 완료 후 <strong>Squash and merge</strong>를 클릭하며, P4의 Submit에 가장 가깝습니다.</p><div class="mono diagram">CL_987654 ── PR ──► smp1900
+                      ↑
+             GitHub Squash and merge</div></div>
+  <div class="merge-type local"><div class="label">② git merge · 내 작업 최신화/충돌 재현</div><h3>base → 내 CL branch</h3><p><strong>로컬 PC에서 수행</strong>합니다. 최신 base를 내 작업 branch에 합쳐 최신화하거나 conflict를 재현합니다. 최종 PR Merge와 다른 동작입니다.</p><div class="mono diagram">upstream/smp1900 ──► local CL_987654
+                         git merge</div></div>
+</div>
+<div class="callout red"><strong>원칙:</strong> “PR Merge”와 “<code>git merge upstream/smp1900</code>”를 같은 동작으로 읽지 마세요. Part B의 merge는 항상 ②를 뜻하며, 최종 ①은 사용자가 GitHub에서 수행합니다.</div>
+
+<h2 id="a9">9. Git Fetch · Merge · Rebase를 그림으로 이해하기</h2>
+<p class="lead" style="font-size:16px">서버의 최신 상태를 가져오는 것과 그 변경을 현재 branch에 합치는 것은 서로 다른 동작입니다. <a href="#a8">8장의 Merge 두 방향</a> 중 여기의 merge는 ② 로컬 merge입니다.</p>
+<div class="git-concept">
+  <div class="cmd-card"><span class="cmd">git fetch upstream</span><h3>서버 상태만 갱신</h3><p><code>upstream</code>의 최신 commit 정보를 로컬 repository로 가져옵니다. 현재 작업 파일은 바꾸지 않습니다.</p><div class="branch-box small"><div><strong>Before</strong> upstream/smp1900 → A─B</div><div style="text-align:center">↓ fetch</div><div><strong>After</strong> upstream/smp1900 → A─B─C</div></div></div>
+  <div class="cmd-card"><span class="cmd">git merge upstream/smp1900</span><h3>base를 현재 CL branch에 합침</h3><p>현재 <code>CL_987654</code>에 최신 <code>smp1900</code> 변경을 합칩니다. 양쪽이 같은 부분을 바꿨다면 conflict가 발생합니다.</p><div class="branch-box mono diagram">Before
+base      A──B──C
+           \
+CL         └──X
+
+After
+base      A──B──C
+           \    \
+CL         └──X──M
+
+M의 부모 = X와 C</div></div>
+  <div class="cmd-card not-used"><span class="cmd">git rebase upstream/smp1900</span><h3>내 commit을 최신 base 위로 다시 쌓음</h3><p><code>CL_987654</code>의 commit을 최신 base 뒤에 다시 적용합니다. 기존 commit의 SHA가 바뀝니다.</p><div class="branch-box mono diagram">Before   A──B──X
+base     A──B──C
+
+rebase 후 A──B──C──X′
+
+X → X′ : 새 SHA</div></div>
+</div>
+<div class="callout red"><strong>Rebase / force push 주의:</strong> 이미 공유된 branch를 rebase하면 commit SHA가 바뀌며, 원격 branch 갱신에 force push가 필요할 수 있습니다. 다른 사람이 사용하는 branch나 자동화가 만든 기존 Open PR branch에서는 기본 동작으로 사용하지 않습니다.</div>
+<div class="callout warn"><strong><code>pull</code>은 언제 쓰나?</strong> 일상적인 개인 작업에서는 <code>git pull</code>을 사용할 수 있습니다. 다만 Part B의 스킬은 <strong>각 단계와 대상 branch를 검증</strong>해야 하므로 fetch와 merge를 분리합니다.</div>
+
+<h2 id="a10">10. upstream / local branch 관계</h2>
+<p class="lead" style="font-size:16px"><strong><code>upstream/smp1900</code>처럼 보이는 이름은 “원격 branch의 로컬 사본”</strong>이며, 정확한 Git 용어로는 <strong>remote-tracking branch</strong>입니다. <code>fetch</code>가 이 정보를 갱신합니다.</p>
+<div class="mono diagram">회사 GitHub 원본 저장소: SMP1900
+
+upstream/smp1900          A──B──C   ← base의 remote-tracking branch
+upstream/CL_987654        A──B──X   ← 자동화 PR head의 remote-tracking branch
+                              │
+                              │ switch / tracking branch 준비
+                              ▼
+local CL_987654           A──B──X   ← 실제 파일을 수정하는 local branch
+
+※ fetch만 해서는 작업 파일이 바뀌지 않습니다.
+※ local CL_987654로 switch한 뒤 필요한 merge를 수행합니다.</div>
+<div class="grid">
+  <div class="card"><span class="tag git">switch</span><h3>작업 branch 선택</h3><p><code>CL_987654</code>를 현재 local branch로 선택해 실제 conflict를 해결합니다.</p></div>
+  <div class="card"><span class="tag git">tracking branch</span><h3>원격 branch와 연결된 local branch</h3><p>local <code>CL_987654</code>가 어느 원격 branch를 기준으로 fetch/push할지 연결 관계를 가집니다.</p></div>
+</div>
+
+
+<section id="a10-worktree" aria-labelledby="worktree-title">
+<h2 id="worktree-title">10-1. Git Worktree: Branch 전환과 별도 작업 폴더의 차이</h2>
+<p class="lead" style="font-size:16px"><strong>Branch는 코드 이력의 갈래</strong>이고, <strong>Worktree는 특정 branch의 파일을 실제로 펼쳐 놓은 작업 폴더</strong>입니다. 일반 Git 사용자는 한 폴더에서 branch를 바꾸지만, <code>git worktree</code>를 사용하면 <strong>하나의 로컬 repository에 여러 작업 폴더를 연결</strong>할 수 있습니다.</p>
+
+<div class="wt-compare" role="group" aria-label="단일 작업 폴더에서 Branch 전환하는 방식과 Git Worktree 방식의 개념 비교">
+  <figure class="wt-panel default" style="margin:0">
+    <span class="tag key">현재 권장 · 기본 운영</span>
+    <h3>① 하나의 폴더에서 Branch 전환</h3>
+    <p class="wt-sub">같은 파일 경로에서 <code>git switch</code>로 작업 대상을 바꿈</p>
+    <div class="wt-graphic one">
+      <span class="wt-kicker">내 PC · 작업 폴더 1개</span>
+      <div class="wt-folder primary">
+        <div class="wt-name">📁 smp1900/</div>
+        <div class="wt-path">/home/whpark/Project/smp1900</div>
+        <div class="wt-branch">현재: fix-SOC-411668</div>
+      </div>
+      <div class="wt-direction">↕ git switch (작업 폴더는 그대로)</div>
+      <div class="wt-branches" aria-label="전환 가능한 브랜치 예시">
+        <span class="wt-chip">smp1900</span>
+        <span class="wt-chip active">fix-SOC-411668</span>
+        <span class="wt-chip">CL_987654</span>
+      </div>
+    </div>
+    <figcaption class="wt-note"><strong>핵심</strong><span>현재 선택한 branch 하나의 파일만 보입니다. 폴더를 늘리지 않아 빌드 산출물과 저장 공간을 관리하기 쉽습니다.</span></figcaption>
+  </figure>
+  <figure class="wt-panel alternative" style="margin:0">
+    <span class="tag git">추가 선택지 · 별도 Worktree</span>
+    <h3>② 한 Repository에 Worktree 두 개</h3>
+    <p class="wt-sub">서로 다른 폴더에서 각기 다른 branch를 동시에 작업</p>
+    <div class="wt-graphic">
+      <div class="wt-shared">하나의 공통 Git Repository
+        <small>Commit 객체 · Branch 참조 공유 (전체 Clone 아님)</small>
+      </div>
+      <div class="wt-stem" aria-hidden="true"></div>
+      <div class="wt-folders">
+        <div class="wt-folder primary">
+          <div class="wt-name">📁 smp1900/</div>
+          <div class="wt-path">기본(Primary) Worktree</div>
+          <div class="wt-branch">smp1900</div>
+        </div>
+        <div class="wt-folder secondary">
+          <div class="wt-name">📁 smp1900-wt-fix/</div>
+          <div class="wt-path">보조(Linked) Worktree</div>
+          <div class="wt-branch">fix-SOC-411668</div>
+        </div>
+      </div>
+    </div>
+    <figcaption class="wt-note"><strong>핵심</strong><span>Git 이력은 공유하지만 파일, 변경사항, Staging, HEAD는 각 폴더별로 구분됩니다. CLion 빌드 산출물도 폴더마다 추가로 쌓일 수 있습니다.</span></figcaption>
+  </figure>
+</div>
+<div class="wt-legend" aria-label="핵심 비교 요약"><span>단일 폴더 = Switch로 전환</span><span>Worktree = 폴더별 동시 작업</span></div>
+
+<h3>Worktree, Branch, Clone을 구별하면</h3>
+<div class="table-scroll"><table class="wide"><thead><tr><th>구분</th><th>Branch</th><th>Git Worktree</th><th>별도 Clone</th></tr></thead><tbody>
+<tr><td>무엇인가?</td><td>Commit 이력을 가리키는 참조</td><td>한 로컬 repository에 연결된 독립 작업 폴더</td><td>별도의 로컬 repository 사본</td></tr>
+<tr><td>실제 작업 파일</td><td>Branch만 만들어서는 새 폴더가 생기지 않음</td><td>Worktree마다 별도 파일과 Staging 영역</td><td>Clone마다 별도 파일</td></tr>
+<tr><td>Git 객체 / 이력</td><td>같은 repository 안에서 공유</td><td><strong>기본 repository와 공유</strong></td><td>일반적으로 별도 객체 저장소</td></tr>
+<tr><td>디스크 사용</td><td>추가 파일 폴더 없음</td><td>새 작업 파일과 빌드 결과만큼 증가</td><td>Git 객체까지 별도로 저장할 수 있음</td></tr>
+</tbody></table></div>
+<div class="callout"><strong>P4 사용자 관점:</strong> 여러 Git Worktree는 P4에서 별도 Workspace를 여러 개 두는 모습과 일부 비슷합니다. 다만 Git Worktree들은 <strong>동일한 로컬 Git repository의 이력과 참조를 공유</strong>한다는 점에서 완전히 같지는 않습니다.</div>
+<div class="callout warn"><strong>현재 팀 운영 기준:</strong> 기본 작업 위치는 <code>/home/whpark/Project/smp1900</code> 하나이며, <strong>새 Worktree 자동 생성은 하지 않습니다.</strong> 여러 작업을 진행할 때도 기존 변경을 먼저 보호하고 같은 폴더에서 local branch를 전환합니다. Git은 일반적으로 동일한 local branch를 두 Worktree에 동시에 체크아웃하지 못하게 합니다.</div>
+<h3>디스크 정리할 때 왜 주의해야 하나?</h3>
+<div class="grid">
+  <div class="card"><span class="tag key">확인 먼저 · 읽기 전용</span><h3>어떤 Worktree가 연결됐는지 보기</h3><div class="mono wt-command">git -C /home/whpark/Project/smp1900 worktree list --porcelain</div><p class="small muted">연결된 경로, branch, 상태를 확인합니다. 이 명령은 제거하지 않습니다.</p></div>
+  <div class="card"><span class="tag warn">삭제는 별도 승인</span><h3>안전한 제거 순서</h3><p>① 해당 폴더가 기본 저장소가 아닌지 확인 → ② 미커밋 파일·작업·CLion 빌드 사용 여부 확인 → ③ 사용자 승인 → ④ <code>l1-github worktree-remove</code>로 제거.</p><p class="small muted"><code>rm -rf</code>로 Worktree 폴더를 바로 삭제하지 않습니다. Worktree 제거는 branch 삭제·PR Merge와 별개입니다.</p></div>
+</div>
+<div class="callout green"><strong>용량 확보 포인트:</strong> 보조 Worktree에 별도로 생성된 작업 파일, <code>cmake-build-*</code> 빌드 산출물은 공간을 차지합니다. <code>l1-cleanup</code>은 <strong>용량 진단</strong>, 실제 Worktree 해제·제거는 <code>l1-github</code>가 담당하도록 나누는 것이 안전합니다.</div>
+</section>
+
+<h2 id="a11">11. Merge와 Rebase 차이</h2>
+<p><a href="#a8">8장의 구분</a>에 따라 여기의 Merge는 <strong>base → 내 branch</strong> 로컬 통합입니다.</p>
+<div class="vs">
+  <div class="card"><span class="tag git">MERGE · Part B 기본 방식</span><h3>기존 commit을 유지하면서 두 이력을 연결</h3><div class="mono diagram">base      A──B──C
+           \    \
+CL         └──X──M
+
+M의 첫 번째 부모 = X
+M의 두 번째 부모 = C
+기존 X는 사라지지 않음</div><p class="small muted">Merge commit M이 X와 C를 모두 부모로 가지므로 기존 CL commit X의 이력을 유지합니다.</p></div>
+  <div class="vs-mid">VS</div>
+  <div class="card not-used"><span class="tag p4">REBASE · Part B 기본 사용 안 함</span><h3>내 commit을 새 base 위에 다시 작성</h3><div class="mono diagram">Before
+base      A──B──C
+CL        A──B──X
+
+After
+base/CL   A──B──C──X′
+
+기존 X → 새로운 X′
+SHA 변경</div><p class="small muted">기존 X가 그대로 이동하는 것이 아니라 같은 변경을 기반으로 새 commit X′가 만들어집니다.</p></div>
+</div>
+
+<h2 id="a12">12. 실제 base branch 작업을 예로 보면</h2>
+<p class="muted small">다른 저장소에서는 공식 branch를 <code>pilot</code> 또는 <code>main</code>처럼 부를 수 있지만, 이 문서의 base 예시는 <code>smp1900</code>으로 통일합니다.</p>
+<div class="mono diagram">smp1900
+   │
+   └── feature branch
+          │
+          ├─ 코드 수정 → git add
+          ├─ commit
+          ├─ push
+          └─ Pull Request
+                │
+                ├─ review / 수정 → commit → push
+                ├─ Build·검증 완료
+                └─ GitHub에서 Squash and merge
+                         ↓
+                    smp1900</div>
+<div class="callout green"><strong>P4 관점 번역:</strong> Feature branch의 Commit + Push는 “공유 가능한 Shelve 상태”에 가깝고, PR 검증·Review 후 GitHub에서 수행하는 Squash and merge는 Submit에 가깝습니다.</div>
+
+<h2 id="a13">13. 최종 치트시트</h2>
+<div class="cheat">
+  <h3>초보자용 5단계</h3>
+  <div class="five">
+    <div class="card"><div class="n">1 · ADD</div><strong>다음 commit에 넣을 변경 선택</strong><span class="muted small">Staging</span></div>
+    <div class="card"><div class="n">2 · COMMIT</div><strong>내 PC에 변경 이력 저장</strong><span class="muted small">Local</span></div>
+    <div class="card"><div class="n">3 · PUSH</div><strong>내 branch를 서버에 업로드</strong><span class="muted small">Remote</span></div>
+    <div class="card"><div class="n">4 · PR</div><strong>공식 branch 반영을 리뷰 요청</strong><span class="muted small">Review</span></div>
+    <div class="card"><div class="n">5 · MERGE</div><strong>검증 후 공식 branch 반영</strong><span class="muted small">Squash and merge</span></div>
+  </div>
+  <p><strong>P4 Shelve ≈ Git Feature Branch의 Commit + Push</strong> · <strong>P4 Submit ≈ GitHub PR Merge</strong></p>
+  <p class="small muted">단, Shelve와 push된 commit의 이력 성격은 다르며, Git Stash는 Shelve가 아니라 로컬 임시 보관 기능에 가깝습니다.</p>
+</div>
+
+<section class="part"><span class="audience">Part B · CL conflict 처리 담당자 대상</span><h2>l1-cl2git-merge 스킬편</h2><p>자동화가 이미 만든 upstream Open PR에서 conflict를 해결하고 같은 branch로 push하는 운영 흐름입니다.</p></section>
+
+<h2 id="b14">14. 자동화가 먼저 만든 Open PR에서 시작한다</h2>
+<p class="lead" style="font-size:16px">일반 개발의 Fork 흐름과 달리 이 스킬은 <strong>이미 회사 upstream 안에 존재하는 자동화 branch와 Open PR</strong>을 이어받습니다.</p>
+<div class="mono diagram">자동화 시스템이 먼저 수행
+
+P4 SMP1800 CL_987654
+        ↓ 자동 반영 시도
+회사 upstream의 CL_987654 branch 생성
+        ↓
+Open PR 생성 (base = smp1900)
+        ↓
+Conflict 발생
+        ↓
+담당자에게 PR URL + upstream/CL_987654 전달
+        ↓
+★ 여기부터 l1-cl2git-merge ★</div>
+<div class="callout"><strong>일반 Fork 개발과 구분:</strong> 일반 개발은 보통 개인 Fork(<code>origin</code>)에 작업 branch를 push하고 upstream으로 PR을 보냅니다. 반면 이 conflict 복구 스킬은 자동화가 만든 <strong>기존 upstream branch 자체</strong>를 사용합니다. 자세한 차이는 <a href="#app-a">부록 A</a>를 참조하세요.</div>
+
+<h2 id="b15">15. 정본: l1-cl2git-merge 6단계 흐름</h2>
+<p class="lead" style="font-size:16px">이 문서에서 스킬의 6단계 정의는 <strong>이 절 하나만 정본</strong>입니다. 다른 절은 이 흐름을 반복하지 않고 여기만 참조합니다.</p>
+<div class="canonical-flow" data-canonical-flow="true">
+  <div class="skill-node"><span class="tag key">1</span><strong>로컬 상태 점검</strong><span class="muted small">현재 repo/branch, 수정 파일, 진행 중 Git 작업, 사용자 변경 보호 여부 확인.</span></div>
+  <div class="skill-node"><span class="tag git">2</span><strong>PR / CL 검증</strong><span class="muted small">PR=OPEN, head=CL_987654, base=smp1900, 회사 upstream인지 확인하고 CL ID·P4 CL 근거를 확보.</span></div>
+  <div class="skill-node"><span class="tag git">3</span><strong>Fetch + branch 준비</strong><span class="muted small">upstream 최신 정보 갱신 후 exact CL branch를 local tracking branch로 준비.</span></div>
+  <div class="skill-node"><span class="tag git">4</span><strong>Base Merge</strong><span class="muted small"><code>upstream/smp1900</code>을 local <code>CL_987654</code>에 merge.</span></div>
+  <div class="skill-node"><span class="tag key">5</span><strong>CL 의도 보존 확인</strong><span class="muted small">Conflict가 있으면 해결하고, 없어도 CASE F 누락 검사를 수행한 뒤 정적 검증.</span></div>
+  <div class="skill-node"><span class="tag git">6</span><strong>Commit + 보호 검증 + Push</strong><span class="muted small">등록된 source_code Repo, upstream 예외, OPEN PR과 정확한 CL branch를 <a href="#c25">Push 직전 검증</a>한 뒤 같은 branch로 Push, 기존 PR 갱신.</span></div>
+</div>
+<div class="mono diagram">STEP 4 Base Merge 완료
+        ↓
+   conflict 발생?
+    ├─ YES → conflict 해결 ──────┐
+    └─ NO ───────────────────────┤
+                                 ↓
+                     CASE F: CL 의도 누락 검사
+                       ├─ 누락 있음 → 보완/분석
+                       └─ 누락 없음
+                                 ↓
+                           정적 검증
+                                 ↓
+                  STEP 6 Commit + Push
+                                 ↓
+                        기존 Open PR 갱신</div>
+<div class="callout red"><strong><a href="#a8">8장의 Merge 구분</a>을 적용하세요.</strong> STEP 4는 “base → 내 CL branch”의 로컬 <code>git merge</code>입니다. 최종 PR Merge는 스킬 범위 밖이며 사용자가 GitHub에서 수행합니다.</div>
+<div class="callout warn"><strong>왜 <code>pull</code> 대신 fetch + merge인가?</strong> 일상 작업에서는 pull을 사용할 수 있지만, 이 스킬은 PR·remote·branch와 각 단계 결과를 검증해야 하므로 fetch와 merge를 분리합니다.</div>
+
+<h2 id="b16">16. 사용자가 주는 입력과 요청 예</h2>
+<div class="grid">
+  <div class="card"><div class="scenario-title"><span class="scenario-num">1</span>Open PR URL</div><p>자동화가 이미 만들어 둔 기존 PR입니다. 스킬이 새 PR을 만들지 않습니다.</p><div class="result-line">예: <code>https://&lt;internal-github&gt;/SMP1900/pull/1234</code></div></div>
+  <div class="card"><div class="scenario-title"><span class="scenario-num">2</span>upstream CL branch</div><p>자동화가 만든 PR의 head branch를 그대로 사용합니다.</p><div class="result-line">예: <code>upstream/CL_987654</code></div></div>
+</div>
+<div class="callout green"><strong>자연어 요청 예:</strong><br>“이 Open PR conflict 해결해서 같은 branch로 push까지 해줘. PR: .../pull/1234, Branch: upstream/CL_987654”</div>
+<p class="muted small">실제 처리는 <a href="#b15">15장의 정본 6단계 흐름</a>을 따릅니다.</p>
+
+<h2 id="b17">17. 상황별로 스킬은 어떻게 행동하나?</h2>
+<div class="grid">
+  <div class="card"><span class="tag key">CASE A</span><h3>로컬에 수정 중인 파일이 있음</h3><p>사용자 작업을 삭제하지 않습니다. 안전하게 보존할 수 있으면 스킬의 안전한 보존 방식으로 보호하고, 불가능하면 사용자에게 확인 후 중단합니다.</p><div class="result-line"><strong>금지:</strong> 임의의 <code>reset --hard</code>, <code>clean -fd</code></div></div>
+  <div class="card"><span class="tag key">CASE B</span><h3>같은 local CL branch가 이미 있음</h3><p>로컬에만 있는 commit이 있는지 먼저 확인합니다. 고유한 미Push commit이 있으면 강제로 지우거나 덮어쓰지 않습니다.</p><div class="result-line">안전할 때만 오래된 local branch를 정리</div></div>
+  <div class="card"><span class="tag warn">CASE C</span><h3>PR / branch 정보가 맞지 않음</h3><p>PR이 OPEN이 아니거나 base/head/upstream 조건이 다르면 진행하지 않습니다.</p><div class="result-line"><strong>BLOCKED:</strong> 임의로 새 branch나 새 PR을 만들어 우회하지 않음</div></div>
+  <div class="card"><span class="tag git">CASE D</span><h3>단순 Conflict</h3><p>라인 이동, include 위치 변경, 명확한 rename/move처럼 CL 의도가 분명한 경우 동일 branch에서 해결합니다.</p><div class="result-line">분류: <strong>SAFE_CONFLICT</strong></div></div>
+  <div class="card"><span class="tag p4">CASE E</span><h3>의미적 Conflict</h3><p>API/signature, class 위치, ownership/control flow 변화 등 텍스트 선택만으로 CL 의도를 보존하기 어려우면 코드 분석이 필요합니다.</p><div class="result-line"><strong>code-analyzer → 필요 시 knowledge → code-fix</strong></div></div>
+  <div class="card"><span class="tag warn">CASE F</span><h3>Conflict 표시는 없지만 CL 일부가 빠짐</h3><p>Git conflict가 없다는 이유만으로 성공 처리하지 않습니다. P4 CL 의도가 target 코드에 모두 대응됐는지 확인합니다.</p><div class="result-line"><strong>INCOMPLETE_PORT</strong> → 누락 해결 후 push</div></div>
+</div>
+<div class="callout"><strong>중요:</strong> CASE F는 conflict가 발생한 경우뿐 아니라 <strong>발생하지 않은 경우에도</strong> <a href="#b15">15장 STEP 5</a>에서 반드시 확인합니다.</div>
+
+<h2 id="b18">18. Push가 끝난 뒤 사용자가 하는 일</h2>
+<p>스킬은 <a href="#b15">15장 정본 흐름</a>의 STEP 6에서 <a href="#c25">Push 대상 보호 검증</a>을 통과한 경우에만 기존 upstream branch Push와 PR 갱신을 수행하고 종료합니다. 실패하면 Push를 보류하고 사유를 안내합니다.</p>
+<div class="flow4">
+  <div class="step"><div class="num">SKILL END</div><strong>기존 PR 갱신</strong><span class="muted">upstream/CL_987654 push 완료</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">USER</div><strong>Build / 검증</strong><span class="muted">사내 절차 수행</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">USER</div><strong>Review 완료</strong><span class="muted">최종 반영 조건 확인</span></div><div class="connector">→</div>
+  <div class="step"><div class="num">USER</div><strong>Squash and merge</strong><span class="muted">GitHub 사이트에서 직접 수행</span></div>
+</div>
+<div class="callout green"><strong>책임 경계:</strong> Build·검증·Review·최종 <strong>Squash and merge</strong>는 사용자 작업입니다. <a href="#a8">8장의 PR Merge</a>에 해당합니다.</div>
+
+<h2 id="b19">19. VS Code에서 특히 조심할 버튼</h2>
+<div class="grid3">
+  <div class="card"><span class="tag warn">Smart Commit</span><h3>의도하지 않은 전체 Stage 가능</h3><p>Staged Changes가 비어 있을 때 설정에 따라 전체 변경을 자동 stage하여 commit할 수 있습니다. commit 전 Source Control의 Staged Changes를 확인하세요.</p></div>
+  <div class="card"><span class="tag warn">Sync Changes</span><h3>pull + push가 연속 수행될 수 있음</h3><p>단계별로 fetch/merge/push 대상을 확인해야 하는 Part B 작업에서는 한 번에 실행하지 말고 각 단계를 확인하는 편이 안전합니다.</p></div>
+  <div class="card"><span class="tag warn">Discard Changes</span><h3>작업 파일 변경 폐기</h3><p>Working Tree의 변경을 폐기합니다. 일반적인 Undo로 <strong>되돌릴 수 없다고 보고</strong> 보존이 필요한 변경에는 사용하지 마세요.</p></div>
+</div>
+
+<h2 id="b20">20. 용어집</h2>
+<dl class="glossary">
+  <dt>remote-tracking branch</dt><dd><code>upstream/smp1900</code>처럼 원격 branch의 상태를 로컬 repository 안에서 가리키는 참조. <code>fetch</code>로 갱신됩니다.</dd>
+  <dt>tracking branch</dt><dd>특정 원격 branch와 연결 관계가 설정된 local branch. 예: local <code>CL_987654</code>가 <code>upstream/CL_987654</code>를 추적.</dd>
+  <dt>Git Worktree</dt><dd>하나의 Git repository에 연결된 독립 작업 폴더. 기본 Worktree 외에 보조(Linked) Worktree를 둘 수 있고, Git 객체와 Branch 참조는 공유하지만 파일·Index·HEAD는 각자 가집니다. <a href="#a10-worktree">10-1장 그림</a> 참조.</dd>
+  <dt>head / base</dt><dd>PR에서 <strong>head</strong>는 변경을 가져오는 작업 branch, <strong>base</strong>는 변경을 넣으려는 대상 branch입니다.</dd>
+  <dt>SHA</dt><dd>Git commit을 식별하는 해시 값. rebase처럼 commit을 다시 작성하면 SHA도 달라집니다.</dd>
+  <dt>force push</dt><dd>원격 branch 이력을 일반적인 fast-forward 규칙을 무시하고 갱신하는 push 방식. 공유 branch에서는 이력 충돌 위험이 있어 주의가 필요합니다.</dd>
+</dl>
+
+
+<section class="guard-part" id="part-c">
+  <div class="audience">Part C · v7 추가 · 일반 개발자 + CL conflict 담당자</div>
+  <h2>GitHub 저장소별 Push 보호 운영 가이드</h2>
+  <p><strong>l1-github v0.3.42</strong> · <strong>l1-cl2git-merge v0.3.5</strong> 기준. 새 Repo도 등록할 수 있지만 <strong>잘못된 대상 Push는 막고, 등록은 사용자 승인으로 처리</strong>합니다.</p>
+</section>
+
+<h2 id="c21">21. 왜 저장소별 Push 보호가 필요한가?</h2>
+<div class="guard-example">
+  <div class="card"><span class="tag warn">기존에 일어나기 쉬운 실수</span><h3>작업은 A인데 Push 대상은 B</h3><p>예를 들어 그룹 스킬 <code>l1sw-skills</code>를 수정하면서 Workflow용 GitHub에 Push 요청하거나, 사외 개인 스킬을 사내 코드 저장소로 올리는 경우입니다.</p><div class="guard-pair">요청 문자열만 믿으면 목적지가 바뀔 수 있음</div></div>
+  <div class="card"><span class="tag key">v7의 기본 원칙</span><h3>먼저 작업 역할, 그다음 Repo</h3><p>등록된 <strong>역할 + 현재 PC의 저장소 경로 + 실제 Git Push URL</strong>을 대조합니다. Git remote 별칭이 <code>origin</code>이라도 실제 URL이 틀리면 중단합니다.</p><div class="guard-pair">미등록은 보류하고 등록 경로 안내</div></div>
+</div>
+<div class="callout green"><strong>기억법:</strong> <code>commit</code>은 로컬 이력 저장이고, <code>push</code>는 지정 GitHub로 전송입니다. <strong>Push 전에 “어디로 전송하는지” 확인</strong>하는 것이 이번 수정의 핵심입니다. 신규 Repo 등록 승인과 Push 실행 승인은 별개입니다.</div>
+
+<h2 id="c22">22. 작업 유형 → GitHub 저장소 매핑</h2>
+<p>실제 URL과 PC별 경로는 사용자가 지정합니다. 아래 Repo명은 작업별 용도 식별을 위한 명칭이며, 정확한 회사 도메인·Fork URL을 문서가 추정하지 않습니다.</p>
+<div class="table-scroll"><table class="wide guard-table"><thead><tr><th>작업 목적</th><th>역할 키</th><th>등록할 Repo</th><th>기본 Push 원칙</th></tr></thead><tbody>
+<tr><td>LTE/NR 코드 개발</td><td><code>source_code</code></td><td><strong>smp1900</strong> (사내 팀 코드)</td><td>일반 개발은 본인 <strong>Fork(origin)</strong>; 공식 upstream은 일반 Push 대상 아님</td></tr>
+<tr><td>그룹 공용 스킬 수정</td><td><code>group_skills</code></td><td><strong>l1sw-skills</strong> (사내 팀 공용)</td><td>본인 사내 <strong>Fork</strong>로 Push, upstream으로 PR</td></tr>
+<tr><td>개인 스킬 수정</td><td><code>personal_skills</code></td><td><strong>skill-updater</strong> (사외 개인)</td><td>등록된 사외 GitHub 개인 Repo만 허용</td></tr>
+<tr><td>Workflow 코드 관리</td><td><code>workflow_source</code></td><td><strong>l1-fix-workflow</strong> (사내 개인)</td><td>등록된 사내 개인 Repo만 허용</td></tr>
+<tr><td>Work 진행 이력 / 산출물</td><td><code>work_docs</code></td><td><strong>l1-workspace</strong></td><td>코드 Repo와 분리해서 등록·검증</td></tr>
+<tr><td>별도 Knowledge 산출물</td><td><code>knowledge</code></td><td><strong>사용자 지정</strong></td><td>필요 시 독립 Repo 등록; 현재 문서에서 특정 Repo로 단정하지 않음</td></tr>
+</tbody></table></div>
+<div class="callout warn"><strong>용도 분리가 필수:</strong> <code>source_code</code>와 <code>work_docs</code>는 같은 저장소에 묶지 않습니다. 동일 역할의 Repo가 여러 개라면 기본 Repo를 설정하거나 작업 때 <code>--repo-id</code>로 정확히 선택합니다. 새 Repo가 발견되어도 기본 Repo를 자동으로 바꾸지 않습니다.</div>
+
+<h2 id="c23">23. Push 보호 도식 — 실제로 어떤 순서인가?</h2>
+<div class="guard-flow" aria-label="Push 사전 검증 4단계">
+  <div class="guard-stage"><span class="tag git">STEP 1</span><strong>요청을 역할로 구분</strong><div class="mini">코드 / 그룹 스킬 / 개인 스킬 / Workflow / Work 이력</div></div>
+  <div class="guard-stage"><span class="tag git">STEP 2</span><strong>Canonical JSON 조회</strong><div class="mini">역할 기본 Repo 또는 명시 Repo ID, 현재 Linux/Windows Host 경로 확인</div></div>
+  <div class="guard-stage"><span class="tag git">STEP 3</span><strong>실제 Push URL 검증</strong><div class="mini">Repo 위치, Remote 이름이 아니라 실제 Push URL, 경로·역할·예외 일치 검사</div></div>
+  <div class="guard-stage"><span class="tag git">STEP 4</span><strong>결과에 따라 처리</strong><div class="mini">일치 → 기존 Push 승인 절차 / 미등록 → 등록 확인 / 불일치 → 차단</div></div>
+</div>
+<div class="guard-branches">
+  <div class="guard-branch safe"><strong>✓ 등록 정보 일치</strong><p>보호 검증 통과. 기존 작업 정책과 Push 승인 절차까지 충족한 경우에만 해당 Repo로 Push합니다.</p></div>
+  <div class="guard-branch hold"><strong>◇ 신규·미등록 Repo</strong><p>Push 일시 보류. 역할·Repo ID·정확한 URL·현재 PC 경로를 보여주고 사용자 확인을 받습니다.</p></div>
+  <div class="guard-branch deny"><strong>✕ 등록 대상과 불일치</strong><p>다른 GitHub/Fork/계정, 복수 Push URL, 보호되지 않은 upstream 등은 Push 중단. 설정 변경도 별도 승인입니다.</p></div>
+</div>
+<div class="callout red"><strong>단순히 “그래도 Push해”라고 해도 우회하지 않습니다.</strong> 실제 URL 변경이 의도된 것이라면 <a href="#c24">24장 설정 갱신 절차</a>부터 수행해야 합니다. Push URL 안의 비밀번호·토큰도 등록 대상으로 사용하지 않습니다.</div>
+
+<h2 id="c24">24. 신규 Repository 생성·변경 시 사용 절차</h2>
+<p>새 Repo가 필요한 업무를 막지는 않습니다. 단, <strong>GitHub에서 실제 Repo 생성</strong>과 <strong>스킬의 Repo 매핑 등록</strong>은 구별합니다. 신규 Repo 생성 후 아래 절차로 안전하게 연결합니다.</p>
+<div class="guard-path" aria-label="신규 저장소 등록 절차">
+  <div class="guard-path-item"><strong>① 신규 Repo로 Push 요청</strong><span class="small muted">미등록 또는 URL 불일치 → Push 보류</span></div>
+  <div class="guard-path-down">↓</div>
+  <div class="guard-path-item"><strong>② 사용자에게 표시·확인</strong><span class="small muted">작업 역할 / Repo ID / 실제 GitHub URL / 로컬 경로 / Push 대상 / 기본 Repo 변경 여부</span></div>
+  <div class="guard-path-down">↓</div>
+  <div class="guard-path-item"><strong>③ 설정 변경 미리보기</strong><span class="small muted"><code>repo-config set</code> (기본은 PREVIEW, 아직 JSON 저장 안 함)</span></div>
+  <div class="guard-path-down">↓</div>
+  <div class="guard-path-item"><strong>④ 승인된 URL로 설정 반영</strong><span class="small muted"><code>--apply --confirm-remote</code> 정확히 일치해야 반영</span></div>
+  <div class="guard-path-down">↓</div>
+  <div class="guard-path-item"><strong>⑤ 변경 후 Push 사전검증 다시 실행</strong><span class="small muted">Repo/Path/실제 Push URL 재검증 → 별도 Push 승인·실행</span></div>
+</div>
+<div class="guard-example" style="margin-top:16px">
+  <div class="card"><span class="tag key">예시 A · 신규 Repo</span><h3>신규 개인 스킬 Repo 만들었어</h3><p>사용자에게 신규 Repo URL과 PC 로컬 경로를 확인받아 <code>personal_skills</code>로 등록합니다. 기존 <code>skill-updater</code>를 교체할지, 같은 역할의 다른 Repo로 둘지도 사용자가 결정합니다.</p><p class="small muted">동일 역할 다중 Repo는 기본 선택 또는 <code>--repo-id</code> 사용</p></div>
+  <div class="card"><span class="tag warn">예시 B · 기존 Remote URL 변경</span><h3>Fork가 변경되었어</h3><p>사용자가 변경을 명시적으로 승인한 경우에만 새로운 정확한 URL을 Canonical JSON에 반영합니다. 단순 Push 요청만으로 기존 매핑을 덮어쓰지 않습니다.</p><p class="small muted">이전 등록 URL과 새 URL의 차이 확인</p></div>
+</div>
+<div class="callout"><strong>Canonical JSON 위치:</strong> <code>l1-github</code>의 <code>data/environment/github-repositories.json</code>이 기준입니다. 실제 절대 경로는 설치 루트에 따라 다릅니다. Linux/Windows가 서로 다른 폴더를 쓰면 <code>host_paths</code>를 해당 Host별로 등록합니다. CL2Git fallback에서 경로가 모호할 때는 <code>L1_GITHUB_REPOSITORIES_FILE</code> 환경변수로 <strong>기존 설정 파일의 절대 경로</strong>를 지정할 수 있습니다.</div>
+
+<h2 id="c25">25. CL2Git의 특수한 upstream Push는 어떻게 보호하나?</h2>
+<p><strong>일반 개발 Push와 다릅니다.</strong> <code>l1-cl2git-merge</code>는 신규 PR을 만드는 스킬이 아니라, 자동화가 이미 만들어 놓은 같은 회사 upstream Repo의 <strong>기존 Open PR과 CL branch</strong>를 복구합니다.</p>
+<div class="guard-path" aria-label="CL2Git 원본 PR Push 보호 도식">
+  <div class="guard-path-item"><strong>일반 개발: 내 origin(Fork) → PR</strong><span class="small muted">source_code의 등록된 Fork URL과 일치해야 함</span></div>
+  <div class="guard-path-down">↕ 작업 방식 구분</div>
+  <div class="guard-path-item"><strong>CL2Git 복구: 기존 upstream/CL_987654 → 기존 PR 갱신</strong><span class="small muted">Push 이전에 아래 4가지 별도 조건 전부 확인</span></div>
+</div>
+<div class="grid" style="margin-top:16px">
+  <div class="card"><span class="tag git">① 등록된 source_code</span><p>현재 PC의 코드 Repo가 정확히 등록되어 있고 실제 <code>upstream</code> Push URL이 사용자가 승인한 공식 URL과 같아야 합니다.</p></div>
+  <div class="card"><span class="tag git">② 제한된 예외 승인</span><p><code>repo-config allow-cl2git</code>로 정확한 upstream URL의 <code>push_exceptions.cl2git</code>를 따로 등록해야 합니다. 일반 upstream Push까지 허용되는 것은 아닙니다.</p></div>
+  <div class="card"><span class="tag git">③ PR 검증</span><p>신뢰할 수 있는 provider에서 새로 조회한 PR 증거로 <strong>OPEN</strong>, base=<code>smp1900</code>, PR head Repo=같은 upstream Repo를 확인합니다.</p></div>
+  <div class="card"><span class="tag git">④ Branch 일치</span><p>PR head가 <code>CL_숫자</code> 형식이고, 실제 로컬 현재 branch도 <strong>같은 CL 번호</strong>여야 합니다. 다른 branch로 Push하지 않습니다.</p></div>
+</div>
+<div class="callout red"><strong>실패 시:</strong> <code>push-preflight</code>에서 BLOCKED. 스킬이 멋대로 개인 Fork나 다른 upstream branch에 재Push하거나 PR을 새로 만들지 않습니다. Push 대상만 안전해도 conflict 해결·CL mapping 정적 검증이 실패했다면 Push하지 않습니다.</div>
+<div class="callout green"><strong>Skillsilent 미설치 동료도 동일 정책:</strong> <code>l1-github</code>가 설치되어 있으면 해당 경로를 우선 사용하고, 없으면 <code>l1-cl2git-merge</code>에 포함된 Token Fallback Push Guard가 Canonical JSON을 검사합니다. Mango MCP 경로 역시 <strong>사전검증이 필수인 운영 계약</strong>으로 사용합니다. 관련 흐름은 <a href="#b15">Part B 15장</a> 참조.</div>
+
+<h2 id="c26">26. 실사용 요청 예시 및 명령어</h2>
+<h3>26-1. 사용자가 자연어로 요청하는 방법</h3>
+<div class="grid">
+  <div class="card"><span class="tag key">설정 조회 · 읽기 전용</span><p>“현재 작업 유형별 GitHub Push 대상과 내 PC의 로컬 경로 보여줘.”</p><p class="result-line">작업 역할 / Repo 이름 / 등록 URL / 로컬 경로 / 일치 여부 확인</p></div>
+  <div class="card"><span class="tag key">신규 Repo 등록</span><p>“신규 그룹 스킬 Repo를 등록하고 싶어. 먼저 현재 설정과 변경 미리보기를 보여줘.”</p><p class="result-line">사용자가 새 URL·역할 확인 → 명시 승인 → 재검증</p></div>
+  <div class="card"><span class="tag key">일반 Push</span><p>“현재 수정한 l1sw-skills를 등록된 내 Fork로 Push해줘. 먼저 Push 대상 검증해줘.”</p><p class="result-line"><code>group_skills</code> 역할과 실제 Fork URL 대조</p></div>
+  <div class="card"><span class="tag key">CL2Git 작업</span><p>“이 Open PR의 CL conflict를 해결하고 기존 upstream/CL_987654로 Push해줘. 대상 보호 검증도 수행해줘.”</p><p class="result-line">OPEN PR 증거·upstream 예외·branch 동일성 검사</p></div>
+</div>
+<h3>26-2. 정확한 명령어 (실제 Repo URL은 사용자 값으로 치환)</h3>
+<details class="guard-details" open><summary>① 현재 역할별 Repo 설정 확인</summary><div>
+<pre class="guard-code"># l1-github 스킬 디렉터리에서 실행
+python scripts/l1_github.py repo-config roles --json
+python scripts/l1_github.py repo-config list --json
+python scripts/l1_github.py repo-config roles --role group_skills --json</pre>
+<p class="small muted">읽기 전용이며, 실제 Git Push URL과 등록 URL의 일치 상태도 조회할 수 있습니다. Linux 환경은 <code>python3</code>, Windows 환경은 <code>python</code> 명령을 사용하세요.</p></div></details>
+<details class="guard-details"><summary>② 신규 Repo 설정 미리보기 → 사용자 확인 → 저장</summary><div>
+<pre class="guard-code"># 먼저 PREVIEW (저장하지 않음)
+python scripts/l1_github.py repo-config set \
+  --repo l1sw-skills --role group_skills \
+  --remote '&lt;MY_GROUP_SKILL_FORK_URL&gt;' \
+  --path '&lt;MY_LOCAL_REPO_PATH&gt;' \
+  --set-default --json
+
+# 정확한 역할/URL/경로에 사용자 명시 승인 후에만 실행
+python scripts/l1_github.py repo-config set \
+  --repo l1sw-skills --role group_skills \
+  --remote '&lt;MY_GROUP_SKILL_FORK_URL&gt;' \
+  --path '&lt;MY_LOCAL_REPO_PATH&gt;' \
+  --set-default --apply \
+  --confirm-remote '&lt;MY_GROUP_SKILL_FORK_URL&gt;' --json
+
+# 적용 뒤 Readback
+python scripts/l1_github.py repo-config roles --json</pre>
+<p class="small muted">위의 <code>\</code> 줄바꿈은 Linux shell 예시입니다. Windows PowerShell에서는 한 줄로 입력하거나 PowerShell 줄바꿈 문법을 사용하세요. 새 Repo를 기본 Repo로 변경하고 싶지 않다면 <code>--set-default</code>를 생략하고 작업 때 <code>--repo-id</code>로 지정합니다.</p></div></details>
+<details class="guard-details"><summary>③ CL2Git upstream Push 예외 등록 (기본 차단 → 사용자 확인)</summary><div>
+<pre class="guard-code"># 정확한 upstream Repo URL을 확인하고 PREVIEW
+python scripts/l1_github.py repo-config allow-cl2git \
+  --repo smp1900 --url '&lt;OFFICIAL_UPSTREAM_URL&gt;' --json
+
+# 사용자 확인 후 적용
+python scripts/l1_github.py repo-config allow-cl2git \
+  --repo smp1900 --url '&lt;OFFICIAL_UPSTREAM_URL&gt;' \
+  --apply --confirm-remote '&lt;OFFICIAL_UPSTREAM_URL&gt;' --json</pre>
+<p class="small muted">이 예외는 <code>source_code</code> 등록과 별도로 필요하며, <strong>모든 upstream 브랜치로 Push를 허용하지 않습니다.</strong></p></div></details>
+<details class="guard-details"><summary>④ CL2Git 실제 Push 직전 Preflight (읽기 전용)</summary><div>
+<pre class="guard-code"># l1-cl2git-merge 스킬 디렉터리에서 실행
+python scripts/github_fallback.py push-preflight \
+  --repo-root '&lt;LOCAL_REPO_PATH&gt;' \
+  --pr-evidence '&lt;FRESH_OPEN_PR_EVIDENCE.json&gt;' \
+  --repo-id smp1900</pre>
+<p class="small muted">PR evidence는 실제 신뢰 가능한 GitHub provider에서 새로 조회한 자료여야 합니다. 이 명령 자체는 Push하지 않습니다. 통과한 경우에만 기존 PR의 정확한 CL branch로 Push합니다.</p></div></details>
+
+<h2 id="c27">27. 차단 메시지 해석과 운영 범위</h2>
+<div class="table-scroll"><table class="wide guard-table"><thead><tr><th>대표 상태</th><th>의미</th><th>다음 조치</th></tr></thead><tbody>
+<tr><td><code>REPO_REGISTRATION_REQUIRED</code></td><td>역할에 맞는 Repo나 Canonical 설정 미등록</td><td>사용자 확인 후 <code>repo-config set</code></td></tr>
+<tr><td><code>REPO_ROLE_MISMATCH</code></td><td>작업 역할과 Repo가 다름</td><td>잘못된 Push를 중단하고 역할·Repo 변경 의도 확인</td></tr>
+<tr><td><code>REPO_PATH_MISMATCH</code></td><td>현재 Git 루트가 등록된 Host 경로와 다름</td><td>현재 PC의 실제 로컬 경로 확인·등록</td></tr>
+<tr><td><code>PUSH_DESTINATION_MISMATCH</code></td><td>실제 Push URL과 등록 URL 다름</td><td><code>git remote get-url --push --all origin</code> 확인 후 등록/변경 승인</td></tr>
+<tr><td><code>CONFIG_AMBIGUOUS</code></td><td>서로 다른 Canonical 설정 파일 후보 존재</td><td>사용 중인 정본 경로 명시; 중복 설정 추측 금지</td></tr>
+<tr><td><code>CL2GIT_APPROVAL_REQUIRED</code></td><td>upstream 예외 승인 미등록</td><td>기존 Open PR 조건 확인 후 <code>allow-cl2git</code> 등록</td></tr>
+<tr><td><code>CL2GIT_PR_MISMATCH</code></td><td>OPEN PR/동일 Repo/base 조건 불일치</td><td>PR 근거 재조회 및 CL 번호 확인, 임의 Push 금지</td></tr>
+</tbody></table></div>
+<div class="grid" style="margin-top:16px">
+  <div class="card"><span class="tag key">보호되는 영역</span><p><strong>두 스킬 내부의 Push 경로</strong> 및 CL2Git Token Fallback에서 사전검증을 수행합니다. 등록 정보 조회는 읽기 전용이며, 저장소 설정 변경은 사용자 확인이 필요합니다.</p></div>
+  <div class="card"><span class="tag warn">추가 방어가 필요한 영역</span><p>사용자가 터미널에서 직접 <code>git push</code>하거나 다른 도구가 자체 Push하는 경로까지 자동 강제하는 것은 아닙니다. 필요 시 <strong>Git pre-push hook</strong>과 GitHub 저장소 권한·Branch 보호를 별도로 적용해야 합니다.</p></div>
+</div>
+<div class="callout green"><strong>운영 체크:</strong> 새 버전 설치 → <code>repo-config roles --json</code>로 현황 확인 → 각 역할의 실 URL·PC 경로 등록 → CL2Git 예외 별도 승인 → 실제 Push 전에 대상 검사. Git Worktree를 새로 만들지 않고 기본 저장소에서 브랜치를 전환하는 정책은 유지됩니다.</div>
+<p class="guard-extra">출처 범위: 첨부된 <code>l1-github v0.3.42</code> 및 <code>l1-cl2git-merge v0.3.5</code> 패키지의 release notes, 저장소 설정/Push Guard 구현, CL2Git SKILL 기준. 실제 회사 GitHub 계정 권한과 설정 경로는 각 PC에서 검증해야 합니다.</p>
+
+
+<section class="sp-part" id="part-d" aria-labelledby="part-d-title">
+  <div class="sp-eyebrow">PART D · v8 신규 · l1-github v0.3.44</div>
+  <h2 id="part-d-title">부모 PR이 Merge됐는데, 내 PR에 남의 변경까지 보인다면?</h2>
+  <p>동료의 Open PR 위에 내 브랜치를 만든 <strong>Stacked PR</strong>에서 생기는 전형적인 현상을 그림으로 이해하고, <code>stacked-pr-cleanup</code>으로 <strong>내 작업만 기존 PR에 남기는 과정</strong>을 설명합니다.</p>
+</section>
+
+<h2 id="d28">28. 내가 겪은 문제를 한눈에 보면</h2>
+<div class="sp-takeaway"><div class="sp-stamp">✓</div><div><strong>부모 PR은 이미 공식 코드에 반영됐습니다.</strong> 그런데 내 브랜치는 여전히 부모의 <em>예전 커밋 이력</em> 위에 있으므로 GitHub Diff에 부모 변경이 중복해서 보일 수 있습니다. 해결은 <strong>최신 Base 위에 내 커밋만 다시 쌓는 것</strong>입니다.</div></div>
+<div class="sp-quick">
+  <div class="sp-quick-card"><div class="sp-quick-head">동료의 작업 = 부모 PR (예: #4199)</div><h3>부모 작업 P1 · P2 · P3</h3><p>아직 Merge되지 않았던 시점에 내 작업이 이 브랜치를 기반으로 시작했습니다.</p><div class="sp-labels"><span class="sp-chip parent">P1</span><span class="sp-chip parent">P2</span><span class="sp-chip parent">P3</span><span class="sp-chip soft">부모 PR</span></div></div>
+  <div class="sp-quick-card"><div class="sp-quick-head">내 작업 = 자식 PR (예: #4200)</div><h3>부모 위에 내 커밋 6개 추가</h3><p>내 브랜치에는 부모 커밋뿐 아니라 내 C1~C6까지 이어져 있습니다.</p><div class="sp-labels"><span class="sp-chip parent">부모 P1~P3</span><span class="sp-connector">→</span><span class="sp-chip child">내 C1~C6</span></div></div>
+</div>
+<div class="callout warn"><strong>예시는 구조 이해용입니다.</strong> 부모 PR <code>#4199</code>, 자식 PR <code>#4200</code>은 이해를 위한 예시 식별자입니다. 앞서 공유한 사례의 “우리 6개 커밋·8개 파일”은 설명에 반영했지만, 실제 부모/자식 PR 링크와 변경 파일 수는 실행 시 조회·검증합니다.</div>
+
+<h2 id="d29">29. 3단계 그림으로 이해하기 — 단계를 눌러보세요</h2>
+<div class="sp-explainer">
+  <h3>왜 예전 부모 커밋이 자식 PR에 남아 있을까?</h3>
+  <div class="sp-toggle-row" aria-label="Stacked PR 단계별 보기">
+    <button type="button" class="sp-toggle" data-sp-stage="1" aria-pressed="false" aria-controls="sp-panel-1"><span class="sp-n">STEP 1</span><span class="sp-t">부모 PR이 열려 있을 때</span></button>
+    <button type="button" class="sp-toggle" data-sp-stage="2" aria-pressed="true" aria-controls="sp-panel-2"><span class="sp-n">STEP 2</span><span class="sp-t">부모 Squash Merge 후 (문제)</span></button>
+    <button type="button" class="sp-toggle" data-sp-stage="3" aria-pressed="false" aria-controls="sp-panel-3"><span class="sp-n">STEP 3</span><span class="sp-t">자식 PR 정리 후 (해결)</span></button>
+  </div>
+  <div class="sp-panel" id="sp-panel-1" data-stage-panel="1" hidden>
+    <div class="sp-panel-title"><span class="sp-chip base">STEP 1</span><h4>동료 PR 위에서 내 개발을 시작</h4></div>
+    <p class="sp-panel-sub">부모 PR은 아직 Open입니다. 내 브랜치가 부모 커밋 P1~P3를 공유하고, 그 뒤로 내 작업 C1~C6가 추가됐습니다.</p>
+    <div class="sp-lane"><div class="sp-lane-label">공식 dev<small>아직 부모 미반영</small></div><div class="sp-nodes"><span class="sp-node base">D0</span></div></div>
+    <div class="sp-lane"><div class="sp-lane-label">부모 PR<small>동료 Open PR</small></div><div class="sp-nodes"><span class="sp-node base">D0</span><span class="sp-connector">→</span><span class="sp-node parent">P1</span><span class="sp-connector">→</span><span class="sp-node parent">P2</span><span class="sp-connector">→</span><span class="sp-node parent">P3</span></div></div>
+    <div class="sp-lane"><div class="sp-lane-label">자식 PR<small>내 작업 브랜치</small></div><div class="sp-nodes"><span class="sp-node base">D0</span><span class="sp-connector">→</span><span class="sp-node parent">P1</span><span class="sp-node parent">P2</span><span class="sp-node parent">P3</span><span class="sp-connector">→</span><span class="sp-node child">C1</span><span class="sp-node child">C2</span><span class="sp-node child">C3</span><span class="sp-node child">C4</span><span class="sp-node child">C5</span><span class="sp-node child">C6</span></div></div>
+    <div class="sp-note">이 상태는 Stacked PR의 자연스러운 구조입니다. 부모 PR이 Merge되기 전에는 내 브랜치가 부모 작업을 포함합니다.</div>
+  </div>
+  <div class="sp-panel" id="sp-panel-2" data-stage-panel="2">
+    <div class="sp-panel-title"><span class="sp-chip problem">STEP 2 · 문제</span><h4>부모 PR이 Squash Merge돼도 내 브랜치의 예전 이력은 그대로</h4></div>
+    <p class="sp-panel-sub">GitHub가 부모 커밋 P1~P3을 한 커밋 S로 합쳐 dev에 반영했습니다. 하지만 내 브랜치는 여전히 P1~P3을 포함합니다.</p>
+    <div class="sp-lane"><div class="sp-lane-label">최신 dev<small>부모 작업 반영</small></div><div class="sp-nodes"><span class="sp-node base">D0</span><span class="sp-connector">→</span><span class="sp-node squash">S</span><span class="sp-chip squash">Squash 1개</span></div></div>
+    <div class="sp-lane"><div class="sp-lane-label">자식 PR<small>정리 전</small></div><div class="sp-nodes"><span class="sp-node base">D0</span><span class="sp-connector">→</span><span class="sp-node parent">P1</span><span class="sp-node parent">P2</span><span class="sp-node parent">P3</span><span class="sp-connector">→</span><span class="sp-node child">C1</span><span class="sp-node child">C2</span><span class="sp-node child">C3</span><span class="sp-node child">C4</span><span class="sp-node child">C5</span><span class="sp-node child">C6</span></div></div>
+    <div class="sp-note red"><strong>문제 원인:</strong> <code>S</code>는 부모 커밋 <code>P1~P3</code>을 그대로 보존한 것이 아니라 <strong>새 커밋</strong>입니다. Git의 공통 조상(merge-base)이 자동으로 S로 바뀌지 않으므로 자식 PR의 <code>Files changed</code>에 부모 변경까지 섞여 보일 수 있습니다.</div>
+  </div>
+  <div class="sp-panel" id="sp-panel-3" data-stage-panel="3" hidden>
+    <div class="sp-panel-title"><span class="sp-chip squash">STEP 3 · 해결</span><h4>최신 dev 위로 내 커밋 6개만 이동</h4></div>
+    <p class="sp-panel-sub"><code>stacked-pr-cleanup</code>이 부모 P1~P3은 재적용하지 않고, 부모 PR Head 뒤의 <strong>내 커밋 C1~C6만</strong> 최신 dev 위에 다시 적용합니다.</p>
+    <div class="sp-lane"><div class="sp-lane-label">최신 dev<small>Squash 반영 완료</small></div><div class="sp-nodes"><span class="sp-node base">D0</span><span class="sp-connector">→</span><span class="sp-node squash">S</span></div></div>
+    <div class="sp-lane"><div class="sp-lane-label">정리된 자식 PR<small>최신 dev 기준</small></div><div class="sp-nodes"><span class="sp-node base">D0</span><span class="sp-connector">→</span><span class="sp-node squash">S</span><span class="sp-connector">→</span><span class="sp-node child">C1′</span><span class="sp-node child">C2′</span><span class="sp-node child">C3′</span><span class="sp-node child">C4′</span><span class="sp-node child">C5′</span><span class="sp-node child">C6′</span></div></div>
+    <div class="sp-note green"><strong>결과:</strong> 부모 작업은 dev의 Squash 커밋 S에만 반영되어 있고, PR에는 <strong>내 작업의 변경만</strong> 남는 것이 목표입니다. C1′~C6′의 SHA는 기존 C1~C6과 다르므로 실제 Push 전에 승인이 필요합니다.</div>
+  </div>
+  <div class="sp-node-legend"><span><i class="sp-legend-dot" style="background:#cbd3df"></i>D0 = 공통 시작점</span><span><i class="sp-legend-dot" style="background:#edc58d"></i>P = 부모 작업</span><span><i class="sp-legend-dot" style="background:#adc1ee"></i>C = 내 작업</span><span><i class="sp-legend-dot" style="background:#8dceb0"></i>S = Squash Commit</span></div>
+  <p class="sp-caption">그림은 이해를 위한 단순화입니다. 실제 커밋 수와 PR 관계는 GitHub의 HEAD·merge SHA로 다시 확인합니다. 버튼은 설명만 바꾸며 Git 명령이나 Push는 실행하지 않습니다.</p>
+</div>
+<div class="callout"><strong>왜 일반 Merge와 다를까?</strong> 부모 PR을 일반 Merge Commit으로 합쳤다면 원래 부모 커밋의 조상 관계가 보존될 수 있습니다. <strong>Squash Merge는 새로운 커밋 S만 남기므로</strong> 자식 브랜치를 재정렬할 필요가 생깁니다.</div>
+
+<h2 id="d30">30. GitHub <code>Files changed</code>는 어떻게 달라질까?</h2>
+<div class="sp-pair" aria-label="정리 전후 PR Diff 비교">
+  <div class="sp-diff before"><span class="tag warn">BEFORE · 정리 전</span><h3>내 PR Diff에 부모 작업까지 표시</h3><div class="sp-diff-zone parent">동료(부모) PR 변경 파일들<span class="sub">이미 dev에 Squash 반영됐는데도 중복 표시될 수 있음</span></div><div class="sp-diff-zone child">내 작업 변경 파일들<span class="sub">이번 PR에서 리뷰받아야 할 변경</span></div><div class="sp-stat"><strong>문제:</strong> 리뷰어가 “어느 파일이 내 변경인지” 구분하기 어려움</div></div>
+  <div class="sp-big-arrow" aria-hidden="true">→</div>
+  <div class="sp-diff after"><span class="tag key">AFTER · 정리 후</span><h3>내 PR에 필요한 변경만 표시</h3><div class="sp-diff-zone removed">부모 PR 중복 변경<span class="sub">PR Diff에서 제외하는 것이 목표</span></div><div class="sp-diff-zone child">내 작업 파일들 (예: 8개)<span class="sub">자식 변경의 예상 파일 목록과 정확히 대조</span></div><div class="sp-stat"><strong>효과:</strong> 기존 Open PR을 유지한 채 리뷰 범위를 내 작업으로 정리</div></div>
+</div>
+<div class="callout warn"><strong>주의:</strong> “파일이 8개로 줄었다”는 사실만으로 코드가 정상이라는 뜻은 아닙니다. 스킬은 <strong>변경 파일 목록·커밋 범위·기본 Diff 검사</strong>를 확인하며, 코드 의미와 동작 보존은 리뷰·Build 등 별도 확인이 필요합니다.</div>
+
+<h2 id="d31">31. <code>stacked-pr-cleanup</code>이 실제로 하는 일</h2>
+<p>명령을 한 번에 무조건 Push하는 기능이 아닙니다. <strong>준비 → 검증 → 원본 게시</strong>의 3단계로 나뉩니다. 각 단계 사이에 안전 경계가 있습니다.</p>
+<div class="sp-process" aria-label="stacked-pr-cleanup 3단계">
+  <div class="sp-process-card confirm"><div class="sp-number">① PREPARE</div><h3>기존 PR 보존하며 정리 준비</h3><p>부모 MERGED / 자식 OPEN 여부와 같은 Repo 관계 확인 → Preview → <strong>사용자 준비 승인</strong> → 로컬 임시 브랜치에서 내 커밋만 Rebase</p><span class="sp-state">원격 PR 아직 변경 없음</span></div>
+  <div class="sp-process-card"><div class="sp-number">② VERIFY</div><h3>부모 변경이 빠졌는지 검사</h3><p>예상 자식 파일 목록과 실제 Diff 비교, 커밋 수, 조상 관계, <code>git diff --check</code> 검사</p><span class="sp-state">Diff 불일치 시 중단</span></div>
+  <div class="sp-process-card approve"><div class="sp-number">③ PUBLISH</div><h3>승인 후 기존 PR 갱신</h3><p><strong>별도 사용자 승인</strong> → 원격 SHA / GitHub PR 상태 / Push URL 재검증 → <code>--force-with-lease</code>로 안전 갱신</p><span class="sp-state">동료 추가 Push 감지 시 중단</span></div>
+</div>
+<div class="callout green"><strong>내 PC 사용 방식은 기존과 동일:</strong> <code>/home/whpark/Project/smp1900</code> 기본 폴더 하나에서 임시 <em>브랜치</em>를 사용합니다. <strong>추가 Worktree 폴더를 생성하지 않습니다.</strong> 기존 작업 파일이 남아 있거나 임시 브랜치가 충돌하면 강제로 삭제하지 않고 중단합니다.</div>
+<details class="sp-detail"><summary>기술적으로는 어떤 Git 작업인가요? (필요할 때만 펼치기)</summary><div><p><strong>핵심 명령 개념:</strong></p><pre class="guard-code">git rebase --onto &lt;최신-dev-tip&gt; &lt;부모-PR-head-SHA&gt; &lt;자식-PR-head&gt;</pre><p><code>--onto</code>는 <strong>재배치 목적지</strong>입니다. 부모 HEAD 다음부터 자식 HEAD까지의 커밋을 새 Base 위로 옮깁니다. 실제 v0.3.44는 보호 로직이 있으므로, 직접 Git 명령을 실행하기보다 스킬을 사용해야 합니다.</p><p><strong>주의:</strong> 부모 변경이 최신 dev에 포함되지 않았거나, 자식 범위에 Merge Commit이 섞였거나, Conflict가 발생하면 자동 완료하지 않습니다.</p></div></details>
+
+<h2 id="d32">32. 안전장치 — 왜 Push에 별도 승인이 필요한가?</h2>
+<div class="sp-boundary">
+  <div class="sp-box ok"><span class="tag key">준비 단계 · 원격 변경 없음</span><h3>기존 Open PR은 그대로 둠</h3><p>임시 로컬 브랜치에서 Rebase·검증합니다. 스킬이 준비를 완료했다고 곧바로 회사 GitHub의 동료 브랜치를 덮어쓰지 않습니다.</p></div>
+  <div class="sp-box stop"><span class="tag warn">게시 단계 · 명시 승인 필수</span><h3>동료 변경이 생겼으면 중단</h3><p>이력 재작성은 새 SHA를 만들기 때문에 <code>--force-with-lease</code>가 필요합니다. 실행 직전 원격 HEAD가 예상 SHA에서 달라지면 Push하지 않습니다.</p></div>
+</div>
+<div class="guard-path" aria-label="게시 직전 Push 안전 검증 흐름">
+ <div class="guard-path-item"><strong>검증 완료 + 사용자 게시 승인</strong><span class="small muted">원본 PR을 수정해도 되는지 별도 확인</span></div><div class="guard-path-down">↓</div>
+ <div class="guard-path-item"><strong>현재 OPEN PR · Base · 원격 Repo URL 재조회</strong><span class="small muted">승인된 저장소만 허용; upstream은 allow-stacked-pr 예외 별도 필요</span></div><div class="guard-path-down">↓</div>
+ <div class="guard-path-item"><strong>원격 HEAD SHA가 처음 확인한 값과 같은가?</strong><span class="small muted">예: 동료가 새 Commit을 Push했다면 값이 달라짐</span></div><div class="guard-path-down">↓</div>
+ <div class="guard-path-item"><strong>일치할 때만 exact <code>--force-with-lease</code> Push</strong><span class="small muted">기존 Open PR 갱신 · 새 PR 생성하지 않음</span></div>
+</div>
+<div class="callout red"><strong>보호 기능의 범위:</strong> <code>force push</code>를 일반적으로 허용하는 것이 아닙니다. <strong>사용자가 승인한 정확한 자식 PR의 특정 이전 SHA</strong>만 조건부 갱신합니다. 원자적 lease를 제공하지 못하는 Mango MCP 경로에서는 게시 단계가 차단됩니다.</div>
+
+<h2 id="d33">33. 언제 처리할 수 있고, 언제 멈추나?</h2>
+<div class="table-scroll"><table class="wide"><thead><tr><th>상황</th><th>v0.3.44 처리</th><th>이유 / 다음 단계</th></tr></thead><tbody>
+<tr><td>부모 PR = Squash Merge, 자식 = OPEN</td><td><strong>대상 후보</strong></td><td>같은 Repo, 같은 Base, 부모 HEAD의 후손인지도 검사</td></tr>
+<tr><td>내 작업 커밋 범위가 명확하고 파일 Diff 일치</td><td><strong>검증 가능</strong></td><td>자식 커밋만 재적용 후 PR Diff와 커밋 수 대조</td></tr>
+<tr><td>부모 PR이 아직 OPEN, 자식 PR이 CLOSED</td><td><strong>중단</strong></td><td>전제 조건 불일치, PR 상태 다시 확인</td></tr>
+<tr><td>동료 Fork PR / 서로 다른 Repo 또는 Base</td><td><strong>중단</strong></td><td>현재 자동 정리 범위가 아님</td></tr>
+<tr><td>동료가 검증 후 새 Commit Push</td><td><strong>Push 차단</strong></td><td>원격 SHA가 변경됨; 다시 Fetch·검증</td></tr>
+<tr><td>Rebase Conflict / 파일 Diff 불일치</td><td><strong>진단·수동 검토</strong></td><td>자동으로 커밋을 버리거나 임의 수정하지 않음</td></tr>
+<tr><td>회사 upstream Push 예외 미등록 / MCP lease 미지원</td><td><strong>게시 차단</strong></td><td>명시 등록·정확한 Push 조건 확보 필요</td></tr>
+</tbody></table></div>
+
+<h2 id="d34">34. 실제로 스킬에 어떻게 요청하나?</h2>
+<div class="sp-example"><strong>자연어 요청 예시</strong><p style="margin:8px 0 0">“부모 PR #4199는 Squash Merge됐고, 자식 Open PR #4200에 부모 작업까지 Diff가 남아 있어. <code>l1-github stacked-pr-cleanup</code>으로 <strong>우리 작업 커밋만 최신 dev 위에 정리</strong>해줘. 먼저 Preview와 정리 후 파일 목록을 보여주고, <strong>원본 Push는 승인받은 뒤</strong> 진행해줘.”</p></div>
+<div class="callout"><strong>필요한 입력:</strong> 실제 <strong>부모 Merged PR URL과 자식 Open PR URL</strong> 두 개. 번호만 제공할 경우 저장소 정보가 불명확하면 URL 확인이 필요합니다. 성공 후에는 GitHub의 <code>Files changed</code>와 CI 상태를 최종 확인합니다.</div>
+<details class="sp-detail"><summary>스킬 CLI 명령 순서 보기 (고급 사용자용)</summary><div>
+<pre class="guard-code"># 1) Preview · 원격 PR 불변
+python scripts/l1_github.py stacked-pr-cleanup \
+  --parent-pr '&lt;MERGED_PARENT_PR_URL&gt;' \
+  --child-pr '&lt;OPEN_CHILD_PR_URL&gt;'
+
+# 2) 사용자 준비 승인 뒤 로컬 임시 브랜치에서만 실행
+python scripts/l1_github.py stacked-pr-cleanup \
+  --parent-pr '&lt;MERGED_PARENT_PR_URL&gt;' \
+  --child-pr '&lt;OPEN_CHILD_PR_URL&gt;' --apply
+
+# 3) Diff 확인 · 읽기 전용 검증
+python scripts/l1_github.py stacked-pr-cleanup-verify \
+  --parent-pr '&lt;MERGED_PARENT_PR_URL&gt;' \
+  --child-pr '&lt;OPEN_CHILD_PR_URL&gt;'
+
+# 4) 별도 명시적 Publish 승인 이후에만 적용
+python scripts/l1_github.py stacked-pr-cleanup-publish \
+  --parent-pr '&lt;MERGED_PARENT_PR_URL&gt;' \
+  --child-pr '&lt;OPEN_CHILD_PR_URL&gt;' \
+  --expected-old-sha '&lt;FULL_CHILD_HEAD_SHA&gt;' \
+  --confirm-history-rewrite --apply</pre>
+<p class="small muted">Linux Shell 줄바꿈 예시입니다. Windows PowerShell에서는 한 줄 실행하거나 PowerShell 줄바꿈을 사용합니다. 이 명령은 설명용이며, 이 HTML을 열거나 버튼을 눌러도 Git Push가 실행되지 않습니다. 사내 인증과 실제 Repo 보호 정책을 먼저 확인해야 합니다.</p>
+</div></details>
+<p class="sp-caption">적용 기준: <code>l1-github v0.3.44 / references/stacked_pr_cleanup.md</code> 및 첨부 사례의 증상. 실제 사내 GitHub/Mango MCP E2E 검증은 별도로 필요하며, 이 문서 자체는 실행 도구가 아닌 오프라인 설명 자료입니다.</p>
+
+<section class="part" id="app-a"><span class="audience">부록 A</span><h2>Fork · Clone · origin · upstream</h2><p>일반 개발의 Fork 모델과 l1-cl2git-merge의 예외적 upstream 직접 작업을 분리해서 봅니다.</p></section>
+
+<h3 id="app-a1">A-1. 일반 개발: SMP1900을 Fork해서 사용</h3>
+<p>팀의 일반 개발 흐름에서는 회사 원본 repository인 <strong>SMP1900</strong>을 개인 계정으로 Fork해 사용합니다. <code>l1-github fork-setup</code> 기준 역할은 아래와 같습니다.</p>
+<div class="vs">
+  <div class="card"><span class="tag git">upstream</span><h3>회사 원본 / canonical repository</h3><p>base 시작 기준, 최신 base 가져오기, PR target 역할입니다.</p><div class="mono diagram">upstream
+   ↓
+회사 SMP1900</div></div>
+  <div class="vs-mid">VS</div>
+  <div class="card"><span class="tag key">origin</span><h3>내 Fork</h3><p>일반 feature/fix branch를 push하는 개인 작업 repository입니다.</p><div class="mono diagram">origin
+  ↓
+내 Fork of SMP1900</div></div>
+</div>
+<div class="mono diagram">[회사 GitHub]
+upstream = SMP1900
+      │
+      │ Fork
+      ▼
+[내 GitHub]
+origin = 내 SMP1900 Fork
+      │
+      │ clone / feature 작업 / push
+      ▼
+[내 PC]
+local feature branch
+      │
+      └──── PR ────► upstream/smp1900</div>
+<div class="callout warn"><strong>remote 이름은 Git이 강제하는 고정어가 아닙니다.</strong> 다만 팀의 <code>l1-github fork-setup</code>은 <code>upstream = 회사 원본</code>, <code>origin = 개인 Fork</code> 역할로 구성합니다.</div>
+
+<h3 id="app-a2">A-2. l1-cl2git-merge는 일반 Fork 작업과 다르다</h3>
+<p>자동화 conflict 복구에서는 이미 회사 upstream repository 안에 <code>CL_987654</code> branch와 Open PR이 존재합니다. 따라서 개인 Fork에 새 branch를 만들지 않습니다.</p>
+<div class="mono diagram">[회사 upstream SMP1900]
+upstream/smp1900
+      │
+      └── 자동화 생성 ──► upstream/CL_987654
+                              │
+                              ├─ 기존 Open PR
+                              │
+                              └─ 담당자가 같은 branch 이어받음
+                                     ↓
+                              conflict 해결 / commit
+                                     ↓
+                              upstream/CL_987654 push
+                                     ↓
+                              기존 Open PR 갱신
+
+※ 새 개인 Fork branch / 새 PR을 만들지 않음</div>
+<div class="callout red"><strong>Part B 전제(v0.3.5):</strong> 우선 <code>l1-github</code>를 사용하지만, 미설치 시에도 Token Fallback의 독립 Push Guard가 동일한 canonical 설정을 검사합니다. 제공된 PR은 <strong>OPEN / 같은 upstream Repo / base=smp1900 / head=CL_987654</strong> 조건을 만족해야 하며, upstream 예외 설정도 필요합니다. <a href="#c25">25장 참조</a>.</div>
+
+<div class="footer">v8 · P4/Git/Worktree/Push Guard 유지 · Stacked PR 3단계 그림과 안전 Push 설명 추가 · 단일 HTML · 외부 리소스 없음 · <a href="#top">맨 위로</a></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var buttons = document.querySelectorAll('[data-sp-stage]');
+  var panels = document.querySelectorAll('[data-stage-panel]');
+  function show(step){
+    buttons.forEach(function(btn){btn.setAttribute('aria-pressed', btn.getAttribute('data-sp-stage') === step ? 'true' : 'false');});
+    panels.forEach(function(panel){panel.hidden = panel.getAttribute('data-stage-panel') !== step;});
+  }
+  buttons.forEach(function(btn){btn.addEventListener('click', function(){show(btn.getAttribute('data-sp-stage'));});});
+  show('2');
+})();
+</script>
+</body>
+</html>
