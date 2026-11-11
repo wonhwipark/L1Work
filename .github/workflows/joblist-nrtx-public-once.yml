@@ -33,12 +33,6 @@ jobs:
               assert archive.testzip() is None
               archive.extractall('staging')
           PY
-          echo "STAGING DEBUG TOP"; find staging -maxdepth 5 -type f | head -60
-          echo "ZIP ENTRY DEBUG"; python3 - <<'PY'
-          import zipfile
-          with zipfile.ZipFile('candidate/job-list_v0_4_36_1112.zip') as z:
-              print([n for n in z.namelist() if 'job_core.py' in n or 'nr_tx_knowledge_linux_job.py' in n or 'VERSION' in n][:15])
-          PY
           python3 -m py_compile staging/job-list_v0_4_36/scripts/job_core.py staging/job-list_v0_4_36/scripts/nr_tx_knowledge_linux_job.py
           python3 staging/job-list_v0_4_36/scripts/job_core.py validate --root staging/job-list_v0_4_36
       - name: Confirm exact active Job and privacy/safety invariants
