@@ -1,4 +1,4 @@
-name: Job-list ZIP compatibility inspection (one-shot)
+name: Job-list ZIP detailed contract inspection (one-shot)
 on:
   push:
     paths:
@@ -11,60 +11,57 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
-      - name: Checkout only approved public ZIP
+      - name: Checkout public baseline only
         uses: actions/checkout@v4
         with:
           persist-credentials: false
           sparse-checkout: |
             job-list_v0_4_34_1109.zip
           sparse-checkout-cone-mode: false
-      - name: Validate baseline and extract packaging contract (read only)
+      - name: Show fixed scope contract files and history (read only)
         shell: python
         run: |
-          import hashlib, zipfile, re
+          import zipfile, hashlib
           from pathlib import Path
-          p = Path('job-list_v0_4_34_1109.zip')
-          assert p.is_file(), 'SOURCE_ZIP_NOT_FOUND'
-          print('BASE_FILE', p.name, flush=True)
-          print('BASE_BYTES', p.stat().st_size, flush=True)
-          print('BASE_SHA256', hashlib.sha256(p.read_bytes()).hexdigest(), flush=True)
+          p=Path('job-list_v0_4_34_1109.zip')
+          assert p.exists()
+          print('ZIP_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
+          targets=[
+            'requests/one-shot-jobs.json',
+            'requests/staged/l1-knowledge-input-verify-v0.4.32.json',
+            '.skill-main.json',
+            '.skill-release.json',
+            'VERSION',
+            'SKILL.md',
+            'scripts/job_list.py',
+            'scripts/job_core.py',
+            'scripts/l1_knowledge_workflow_bridge.py',
+            'scripts/l1_knowledge_input_verify_linux_job.py',
+            'scripts/dispatcher_cycle_bridge.py',
+            'docs/L1_KNOWLEDGE_INPUT_VERIFY_IMPLEMENTATION_STATUS_v0431.md',
+            'review_v0434/KNOWN_ISSUES.md',
+            'review_v0434/REVIEW_SCOPE.md',
+            'review_v0434/TEST_RESULTS.md',
+            'tests/test_v0434_knowledge_input_activation.py',
+          ]
           with zipfile.ZipFile(p) as z:
-              bad = z.testzip()
-              assert bad is None, 'BAD_CRC:' + str(bad)
-              names = z.namelist()
-              assert len(names) > 3, 'NOT_A_COMPLETE_PACKAGE'
-              for n in names:
-                  assert not n.startswith('/') and '..' not in Path(n).parts, 'PATH_TRAVERSAL'
-              print('ENTRY_COUNT', len(names), flush=True)
-              print('BEGIN_FILELIST', flush=True)
-              for n in names[:650]:
-                  print('ZIP_ENTRY', n, flush=True)
-              print('END_FILELIST', flush=True)
-              print('BEGIN_RELEVANT_TEXT', flush=True)
-              written=0
-              for n in names:
-                  ln=n.lower()
-                  if n.endswith('/'):
-                      continue
-                  if not (ln.endswith('skill.md') or 'manifest' in ln or 'job' in ln or 'queue' in ln or 'dispatch' in ln or 'contract' in ln or 'updater' in ln or 'reference' in ln or 'template' in ln):
-                      continue
-                  if not n.lower().endswith(('.md','.json','.yaml','.yml','.toml','.txt','.py')):
-                      continue
-                  info=z.getinfo(n)
-                  if info.file_size > 40000:
-                      continue
-                  try:
-                      raw=z.read(n)
-                      s=raw.decode('utf-8')
-                  except (UnicodeError,RuntimeError):
-                      continue
-                  print('BEGIN_SOURCE',n,'BYTES',len(raw),flush=True)
-                  budget=min(12000,85000-written)
-                  if budget<=0:
-                      break
-                  print(s[:budget],flush=True)
-                  print('END_SOURCE',n,flush=True)
-                  written+=min(len(s),budget)
-              print('END_RELEVANT_TEXT',flush=True)
-              assert written>=1000, 'INSUFFICIENT_DOCS'
-          print('ZIP_READONLY_INSPECTION_PASS',flush=True)
+            assert z.testzip() is None
+            root=z.namelist()[0].split('/')[0]+'/'
+            print('ROOT',root)
+            for key in targets:
+              n=root+key
+              if n not in z.namelist():
+                print('MISSING',key)
+                continue
+              raw=z.read(n)
+              try: s=raw.decode('utf-8')
+              except UnicodeDecodeError: print('NON_UTF8',key); continue
+              print('===== BEGIN',key,len(raw),'=====')
+              print(s[:24000])
+              print('===== END',key,'=====')
+            print('===== JOB RELATED FILES =====')
+            for n in z.namelist():
+              k=n[len(root):]
+              if k.startswith(('docs/','tests/')) and any(t in k.lower() for t in ('job','knowledge','v043','linux')):
+                print('FILE',k)
+          print('ZIP_DETAILED_INSPECT_PASS')
