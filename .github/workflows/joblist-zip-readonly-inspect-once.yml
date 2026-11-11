@@ -1,0 +1,70 @@
+name: Job-list ZIP compatibility inspection (one-shot)
+on:
+  push:
+    paths:
+      - .github/workflows/joblist-zip-readonly-inspect-once.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Checkout only approved public ZIP
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            job-list_v0_4_34_1109.zip
+          sparse-checkout-cone-mode: false
+      - name: Validate baseline and extract packaging contract (read only)
+        shell: python
+        run: |
+          import hashlib, zipfile, re
+          from pathlib import Path
+          p = Path('job-list_v0_4_34_1109.zip')
+          assert p.is_file(), 'SOURCE_ZIP_NOT_FOUND'
+          print('BASE_FILE', p.name, flush=True)
+          print('BASE_BYTES', p.stat().st_size, flush=True)
+          print('BASE_SHA256', hashlib.sha256(p.read_bytes()).hexdigest(), flush=True)
+          with zipfile.ZipFile(p) as z:
+              bad = z.testzip()
+              assert bad is None, 'BAD_CRC:' + str(bad)
+              names = z.namelist()
+              assert len(names) > 3, 'NOT_A_COMPLETE_PACKAGE'
+              for n in names:
+                  assert not n.startswith('/') and '..' not in Path(n).parts, 'PATH_TRAVERSAL'
+              print('ENTRY_COUNT', len(names), flush=True)
+              print('BEGIN_FILELIST', flush=True)
+              for n in names[:650]:
+                  print('ZIP_ENTRY', n, flush=True)
+              print('END_FILELIST', flush=True)
+              print('BEGIN_RELEVANT_TEXT', flush=True)
+              written=0
+              for n in names:
+                  ln=n.lower()
+                  if n.endswith('/'):
+                      continue
+                  if not (ln.endswith('skill.md') or 'manifest' in ln or 'job' in ln or 'queue' in ln or 'dispatch' in ln or 'contract' in ln or 'updater' in ln or 'reference' in ln or 'template' in ln):
+                      continue
+                  if not n.lower().endswith(('.md','.json','.yaml','.yml','.toml','.txt','.py')):
+                      continue
+                  info=z.getinfo(n)
+                  if info.file_size > 40000:
+                      continue
+                  try:
+                      raw=z.read(n)
+                      s=raw.decode('utf-8')
+                  except (UnicodeError,RuntimeError):
+                      continue
+                  print('BEGIN_SOURCE',n,'BYTES',len(raw),flush=True)
+                  budget=min(12000,85000-written)
+                  if budget<=0:
+                      break
+                  print(s[:budget],flush=True)
+                  print('END_SOURCE',n,flush=True)
+                  written+=min(len(s),budget)
+              print('END_RELEVANT_TEXT',flush=True)
+              assert written>=1000, 'INSUFFICIENT_DOCS'
+          print('ZIP_READONLY_INSPECTION_PASS',flush=True)
