@@ -1,4 +1,4 @@
-name: Job-list ZIP detailed contract inspection (one-shot)
+name: Job-list runtime interface inspection (one-shot)
 on:
   push:
     paths:
@@ -11,57 +11,53 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 6
     steps:
-      - name: Checkout public baseline only
+      - name: Checkout baseline ZIP
         uses: actions/checkout@v4
         with:
           persist-credentials: false
           sparse-checkout: |
             job-list_v0_4_34_1109.zip
           sparse-checkout-cone-mode: false
-      - name: Show fixed scope contract files and history (read only)
+      - name: Print bounded native Profile and OpenCode invoker contracts
         shell: python
         run: |
-          import zipfile, hashlib
           from pathlib import Path
+          import zipfile, ast, re
           p=Path('job-list_v0_4_34_1109.zip')
-          assert p.exists()
-          print('ZIP_SHA256',hashlib.sha256(p.read_bytes()).hexdigest())
-          targets=[
-            'requests/one-shot-jobs.json',
-            'requests/staged/l1-knowledge-input-verify-v0.4.32.json',
-            '.skill-main.json',
-            '.skill-release.json',
-            'VERSION',
-            'SKILL.md',
-            'scripts/job_list.py',
-            'scripts/job_core.py',
-            'scripts/l1_knowledge_workflow_bridge.py',
-            'scripts/l1_knowledge_input_verify_linux_job.py',
-            'scripts/dispatcher_cycle_bridge.py',
-            'docs/L1_KNOWLEDGE_INPUT_VERIFY_IMPLEMENTATION_STATUS_v0431.md',
-            'review_v0434/KNOWN_ISSUES.md',
-            'review_v0434/REVIEW_SCOPE.md',
-            'review_v0434/TEST_RESULTS.md',
-            'tests/test_v0434_knowledge_input_activation.py',
-          ]
           with zipfile.ZipFile(p) as z:
             assert z.testzip() is None
-            root=z.namelist()[0].split('/')[0]+'/'
-            print('ROOT',root)
-            for key in targets:
-              n=root+key
-              if n not in z.namelist():
-                print('MISSING',key)
-                continue
+            ns=z.namelist(); prefix=ns[0].split('/')[0]+'/'
+            selected=[
+              'scripts/u3_opencode_linux_job.py',
+              'scripts/l1_mcp_e2e_pilot_linux_job.py',
+              'scripts/l1_knowledge_input_verify_linux_job.py',
+              'scripts/job_core.py',
+              'requests/one-shot-jobs.json',
+              'lifecycle.json',
+              'skillsilent/contract.json',
+              'skillsilent/manifest.json',
+              'skillsilent/policy.json',
+              'VERSION',
+              'PACKAGE_CONTENTS.sha256',
+            ]
+            for rel in selected:
+              n=prefix+rel
+              if n not in ns:
+                print('MISSING',rel,flush=True);continue
               raw=z.read(n)
-              try: s=raw.decode('utf-8')
-              except UnicodeDecodeError: print('NON_UTF8',key); continue
-              print('===== BEGIN',key,len(raw),'=====')
-              print(s[:24000])
-              print('===== END',key,'=====')
-            print('===== JOB RELATED FILES =====')
-            for n in z.namelist():
-              k=n[len(root):]
-              if k.startswith(('docs/','tests/')) and any(t in k.lower() for t in ('job','knowledge','v043','linux')):
-                print('FILE',k)
-          print('ZIP_DETAILED_INSPECT_PASS')
+              if rel=='PACKAGE_CONTENTS.sha256':
+                print('SHA_MANIFEST_SAMPLE',raw.decode('utf-8')[:1200],flush=True);continue
+              s=raw.decode('utf-8')
+              if rel=='scripts/job_core.py':
+                tree=ast.parse(s)
+                print('PROFILE_SECTION',s[s.index('BUILTIN_SAFE_PROFILES:'):s.index('BUILTIN_SAFE_PROFILES:')+24000])
+                for node in ast.walk(tree):
+                  if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef)):
+                    if any(k in node.name for k in ('activat','profile','validat','dispatch','consume','enqueue','worker','result','receipt','queue','preflight')):
+                      print('FUNCTION',node.name,'LINES',node.lineno,node.end_lineno)
+                print('CLI_END',s[-16000:])
+              else:
+                print('===== SOURCE',rel,'BYTES',len(raw),'=====')
+                print(s[:32000])
+                print('===== END',rel,'=====')
+          print('NRTx_CONTRACT_INSPECT_PASS')
