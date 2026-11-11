@@ -1,0 +1,97 @@
+name: One-shot PUBLIC Job-list NR L1 Tx v0.4.36
+on:
+  push:
+    paths:
+      - .github/workflows/joblist-nrtx-public-once.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build_test_and_publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - name: Checkout L1Work (baseline only, no production host connection)
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Build new active one-shot from pinned immutable ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f job-list_v0_4_34_1109.zip
+          test ! -e job-list_v0_4_36_1112.zip
+          python3 .github/joblist-nrtx-once/build_active.py job-list_v0_4_34_1109.zip candidate
+          test -s candidate/job-list_v0_4_36_1112.zip
+          mkdir -p staging
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile
+          z=Path('candidate/job-list_v0_4_36_1112.zip')
+          with zipfile.ZipFile(z) as archive:
+              assert archive.testzip() is None
+              archive.extractall('staging')
+          PY
+          python3 -m py_compile staging/job-list_v0_4_36/scripts/job_core.py staging/job-list_v0_4_36/scripts/nr_tx_knowledge_linux_job.py
+          python3 staging/job-list_v0_4_36/scripts/job_core.py validate --root staging/job-list_v0_4_36
+      - name: Confirm exact active Job and privacy/safety invariants
+        shell: python
+        run: |
+          import hashlib, json, pathlib, zipfile
+          p=pathlib.Path('candidate/job-list_v0_4_36_1112.zip')
+          root=pathlib.Path('staging/job-list_v0_4_36')
+          a=json.loads((root/'requests/one-shot-jobs.json').read_text())['jobs']
+          assert len(a)==1, 'exactly one active Job required'
+          j=a[0]
+          assert j=={
+              'job_id':'JOB-20261112-NR-L1TX-KNOWLEDGE-MSC-EXEC-01',
+              'profile':'nr-l1tx-knowledge-research-linux',
+              'platform':'linux','priority':65,
+              'expires_at':'2027-01-31T23:59:59+09:00','params':{}
+          }, 'request not pinned'
+          script=(root/'scripts/nr_tx_knowledge_linux_job.py').read_text()
+          prompt=(root/'references/NR_TX_KNOWLEDGE_RESEARCH_ORCHESTRATION_v0436.md').read_text()
+          for v in ('L2_L1_TX_REQ','PHY_CONFIG_REQ','SCELL_STATUS_IND','l1-knowledge-updater','code-analyzer','doc-converter','SOURCE_PARENT_DIR_V1'):
+              assert v in prompt, v
+          for t in ('"edit": "deny"','"write": "deny"','"apply_patch": "deny"','"webfetch": "deny"'):
+              assert t in script,t
+          for t in ('/home/whpark','CoWork-Skill-Collab','github.com/wonhwipark/CoWork-Skill-Collab'):
+              assert t not in script and t not in prompt, 'public package privacy check'
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              names=z.namelist()
+              assert len(names)==len(set(names))
+              for item in z.infolist():
+                  assert not (item.external_attr >> 16) & 0o170000 == 0o120000, 'symlink forbidden'
+                  assert '..' not in pathlib.PurePosixPath(item.filename).parts
+              assert names[0].startswith('job-list_v0_4_36/')
+          print('ACTIVE_JOB=1 / PRIVACY_CHECK=PASS / SOURCE_WRITE=DENY / PACKAGE_BYTES=',p.stat().st_size)
+          print('PACKAGE_SHA256=',hashlib.sha256(p.read_bytes()).hexdigest())
+      - name: Targeted historical and new one-shot regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/joblist-test-venv"
+          "$RUNNER_TEMP/joblist-test-venv/bin/python" -m pip install --quiet pytest
+          cd staging/job-list_v0_4_36
+          "$RUNNER_TEMP/joblist-test-venv/bin/python" -m pytest -q \
+            tests/test_v0434_dependency_gate.py \
+            tests/test_v0432_knowledge_workflow_bridge.py \
+            tests/test_v0431_knowledge_input_stage.py \
+            tests/test_v0436_nrtx_active.py
+      - name: Publish approved one-shot ZIP to L1Work/main root (never overwrite)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e job-list_v0_4_36_1112.zip
+          cp candidate/job-list_v0_4_36_1112.zip ./job-list_v0_4_36_1112.zip
+          sha256sum job-list_v0_4_36_1112.zip
+          git add -- job-list_v0_4_36_1112.zip
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "release(job-list): NR L1 Tx one-shot read-only investigation v0.4.36"
+          git push origin HEAD:main
+          echo "POSTED_PUBLIC_PATH=job-list_v0_4_36_1112.zip"
+          echo "POSTED_GIT_BLOB_SHA=$(git hash-object job-list_v0_4_36_1112.zip)"
+          echo "PUBLIC_DEPLOY_DONE_HOST_EXECUTION_NOT_VERIFIED"
