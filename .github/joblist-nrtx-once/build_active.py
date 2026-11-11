@@ -146,9 +146,9 @@ from this package's synthetic tests. Existing v0.4.34 history preserved.
         "TEST_ACTIVE_JOB_ID")
     data["tests/test_v0431_knowledge_input_stage.py"] = replace_one(
         data["tests/test_v0431_knowledge_input_stage.py"],
-        b"read_text())['jobs']",
-        b"read_text())['jobs'][:0]",
-        "TEST_OLD_STAGE_ASSERTION")
+        b"assert not json.loads((ROOT/'requests/one-shot-jobs.json').read_text())['jobs']",
+        b"assert json.loads((ROOT/'requests/one-shot-jobs.json').read_text())['jobs'][0]['job_id']=='JOB-20261112-NR-L1TX-KNOWLEDGE-MSC-EXEC-01'",
+        "TEST_ACTIVE_JOB_V0431")
 
     data["tests/test_v0436_nrtx_active.py"] = (
         tool_dir / "test_v0436_nrtx_active.py").read_bytes()
