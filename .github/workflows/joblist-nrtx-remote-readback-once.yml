@@ -1,0 +1,47 @@
+name: Verify published NR L1 Tx Job-list ZIP from PUBLIC remote
+on:
+  push:
+    paths:
+      - .github/workflows/joblist-nrtx-remote-readback-once.yml
+permissions:
+  contents: read
+jobs:
+  remote_sha256_readback:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Independent HTTPS redownload of posted PUBLIC ZIP
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --max-time 90 \
+            -o job-list_v0_4_36_1112.zip \
+            https://raw.githubusercontent.com/wonhwipark/L1Work/main/job-list_v0_4_36_1112.zip
+          echo 'cbe17dc15199593e2a9bce6aa2b8857c1f011336ebd2cd3d4c8ee3cce0eee3f6  job-list_v0_4_36_1112.zip' | sha256sum --check
+          test "$(wc -c < job-list_v0_4_36_1112.zip)" = "1563658"
+      - name: Independently verify ZIP contents, active job, blob identity
+        shell: python
+        run: |
+          import hashlib,json,zipfile
+          from pathlib import Path
+          p=Path('job-list_v0_4_36_1112.zip')
+          raw=p.read_bytes()
+          sha=hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
+          assert sha=='4357594be4cdae26a4fd19788fb3a35d7de3b5d5',sha
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              root='job-list_v0_4_36/'
+              assert z.read(root+'VERSION').strip()==b'0.4.36'
+              jobs=json.loads(z.read(root+'requests/one-shot-jobs.json'))['jobs']
+              assert len(jobs)==1
+              assert jobs[0]['job_id']=='JOB-20261112-NR-L1TX-KNOWLEDGE-MSC-EXEC-01'
+              assert jobs[0]['platform']=='linux'
+              assert not jobs[0]['params']
+              for name in ('scripts/nr_tx_knowledge_linux_job.py',
+                           'references/NR_TX_KNOWLEDGE_RESEARCH_ORCHESTRATION_v0436.md',
+                           'tests/test_v0436_nrtx_active.py'):
+                  assert root+name in z.namelist()
+          print('PUBLIC_REMOTE_DOWNLOAD_SHA256_PASS')
+          print('PUBLIC_REMOTE_GIT_BLOB_PASS',sha)
+          print('PUBLIC_REMOTE_ACTIVE_ONE_SHOT_PASS')
+          print('HOST_INSTALL_AND_EXECUTION_NOT_VERIFIED')
