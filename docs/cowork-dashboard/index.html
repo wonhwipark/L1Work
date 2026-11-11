@@ -2,60 +2,155 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'none'; img-src 'none'; connect-src 'none'; form-action 'none'">
-<title>CoWork | 공개용 대시보드 미리보기</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; script-src 'none'; connect-src 'none'; font-src 'none'; form-action 'none'; base-uri 'none'">
+<title>CoWork | 협업 흐름과 현재 상태</title>
 <style>
-:root { color-scheme: light; --ink:#1b2942; --muted:#516178; --line:#dce4ee; --paper:#fff; --bg:#f4f7fb; --accent:#315e90; }
-* { box-sizing:border-box; }
-body { margin:0; font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
-main { width:min(1080px,100%); margin:auto; padding:40px 24px 80px; }
-header { display:flex; flex-direction:column; gap:8px; }
-.eyebrow { color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.1em; }
-h1 { font-size:clamp(26px,4vw,40px); line-height:1.25; margin:0; letter-spacing:-.045em; }
-h2 { font-size:21px; margin:0; } h3 { font-size:19px; margin:12px 0 5px; }
-p { margin:0; } .muted { color:var(--muted); }
-.notice { margin-top:24px; padding:20px 22px; border:1px solid #cbd9ea; border-radius:16px; background:#eaf1fa; }
-.notice strong { display:block; font-size:17px; margin-bottom:6px; }
-.status { display:inline-block; margin-top:13px; padding:5px 11px; border-radius:100px; background:#fff; border:1px solid #bfcfe1; color:#264e7b; font-size:12px; font-weight:750; }
-.section-head { display:flex; flex-direction:column; gap:4px; margin:34px 0 16px; }
-.grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
-.step { padding:23px; background:var(--paper); border:1px solid var(--line); border-radius:18px; min-width:0; }
-.step-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
-.step-no { color:var(--accent); font-weight:850; font-size:24px; }
-.tag { font-size:12px; padding:4px 9px; border:1px solid #d3dfeb; border-radius:99px; color:#52677e; }
-.step p { color:var(--muted); font-size:14px; }
-.summary { border:1px solid var(--line); border-radius:16px; padding:22px 24px; background:#fff; }
-.summary strong { display:block; margin-bottom:8px; }
-footer { margin-top:32px; color:var(--muted); font-size:13px; border-top:1px solid var(--line); padding-top:18px; }
-@media(max-width:760px) { main { padding:22px 15px 48px; } .grid { grid-template-columns:1fr; } }
+:root{color-scheme:light;--bg:#f4f6fa;--ink:#1e2a40;--muted:#55657a;--line:#dce4ee;--blue:#285d96;--navy:#18314e;--white:#fff}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;color:var(--ink);line-height:1.58;font-size:14px}
+a{color:#235f9d;text-decoration:underline;text-underline-offset:3px}
+a:focus-visible{outline:3px solid #2282c0;outline-offset:4px;border-radius:3px}
+.wrapper{max-width:1150px;margin:0 auto;padding:0 22px 70px}
+.masthead{padding:35px 0 28px;background:linear-gradient(135deg,#152b45,#244966);color:white}
+.masthead .wrapper{padding-bottom:0}
+.eyebrow{display:block;color:#b8d6f0;letter-spacing:.12em;font-size:11px;font-weight:750}
+h1{font-size:clamp(27px,4.5vw,41px);line-height:1.25;letter-spacing:-.04em;margin:9px 0}
+.masthead p{font-size:15px;color:#d6e4f0;max-width:700px;margin:0}
+.header-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:19px}
+.chip{border:1px solid #6687a2;padding:5px 10px;border-radius:9px;color:#eaf4fb;font-size:12px}
+.section{margin-top:28px}
+.sectionheader{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:10px;margin-bottom:14px}
+h2{font-size:clamp(18px,2.6vw,23px);margin:0;letter-spacing:-.025em}
+h3{font-size:16px;line-height:1.4;margin:0}
+.sectionheader p,.muted{color:var(--muted);margin:0}
+.overview{display:grid;grid-template-columns:1.3fr 1fr;gap:15px;margin-top:22px}
+.panel{border:1px solid var(--line);background:var(--white);border-radius:16px;padding:22px}
+.critical{border-left:5px solid #b18550;background:#fffdf9}
+.kicker{font-size:12px;font-weight:750;color:#746042;letter-spacing:.02em}
+.lead{font-size:20px;font-weight:800;margin:8px 0}
+.panel p{margin:0;color:var(--muted)}
+.safe{background:#f2f7fb}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pair .name{font-size:13px;font-weight:750;color:#234567}
+.pair p{font-size:12px;margin-top:7px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
+.kpi{padding:20px;background:var(--white);border:1px solid var(--line);border-radius:14px}
+.kpi strong{display:block;font-size:29px;line-height:1.2;color:#233f62;font-variant-numeric:tabular-nums}
+.kpi span{font-size:12px;color:var(--muted);display:block;margin-top:6px}
+.caption{font-size:12px;color:var(--muted);margin:10px 2px 0}
+.lanes{display:grid;gap:15px}
+.lane{background:var(--white);border:1px solid var(--line);padding:20px;border-radius:16px}
+.lane.live{background:#f1f7f4;border-color:#c8dfd4}
+.lane.target{background:#f1f5fb;border-color:#cedef0}
+.lane-heading{font-size:12px;font-weight:850;color:#2c5f56;letter-spacing:.02em;margin-bottom:8px}
+.lane.target .lane-heading{color:#315d8e}
+.sequence{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-weight:750;color:#253c53;line-height:1.7}
+.sequence .arr{color:#66889d;font-weight:800}
+.lane p{margin:8px 0 0;color:var(--muted);font-size:12px}
+.flow{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:19px 14px;margin:0;padding:0}
+.step{border:1px solid var(--line);background:white;border-radius:14px;padding:19px;min-width:0;position:relative;min-height:166px}
+.step:not(:last-child):after{content:"→";position:absolute;right:-15px;top:46%;font-size:21px;color:#8498af;z-index:2;font-weight:800}
+.stepnum{display:block;font-size:12px;font-weight:850;color:#33618e;margin-bottom:11px}
+.step h3{font-size:15px}
+.owner{font-size:12px;font-weight:700;color:#456b93;margin:10px 0 4px}
+.desc{font-size:12px;color:var(--muted);margin:0}
+.details-table{overflow:auto;border:1px solid var(--line);border-radius:16px;background:white}
+table{border-collapse:collapse;width:100%;font-size:13px;text-align:left}
+thead{background:#eef3f8;color:#324c68}
+td,th{padding:14px 17px;border-bottom:1px solid #e7edf3;vertical-align:middle}
+tbody tr:last-child td,tbody tr:last-child th{border-bottom:0}
+tbody th{font-weight:730;white-space:nowrap}
+.status{display:inline-block;padding:4px 9px;border-radius:6px;font-weight:750;background:#edf2f8;color:#35536e;white-space:nowrap;font-size:12px}
+.status.ok{background:#edf5f1;color:#346150}
+.status.hold{background:#faf1e5;color:#795728}
+.status.pending{background:#eef1f5;color:#55677b}
+.workcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.work{padding:19px;background:white;border:1px solid var(--line);border-radius:14px}
+.work .stepnum{margin-bottom:8px}
+.work p{font-size:13px;color:var(--muted);margin:8px 0}
+.work b{font-size:13px}
+.source{border-radius:14px;padding:20px;background:#edf2f8;border:1px solid #d7e1ec}
+.source p{margin:6px 0;font-size:13px;color:#465e78}
+footer{border-top:1px solid var(--line);margin-top:28px;padding-top:18px;color:var(--muted);font-size:12px}
+@media(max-width:950px){.flow{grid-template-columns:repeat(2,minmax(0,1fr))}.step:nth-child(2n):not(:last-child):after{content:"↓";top:auto;bottom:-23px;right:15px}.overview{grid-template-columns:1fr}}
+@media(max-width:650px){.wrapper{padding-left:15px;padding-right:15px}.masthead{padding:27px 0}.flow,.workcards{grid-template-columns:1fr;gap:21px}.step{min-height:0}.step:not(:last-child):after,.step:nth-child(2n):not(:last-child):after{content:"↓";top:auto;right:calc(50% - 9px);bottom:-24px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.kpi{padding:16px}.kpi strong{font-size:26px}.pair{grid-template-columns:1fr}.panel,.lane{padding:18px}.details-table table{min-width:580px}}
+@media print{body{background:#fff}.masthead{print-color-adjust:exact;-webkit-print-color-adjust:exact}.wrapper{padding-bottom:10px}.panel,.kpi,.step,.lane{break-inside:avoid}}
 </style>
 </head>
-<body>
-<main data-schema="COWORK_PUBLIC_PREVIEW_V1" data-classification="SYNTHETIC_ONLY" data-release="PUBLIC_SAMPLE_APPROVED">
-<header>
-<div class="eyebrow">COWORK · PUBLIC PREVIEW CONCEPT</div>
-<h1>협업 진행 대시보드</h1>
-<p class="muted">웹브라우저에서 즉시 열 수 있도록 준비한 공개용 화면 시안</p>
-</header>
-<section class="notice" aria-label="데이터 및 공개 상태">
-<strong>샘플 데이터만 표시하는 미리보기입니다.</strong>
-<p>실제 업무 현황, 내부 프로젝트, 리뷰 이력 또는 운영 상태를 반영하지 않습니다. 현재 공개된 샘플 화면이며 실제 업무 현황이 아닙니다.</p>
-<span class="status">공개 샘플 · 비운영 데모</span>
+<body data-visibility="PUBLIC_ALLOWLIST_STATUS" data-synchronization="MANUAL_VERIFIED_SNAPSHOT" data-asof="2026-11-12">
+<header class="masthead"><div class="wrapper">
+<span class="eyebrow">COWORK / COLLABORATION OPERATIONS</span>
+<h1>협업 흐름과 현재 상태</h1>
+<p>실제 확인된 기록을 바탕으로 협업 구조, 검증 단계, 다음 작업을 한눈에 보여주는 대시보드입니다.</p>
+<div class="header-meta"><span class="chip">기준일 2026.11.12</span><span class="chip">공개 승인된 요약 정보</span><span class="chip">업무 현황 자동 동기화 아님</span></div>
+</div></header>
+<main class="wrapper">
+<div class="overview">
+<section class="panel critical" aria-label="주요 운영 상황">
+<span class="kicker">운영 상태 / CUTOVER GATE</span>
+<div class="lead">GitHub 정식 전환 전</div>
+<p>기존 처리 경로는 변경하지 않았습니다. GitHub 기반 협업 운송으로 전환하기 전, 호스트 검증·독립 리뷰·운영 승인 절차가 남아 있습니다.</p>
 </section>
-<section aria-label="예시 업무 흐름">
-<div class="section-head"><h2>업무 진행 흐름</h2><p class="muted">아래 카드는 동작 구조를 보여주기 위한 예시입니다.</p></div>
-<div class="grid"><article class="step"><div class="step-top"><span class="step-no">01</span><span class="tag">샘플 단계</span></div><h3>요청 접수</h3><p>작업이 등록되면 요청 목적과 범위를 확인하는 단계입니다.</p></article>
-<article class="step"><div class="step-top"><span class="step-no">02</span><span class="tag">샘플 단계</span></div><h3>검토 및 피드백</h3><p>검토 결과를 분류하고 필요한 후속 보완을 정리하는 단계입니다.</p></article>
-<article class="step"><div class="step-top"><span class="step-no">03</span><span class="tag">샘플 단계</span></div><h3>판정 및 마무리</h3><p>확인된 결과를 판정하고 다음 작업을 결정하는 단계입니다.</p></article></div>
+<section class="panel safe" aria-label="역할 구분">
+<div class="pair">
+<div><div class="name">협업 관리 환경</div><p>GPT: 요구 범위·판정<br>GitHub: 문서·현황 관리</p></div>
+<div><div class="name">업무 실행 환경</div><p>Windows watcher: 정책 검증<br>Claude Code: 독립 리뷰</p></div>
+</div>
 </section>
-<section aria-label="공개 범위 안내">
-<div class="section-head"><h2>공개 화면에 표시할 내용</h2></div>
-<div class="summary"><strong>공개 승인된 정보만 표시</strong>
-<p class="muted">실제 데이터를 연결하려면 별도 공개 승인과 항목별 반출 심사가 필요합니다. 승인 전에는 예시 화면만 유지합니다.</p></div>
+</div>
+<section class="section" aria-label="GitHub 관측 자료">
+<div class="sectionheader"><h2>현재 관측 지표</h2><p>GitHub 기록만 집계</p></div>
+<div class="kpis">
+<div class="kpi"><strong>3</strong><span>상태 문서가 있는 프로젝트</span></div>
+<div class="kpi"><strong>0</strong><span>GitHub 요청 파일 관측</span></div>
+<div class="kpi"><strong>0</strong><span>GitHub 리뷰 결과 관측</span></div>
+<div class="kpi"><strong>0</strong><span>GitHub 영수증 관측</span></div>
+</div>
+<p class="caption">※ 파일 관측 수는 검증 완료 건수 또는 전체 업무 수가 아닙니다. 이관되지 않은 기존 자료는 ‘미확인’입니다.</p>
 </section>
-<footer>© CoWork · 공개 샘플 화면. 개인정보·운영정보·내부 링크·실제 이슈 및 리뷰 내용은 포함하지 않습니다.</footer>
+<section class="section" aria-label="협업 환경별 현재·목표 경로">
+<div class="sectionheader"><h2>현재 경로와 목표 경로</h2><p>운영 중인 경로와 설계된 목표를 구분</p></div>
+<div class="lanes">
+<div class="lane live"><div class="lane-heading">현재 운영 경로 · 기존 처리 유지</div>
+<div class="sequence"><span>GPT 요청·판정</span><span class="arr">→</span><span>기존 운송 채널</span><span class="arr">→</span><span>Windows 감시기·Claude Code</span><span class="arr">→</span><span>결과·영수증</span></div>
+<p>기존 운영 기록에 근거한 구조이며, 이 화면이 운영 호스트의 실시간 작동을 검증하지는 않습니다.</p></div>
+<div class="lane target"><div class="lane-heading">GitHub 목표 경로 · 정식 전환 전</div>
+<div class="sequence"><span>GPT 요구</span><span class="arr">→</span><span>GitHub PRIVATE 요청</span><span class="arr">→</span><span>watcher 검증</span><span class="arr">→</span><span>Claude Code 리뷰</span><span class="arr">→</span><span>GPT 판정</span></div>
+<p>서명·비용·중복 방지, 호스트 시험, 독립 검토, 사용자 승인 등 실제 완료 확인이 필요한 목표 흐름입니다.</p></div>
+</div>
+</section>
+<section class="section" aria-label="협업 단계별 구성">
+<div class="sectionheader"><h2>협업 단계별 구조</h2><p>7단계 처리 개념도</p></div>
+<ol class="flow"><li class="step"><span class="stepnum">01</span><div class="stepbody"><h3>요청·범위 정의</h3><p class="owner">GPT</p><p class="desc">업무 목적, 검토 범위, 공개/실행 승인 구분</p></div></li>
+<li class="step"><span class="stepnum">02</span><div class="stepbody"><h3>REQUEST / READY</h3><p class="owner">GitHub · 협업 관리 환경</p><p class="desc">고정된 요청·승인 정보 확인</p></div></li>
+<li class="step"><span class="stepnum">03</span><div class="stepbody"><h3>정책·서명 검증</h3><p class="owner">Python watcher · 업무 실행 환경</p><p class="desc">서명, 해시, 비용, 중복 실행 차단</p></div></li>
+<li class="step"><span class="stepnum">04</span><div class="stepbody"><h3>독립 리뷰</h3><p class="owner">Claude Code · 업무 실행 환경</p><p class="desc">개발자 자체 시험과 별도 검토</p></div></li>
+<li class="step"><span class="stepnum">05</span><div class="stepbody"><h3>결과·영수증</h3><p class="owner">GitHub · 협업 관리 환경</p><p class="desc">결과 게시 및 일치 여부 확인</p></div></li>
+<li class="step"><span class="stepnum">06</span><div class="stepbody"><h3>GPT 판정·피드백</h3><p class="owner">GPT · 협업 관리 환경</p><p class="desc">수용/보완/보류, 다음 담당 결정</p></div></li>
+<li class="step"><span class="stepnum">07</span><div class="stepbody"><h3>현황 대시보드</h3><p class="owner">GitHub Actions</p><p class="desc">증거 문서 기반 HTML 상태 표시</p></div></li></ol>
+<p class="caption">위 순서는 설계된 절차입니다. 단계를 도식에 표시했다고 실제 실행 또는 승인이 완료됐다는 뜻은 아닙니다.</p>
+</section>
+<section class="section" aria-label="최신 검증 상태">
+<div class="sectionheader"><h2>실제 기록 기반 STATUS</h2><p>PASS와 NOT_RUN을 분리</p></div>
+<div class="details-table"><table><thead><tr><th scope="col">구분</th><th scope="col">현재 판정</th><th scope="col">근거/제한</th></tr></thead>
+<tbody><tr><th scope="row">운영 경로</th><td><span class="status hold">기존 경로 유지</span></td><td>현재 운영 기준을 변경하지 않음</td></tr><tr><th scope="row">GitHub 전환</th><td><span class="status hold">전환 전</span></td><td>필수 보안·운영 게이트와 별도 승인 대기</td></tr><tr><th scope="row">Windows 호스트 검증</th><td><span class="status pending">미실행</span></td><td>실제 호스트 검증 결과 미관측</td></tr><tr><th scope="row">Claude Code 독립 리뷰</th><td><span class="status pending">미실행</span></td><td>독립 리뷰 결과·영수증 미관측</td></tr><tr><th scope="row">공개 HTML 웹페이지</th><td><span class="status ok">배포 성공</span></td><td>공개 대시보드 페이지 제공 중</td></tr><tr><th scope="row">GitHub 리뷰 운송</th><td><span class="status pending">실운영 미확인</span></td><td>문서 관측 수를 검증된 처리 건수로 간주하지 않음</td></tr></tbody></table></div>
+</section>
+<section class="section" aria-label="핵심 업무 흐름">
+<div class="sectionheader"><h2>진행 중인 작업 영역</h2><p>공개 가능한 상위 범주만 표시</p></div>
+<div class="workcards">
+<article class="work"><span class="stepnum">01 · 협업 운송</span><h3>GitHub 전환 준비</h3><p>전환 설계와 시험 후보는 마련됐지만 실제 호스트 검증과 정식 전환 승인은 완료되지 않았습니다.</p><b>다음: 승인된 호스트 검증 근거 확인</b></article>
+<article class="work"><span class="stepnum">02 · 현황 시각화</span><h3>HTML 대시보드 제공</h3><p>브라우저에서 바로 보는 GitHub Pages를 제공하며, 승인된 상태 요약만 표시합니다.</p><b>다음: 새 결과 반영 시 공개 범위 확인</b></article>
+<article class="work"><span class="stepnum">03 · 지식 자산</span><h3>설계·문서 작업</h3><p>관련 설계 문서가 등록된 상태입니다. 구현·운영 검증 완료 여부는 확인되지 않았습니다.</p><b>다음: 검증 증거가 게시되면 상태 갱신</b></article>
+</div>
+</section>
+<section class="section source" aria-label="데이터 범위와 갱신 방식">
+<h3>상태 데이터와 갱신 방식</h3>
+<p><strong>이 화면은 2026년 11월 12일 확인된 기록의 공개용 요약 스냅샷입니다.</strong> PRIVATE 업무 자료 원문, 요청 식별자, 상세 피드백, 자격증명은 포함하지 않습니다.</p>
+<p>Pages는 공개 파일 변경 시 다시 배포되지만, PRIVATE 기록을 PUBLIC으로 자동 동기화하지 않습니다. 새로운 업무 상태는 별도 확인·공개 범위 검토 후 반영합니다.</p>
+</section>
+<footer>CoWork · 협업 상태 공개 요약 · 문서 관측 ≠ 호스트 검증 완료 · 정식 LIVE 전환 미실시</footer>
 </main>
-</body>
-</html>
+</body></html>
