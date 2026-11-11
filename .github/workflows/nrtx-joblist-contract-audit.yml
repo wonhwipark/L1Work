@@ -1,0 +1,52 @@
+name: NR TX job-list contract audit (one-shot)
+on:
+  push:
+    paths: [".github/workflows/nrtx-joblist-contract-audit.yml"]
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            job-list_v0_4_34_1109.zip
+            code-analyzer_v0_15_2_1107.zip
+            doc-converter_v0_2_21_1106.zip
+          sparse-checkout-cone-mode: false
+      - name: Inspect exact current profile and activation contracts
+        shell: python
+        run: |
+          import zipfile,ast,re,hashlib
+          from pathlib import Path
+          for fn in ['job-list_v0_4_34_1109.zip','code-analyzer_v0_15_2_1107.zip','doc-converter_v0_2_21_1106.zip']:
+            p=Path(fn)
+            if not p.exists(): print('NO_ZIP',fn);continue
+            with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              root=z.namelist()[0].split('/')[0]+'/'
+              print('PACKAGE',fn,'SHA',hashlib.sha256(p.read_bytes()).hexdigest(),'ROOT',root)
+              for rel in (['SKILL.md','README.md'] if not fn.startswith('job-list') else ['scripts/job_core.py','requests/one-shot-jobs.json','lifecycle.json','scripts/l1_knowledge_input_verify_linux_job.py']):
+                name=root+rel
+                if name not in z.namelist(): print('NOT_PRESENT',rel);continue
+                txt=z.read(name).decode('utf8')
+                print('BEGIN',fn,rel)
+                if rel=='scripts/job_core.py':
+                  tree=ast.parse(txt)
+                  at=txt.index('BUILTIN_SAFE_PROFILES:')
+                  print('BUILTIN_PROFILES',txt[at:at+13000])
+                  wanted=('validate','profile','activate','preflight','dispatch','enqueue','run','worker','result','receipt','job')
+                  for nd in tree.body:
+                    if isinstance(nd,ast.FunctionDef) and any(w in nd.name.lower() for w in wanted):
+                      st=nd.lineno-1;en=nd.end_lineno
+                      lines=txt.splitlines()
+                      bl='\\n'.join(lines[st:en])
+                      if any(k in nd.name.lower() for k in ('activat','profile','preflight','worker','job')) and len(bl)<12000:
+                        print('FUNC',nd.name,'LINE',nd.lineno,'SOURCE',bl[:7000])
+                      else:print('FUNC',nd.name,'LINE',nd.lineno,'END',en)
+                else: print(txt[:10500])
+                print('END',fn,rel)
+          print('AUDIT_PASS')
