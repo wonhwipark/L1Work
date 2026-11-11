@@ -51,7 +51,7 @@ def build(base: Path, tool_dir: Path, out_dir: Path) -> Path:
             raise ValueError("BASELINE_BAD_CRC")
         infos = oldzip.infolist()
         old_root = "job-list_v0_4_34/"
-        new_root = "job-list_v0_4_35/"
+        new_root = "job-list_v0_4_36/"
         if not all(i.filename.startswith(old_root) for i in infos):
             raise ValueError("BASELINE_ROOT_INCONSISTENT")
         found = set()
