@@ -3,6 +3,7 @@ on:
   push:
     paths:
       - .github/workflows/joblist-nrtx-public-once.yml
+      - .github/joblist-nrtx-once/**
   workflow_dispatch:
 permissions:
   contents: write
