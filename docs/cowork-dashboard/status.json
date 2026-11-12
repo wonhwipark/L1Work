@@ -30,8 +30,8 @@
       "category": "dashboard",
       "next_action": "HTML 화면 및 자동 갱신 상태 검증",
       "owner": "GPT",
-      "phase_index": 2,
-      "phase_label": "개발·시험 신고",
+      "phase_index": 4,
+      "phase_label": "판정·보완 신고",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "CoWork 대시보드"
