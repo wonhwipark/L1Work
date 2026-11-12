@@ -4,9 +4,9 @@ L1 업무용 스킬 패키지 및 별도 승인된 공개 자료를 제공하는
 
 ## 바로가기
 
-- **[CoWork 협업 현황 대시보드 — HTML 웹페이지 바로 보기](https://wonhwipark.github.io/L1Work/cowork-dashboard/)**  
-  **기본 대시보드 링크**입니다. 실제 기록에서 공개 가능한 상태만 선별한 HTML 화면이며, PRIVATE 문서 원문이나 상세 피드백은 포함하지 않습니다. 2026-11-12 기준 승인된 스냅샷으로, PRIVATE 상태 자동 동기화는 하지 않습니다.
-- **[대시보드 리디자인 시안 3개 비교하기](https://wonhwipark.github.io/L1Work/cowork-dashboard/concepts/)** — Executive / System Topology / Process Journey. **선택 전까지 기존 기본 화면 유지**.
+- **[CoWork Executive · Work Tracker HTML 바로 열기](https://wonhwipark.github.io/L1Work/cowork-dashboard/)**  
+  **기본 대시보드(사용자 선택 1번)**입니다. 협업 구조와 별도 Work별 단계·담당·시험/리뷰 구분·다음 조치를 표시합니다. 공개 허용된 작업 범주 요약만 포함하며 PRIVATE 원문·Work ID·영수증은 게시하지 않습니다. 기준일 2026-11-12, PRIVATE 상태 자동 동기화는 하지 않습니다.
+- **[대시보드 리디자인 시안 3개 비교하기](https://wonhwipark.github.io/L1Work/cowork-dashboard/concepts/)** — Executive / System Topology / Process Journey. **기존 2·3번 시안은 비교용으로 보존**.
 - [CoWork HTML 원본 보기](docs/cowork-dashboard/index.html) — GitHub 파일 화면에서는 HTML 소스 표시
 - [L1Work 전체 파일·스킬 ZIP 보기](https://github.com/wonhwipark/L1Work) — 기존 배포 파일 및 자료
 
