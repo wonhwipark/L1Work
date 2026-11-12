@@ -21,7 +21,7 @@
       "next_action": "승인된 환경 검증 근거 확인 후 전환 게이트 판정",
       "owner": "협업 관리·업무 실행",
       "phase_index": 0,
-      "phase_label": "단계 미확인",
+      "phase_label": "검증 게이트 대기",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "협업 운송 전환"
