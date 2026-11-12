@@ -1,0 +1,194 @@
+# L1 Knowledge 분석 항목 — 담당자 검토용 분류표 v0.7 (초안)
+
+> 작성 상태: 이전 v0.6 파일 원문은 이 세션에서 재확보하지 못해 1:1 대조하지 못함. 대화에서 확인된 분류와 검토 후보를 재구성한 문서이며, 기존 v0.6 정본을 대체하지 않음.
+
+## A. Procedure / Scenario
+
+| 모듈 | 대분류 (Procedure) | 세부 시나리오 | 담당자 검토 (적절 / 누락 / 변경 / 제외) |
+|---|---|---|---|
+| NR BCH (L1 Channel) | Initial Access / Attach | Cell synchronization 완료 이후 PBCH/MIB 수신 설정·획득 연동 | 미검토 |
+| NR BCH (L1 Channel) | Initial Access / Attach | Initial Access 관련 L1 채널 초기 설정 | 미검토 |
+| NR BCH (L1 Channel) | System Information Acquisition | SIB1 수신·복호 관련 L1 설정 | 미검토 |
+| NR BCH (L1 Channel) | System Information Acquisition | 기타 SIB/SI 수신 설정 및 변경 적용 | 미검토 |
+| NR BCH (L1 Channel) | System Information Acquisition | System Information 갱신/재획득 | 미검토 |
+| NR BCH (L1 Channel) | RRC Reconfiguration | RRC 전달 DL 채널 설정 적용 | 미검토 |
+| NR BCH (L1 Channel) | RRC Reconfiguration | RRC 전달 UL 채널 설정 적용 | 미검토 |
+| NR BCH (L1 Channel) | RRC Reconfiguration | RRC 재설정 시 L1 채널 자원 변경 | 미검토 |
+| NR BCH (L1 Channel) | Mobility / Handover | Target Cell L1 채널 설정 준비·적용 | 미검토 |
+| NR BCH (L1 Channel) | Mobility / Handover | Handover 이후 L1 채널 재설정 | 미검토 |
+| NR BCH (L1 Channel) | Cell Change / Recovery | Cell Reselection 결과에 따른 채널 설정 변경 연동 | 미검토 |
+| NR BCH (L1 Channel) | Cell Change / Recovery | Cell Change 시 L1 채널 재초기화 | 미검토 |
+| NR BCH (L1 Channel) | Release / Suspend / Resume | L1 채널 Release 및 자원 정리 | 미검토 |
+| NR BCH (L1 Channel) | Release / Suspend / Resume | Suspend/Resume 관련 채널 상태 복원 (코드 확인) | 미검토 |
+| NR BCH (L1 Channel) | Exception / Recovery | 채널 설정 실패·Timeout 처리 | 미검토 |
+| NR BCH (L1 Channel) | Exception / Recovery | MIB/SIB 수신 실패와 L1 복구 연동 | 미검토 |
+| NR BCH (L1 Channel) | BWP Switching | RRC 기반 BWP 설정·전환 | 미검토 |
+| NR BCH (L1 Channel) | BWP Switching | DCI 기반 Active BWP 전환 연동 | 미검토 |
+| NR BCH (L1 Channel) | BWP Switching | BWP Inactivity Timer 기반 전환 연동 | 미검토 |
+| NR BCH (L1 Channel) | BWP Switching | BWP 전환 시 DL/UL 채널 설정 및 상태 반영 | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Configuration | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Configuration | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Activation | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Activation | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Deactivation | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Deactivation | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Release | 미검토 |
+| NR BCH (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Release | 미검토 |
+| NR L1 Tx | Initial Access / UL Transmission | PRACH 송신 경로·파라미터 설정 연동 | 미검토 |
+| NR L1 Tx | Initial Access / UL Transmission | Msg3/초기 PUSCH 송신 설정 | 미검토 |
+| NR L1 Tx | RRC Reconfiguration | UL Tx 설정 변경 반영 | 미검토 |
+| NR L1 Tx | RRC Reconfiguration | 상위 채널 설정 변경에 따른 Tx 자원 재구성 | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | UL SCell Configuration 중 Tx 관련 설정 | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | UL SCell Activation 중 Tx 관련 처리 | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | UL SCell Deactivation 중 Tx 관련 처리 | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | UL SCell Release 중 Tx 자원 정리 | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | UL Tx Switching (조건부) | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | SRS Carrier Switching (조건부) | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | SLO (사내 정의 확인) | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | RF Tx Configuration | 미검토 |
+| NR L1 Tx | UL CA / SCell 참여 | UL CA 동작 중 Tx Path 전환 | 미검토 |
+| NR L1 Tx | EN-DC | LTE/NR 동시 송신 시 NR Tx 설정 연동 | 미검토 |
+| NR L1 Tx | EN-DC | EN-DC Tx 자원 공유·경로 전환 | 미검토 |
+| NR L1 Tx | Mobility / Handover | Mobility 시 UL Tx 경로 및 설정 재구성 | 미검토 |
+| NR L1 Tx | Connected Mode UL Tx | Tx Antenna Switching | 미검토 |
+| NR L1 Tx | Connected Mode UL Tx | Tx Path Switching | 미검토 |
+| NR L1 Tx | Connected Mode UL Tx | Tx Chain/BB Tx 자원 재할당 (코드 확인) | 미검토 |
+| NR L1 Tx | CDRX 연동 | CDRX 진입·복귀에 따른 UL Tx 동작 연동 | 미검토 |
+| NR L1 Tx | Exception / Recovery | UL Tx 설정 실패 및 경로 복구 | 미검토 |
+| NR L1 Tx | Exception / Recovery | Tx Switching 실패·재시도 처리 | 미검토 |
+| NR L1 Tx | NRDC | BB TX Reconfiguration | 미검토 |
+| NR L1 Tx | NRDC | F1 Rank Change (사내 의미 확인) | 미검토 |
+| NR L1 Tx | Dual SIM | Tx Sharing | 미검토 |
+| NR L1 Tx | Dual SIM | BB Tx Change | 미검토 |
+| LTE ChCfg (L1 Channel) | Initial Access / Attach | LTE PBCH/MIB 획득 관련 L1 채널 설정 | 미검토 |
+| LTE ChCfg (L1 Channel) | Initial Access / Attach | Initial Access용 DL/UL 채널 초기 설정 | 미검토 |
+| LTE ChCfg (L1 Channel) | System Information Acquisition | LTE SIB1/SI 수신 관련 채널 설정 | 미검토 |
+| LTE ChCfg (L1 Channel) | System Information Acquisition | System Information 변경·갱신 처리 | 미검토 |
+| LTE ChCfg (L1 Channel) | RRC Reconfiguration | LTE RRC 전달 DL 채널 설정 적용 | 미검토 |
+| LTE ChCfg (L1 Channel) | RRC Reconfiguration | LTE RRC 전달 UL 채널 설정 적용 | 미검토 |
+| LTE ChCfg (L1 Channel) | RRC Reconfiguration | L1 채널 자원 재설정 | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Configuration | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Configuration | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Activation | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Activation | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Deactivation | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Deactivation | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | DL SCell Release | 미검토 |
+| LTE ChCfg (L1 Channel) | SCell Config / Activation / Deactivation / Release | UL SCell Release | 미검토 |
+| LTE ChCfg (L1 Channel) | Mobility / Handover | Target Cell 채널 설정 및 Handover 연동 | 미검토 |
+| LTE ChCfg (L1 Channel) | Mobility / Handover | Cell Change 후 채널 설정 변경 | 미검토 |
+| LTE ChCfg (L1 Channel) | PCell / CC Reconfiguration | PCell 관련 채널 설정 변경 | 미검토 |
+| LTE ChCfg (L1 Channel) | PCell / CC Reconfiguration | CA 구성 CC 추가·제거에 따른 채널 설정 반영 | 미검토 |
+| LTE ChCfg (L1 Channel) | EN-DC LTE Anchor 연동 | EN-DC LTE 측 채널 설정·재설정 | 미검토 |
+| LTE ChCfg (L1 Channel) | EN-DC LTE Anchor 연동 | NR 연동을 위한 LTE 채널 설정 변경 | 미검토 |
+| LTE ChCfg (L1 Channel) | Release / Exception / Recovery | LTE L1 채널 해제·자원 정리 | 미검토 |
+| LTE ChCfg (L1 Channel) | Release / Exception / Recovery | 채널 설정 실패·Timeout 복구 | 미검토 |
+| LTE L1 Tx | Initial Access / UL Transmission | PRACH 송신 설정 및 경로 초기화 | 미검토 |
+| LTE L1 Tx | Initial Access / UL Transmission | Msg3/초기 PUSCH 송신 설정 | 미검토 |
+| LTE L1 Tx | UL Tx Configuration | RRC 구성에 따른 UL Tx 파라미터 반영 | 미검토 |
+| LTE L1 Tx | UL Tx Configuration | UL 송신 자원·BB/RF 설정 변경 | 미검토 |
+| LTE L1 Tx | UL CA / SCell 참여 | UL SCell Configuration 중 Tx 설정 | 미검토 |
+| LTE L1 Tx | UL CA / SCell 참여 | UL SCell Activation 중 Tx 처리 | 미검토 |
+| LTE L1 Tx | UL CA / SCell 참여 | UL SCell Deactivation 중 Tx 처리 | 미검토 |
+| LTE L1 Tx | UL CA / SCell 참여 | UL SCell Release 중 Tx 자원 정리 | 미검토 |
+| LTE L1 Tx | UL CA / SCell 참여 | UL CA Tx 자원 재할당 및 경로 전환 | 미검토 |
+| LTE L1 Tx | UL Tx Resource | PCell/SCell Tx 자원 구성 | 미검토 |
+| LTE L1 Tx | UL Tx Resource | Power/Tx Chain 자원 제약 연동 (코드 확인) | 미검토 |
+| LTE L1 Tx | Tx Antenna / Path Switching | Tx Antenna Switching (실제 지원 여부 확인) | 미검토 |
+| LTE L1 Tx | Tx Antenna / Path Switching | Tx Path Switching | 미검토 |
+| LTE L1 Tx | Tx Antenna / Path Switching | RF Tx Configuration 연동 | 미검토 |
+| LTE L1 Tx | EN-DC | LTE/NR 동시 송신 시 LTE Tx 자원·경로 조정 | 미검토 |
+| LTE L1 Tx | EN-DC | EN-DC Tx Sharing/전환 연동 | 미검토 |
+| LTE L1 Tx | Dual SIM | Tx Sharing (실제 지원 여부 확인) | 미검토 |
+| LTE L1 Tx | Dual SIM | BB Tx Change (실제 지원 여부 확인) | 미검토 |
+| LTE L1 Tx | Exception / Recovery | UL Tx 경로·설정 실패 복구 | 미검토 |
+| LTE L1 Tx | Exception / Recovery | Tx Resource Release 및 재초기화 | 미검토 |
+
+## B. Technical Knowledge
+
+| 모듈 | 대분류 (Technical Knowledge) | 세부 기능 / 분석 항목 | 담당자 검토 (적절 / 누락 / 변경 / 제외) |
+|---|---|---|---|
+| NR BCH (L1 Channel) | L1 Channel Configuration | DL/UL Physical Channel 설정 파라미터 | 미검토 |
+| NR BCH (L1 Channel) | L1 Channel Configuration | RRC → L1 Configuration 매핑·적용 조건 | 미검토 |
+| NR BCH (L1 Channel) | L1 Channel Configuration | 채널 Config/Reconfig 순서 및 의존성 | 미검토 |
+| NR BCH (L1 Channel) | PBCH / MIB / System Information | PBCH/MIB 수신 관련 채널 설정·결과 처리 | 미검토 |
+| NR BCH (L1 Channel) | PBCH / MIB / System Information | SIB1/SI 수신 설정·결과 연동 | 미검토 |
+| NR BCH (L1 Channel) | BWP / CC / SCell Resource | Active DL/UL BWP 상태·설정 | 미검토 |
+| NR BCH (L1 Channel) | BWP / CC / SCell Resource | PCell/SCell 채널 자원 설정 | 미검토 |
+| NR BCH (L1 Channel) | BWP / CC / SCell Resource | SCell Config/Act/Deact/Release 시 자원 전이 | 미검토 |
+| NR BCH (L1 Channel) | Interface | RRC ↔ BCH 제어/결과 인터페이스 | 미검토 |
+| NR BCH (L1 Channel) | Interface | Measure Controller 결과 입력 인터페이스 | 미검토 |
+| NR BCH (L1 Channel) | Interface | DRX Controller와 채널 설정 연동 경계 | 미검토 |
+| NR BCH (L1 Channel) | Interface | PHY/HAL 설정 명령 및 응답 | 미검토 |
+| NR BCH (L1 Channel) | State Management | 채널 Config/Active/Release 상태 전이 | 미검토 |
+| NR BCH (L1 Channel) | State Management | SCell Activation/Deactivation 상태 | 미검토 |
+| NR BCH (L1 Channel) | State Management | BWP Switching 트리거별 상태 변경 | 미검토 |
+| NR BCH (L1 Channel) | Timing / Scheduling | 채널 설정 적용 시점·동기화 | 미검토 |
+| NR BCH (L1 Channel) | Timing / Scheduling | BWP/SCell 변경의 타이밍 제약 | 미검토 |
+| NR BCH (L1 Channel) | Timing / Scheduling | 설정 요청과 PHY 적용 순서 | 미검토 |
+| NR BCH (L1 Channel) | Recovery / Diagnostics | 설정 Timeout/실패 감지·복구 | 미검토 |
+| NR BCH (L1 Channel) | Recovery / Diagnostics | MIB/SIB 관련 실패 분류 | 미검토 |
+| NR BCH (L1 Channel) | Recovery / Diagnostics | 상태 추적 로그·원인 분석 포인트 | 미검토 |
+| NR L1 Tx | UL Physical Channel | PUSCH/PUCCH/PRACH 송신 설정 | 미검토 |
+| NR L1 Tx | UL Physical Channel | UL Physical Channel 송신 경로별 동작 | 미검토 |
+| NR L1 Tx | Reference Signal / SRS | SRS 송신 설정 및 자원 | 미검토 |
+| NR L1 Tx | Reference Signal / SRS | SRS Carrier Switching의 트리거·제약 | 미검토 |
+| NR L1 Tx | Reference Signal / SRS | DMRS 관련 Tx 설정 (코드 확인) | 미검토 |
+| NR L1 Tx | Tx Resource | Tx Antenna / RF Path / Tx Chain Allocation | 미검토 |
+| NR L1 Tx | Tx Resource | UL CA/NRDC/Dual SIM 자원 공유·우선순위 | 미검토 |
+| NR L1 Tx | Tx Resource | BB Tx Resource 할당·해제 | 미검토 |
+| NR L1 Tx | Tx Switching | UL Tx Switching 결정 조건·상태 | 미검토 |
+| NR L1 Tx | Tx Switching | Tx Antenna Switching 알고리즘·조건 | 미검토 |
+| NR L1 Tx | Tx Switching | Tx Path Switching 알고리즘·조건 | 미검토 |
+| NR L1 Tx | Tx Switching | SRS Carrier Switching 구현 및 복귀 | 미검토 |
+| NR L1 Tx | Tx Switching | Dual SIM Tx Sharing 충돌·우선순위 | 미검토 |
+| NR L1 Tx | Tx Configuration | RF Tx Configuration | 미검토 |
+| NR L1 Tx | Tx Configuration | BB TX Reconfig (NRDC) | 미검토 |
+| NR L1 Tx | Tx Configuration | BB Tx Change (Dual SIM) | 미검토 |
+| NR L1 Tx | Tx Configuration | F1 Rank Change (NRDC; 사내 정의 확인) | 미검토 |
+| NR L1 Tx | Tx Configuration | SLO (ULCA; 사내 정의 확인) | 미검토 |
+| NR L1 Tx | Interface | L1 Channel Controller ↔ Tx 설정/이벤트 | 미검토 |
+| NR L1 Tx | Interface | TxCfgMngr/TxSwitchMngr ↔ HAL/RF 인터페이스 | 미검토 |
+| NR L1 Tx | Interface | PHY 송신 설정·결과 인터페이스 | 미검토 |
+| NR L1 Tx | State / Recovery | UL Tx 및 Tx Path 상태 관리 | 미검토 |
+| NR L1 Tx | State / Recovery | CDRX 연동 시 UL Tx 상태 전이 | 미검토 |
+| NR L1 Tx | State / Recovery | RF/BB 설정 실패 진단·복구 | 미검토 |
+| LTE ChCfg (L1 Channel) | LTE Channel Configuration | DL/UL Physical Channel 설정 파라미터 | 미검토 |
+| LTE ChCfg (L1 Channel) | LTE Channel Configuration | LTE RRC → L1 설정 매핑 | 미검토 |
+| LTE ChCfg (L1 Channel) | LTE Channel Configuration | Channel Config/Reconfig 적용 순서 | 미검토 |
+| LTE ChCfg (L1 Channel) | MIB / SIB / System Information | LTE MIB 관련 채널 설정·결과 처리 | 미검토 |
+| LTE ChCfg (L1 Channel) | MIB / SIB / System Information | LTE SIB/SI 수신 설정·갱신 연동 | 미검토 |
+| LTE ChCfg (L1 Channel) | PCell / SCell / CC Resource | PCell/CC 설정·유지 | 미검토 |
+| LTE ChCfg (L1 Channel) | PCell / SCell / CC Resource | SCell Config/Act/Deact/Release 자원 상태 | 미검토 |
+| LTE ChCfg (L1 Channel) | PCell / SCell / CC Resource | DL/UL CA 채널 설정·리소스 | 미검토 |
+| LTE ChCfg (L1 Channel) | Interface | RRC ↔ ChCfg 제어·상태 인터페이스 | 미검토 |
+| LTE ChCfg (L1 Channel) | Interface | Measure/DRX Controller 연동 경계 | 미검토 |
+| LTE ChCfg (L1 Channel) | Interface | PHY/HAL 설정 명령·결과 | 미검토 |
+| LTE ChCfg (L1 Channel) | State Management | PCell/SCell 채널 상태 전이 | 미검토 |
+| LTE ChCfg (L1 Channel) | State Management | Config/Active/Deactive/Release 상태 관리 | 미검토 |
+| LTE ChCfg (L1 Channel) | State Management | EN-DC LTE Anchor 설정 상태 (코드 확인) | 미검토 |
+| LTE ChCfg (L1 Channel) | Timing / Scheduling | 채널 설정 타이밍 및 적용 시점 | 미검토 |
+| LTE ChCfg (L1 Channel) | Timing / Scheduling | SCell Activation/Deactivation 타이밍 | 미검토 |
+| LTE ChCfg (L1 Channel) | Timing / Scheduling | Handover 시 채널 설정 순서 | 미검토 |
+| LTE ChCfg (L1 Channel) | Recovery / Diagnostics | 설정 Timeout/실패 처리 | 미검토 |
+| LTE ChCfg (L1 Channel) | Recovery / Diagnostics | 채널 재설정·해제 시 정합성 검증 | 미검토 |
+| LTE ChCfg (L1 Channel) | Recovery / Diagnostics | 상태/오류 로그 분석 포인트 | 미검토 |
+| LTE L1 Tx | UL Physical Channel | LTE PRACH/PUSCH/PUCCH 송신 설정 | 미검토 |
+| LTE L1 Tx | UL Physical Channel | UL Tx 파라미터·채널별 동작 | 미검토 |
+| LTE L1 Tx | Reference Signal / SRS | LTE SRS 송신 설정·리소스 | 미검토 |
+| LTE L1 Tx | Reference Signal / SRS | UL CA 관련 SRS 송신 연동 (코드 확인) | 미검토 |
+| LTE L1 Tx | Tx Resource | RF Path/Tx Chain/BB Tx 자원 할당 | 미검토 |
+| LTE L1 Tx | Tx Resource | PCell/SCell UL Tx Resource 관리 | 미검토 |
+| LTE L1 Tx | Tx Resource | EN-DC 및 Dual SIM 자원 제약 | 미검토 |
+| LTE L1 Tx | Tx Switching | Tx Path Switching 결정·실행 | 미검토 |
+| LTE L1 Tx | Tx Switching | Tx Antenna Switching (지원 여부 확인) | 미검토 |
+| LTE L1 Tx | Tx Switching | Tx Sharing/우선순위·충돌 처리 | 미검토 |
+| LTE L1 Tx | Tx Configuration | RF Tx Configuration | 미검토 |
+| LTE L1 Tx | Tx Configuration | BB Tx Change (코드 확인) | 미검토 |
+| LTE L1 Tx | Tx Configuration | UL CA 송신 자원 재구성 | 미검토 |
+| LTE L1 Tx | Interface | LTE ChCfg ↔ L1 Tx 설정 인터페이스 | 미검토 |
+| LTE L1 Tx | Interface | TxCfgMngr/TxSwitchMngr ↔ RF/HAL 인터페이스 | 미검토 |
+| LTE L1 Tx | Interface | EN-DC LTE/NR Tx 연동 인터페이스 | 미검토 |
+| LTE L1 Tx | State / Recovery | UL Tx/Tx Path 상태 전이 | 미검토 |
+| LTE L1 Tx | State / Recovery | 설정 실패·Tx Resource 복구 | 미검토 |
+| LTE L1 Tx | State / Recovery | Release 및 재초기화 상태 관리 | 미검토 |
