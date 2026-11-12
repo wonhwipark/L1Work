@@ -25,6 +25,10 @@
     if (!counts || typeof counts !== "object" ||
         !["projects", "requests", "reviews", "receipts", "works"].every(key =>
           Number.isSafeInteger(counts[key]) && counts[key] >= 0 && counts[key] <= 100000)) return false;
+    const allowedChecks = ["미실행·대기", "기록 미관측", "추가 증거 검증 필요"];
+    if (!data.checks || typeof data.checks !== "object" ||
+        !["independent_review", "windows_stage1"].every(k =>
+          allowedChecks.includes(data.checks[k]))) return false;
     if (!Array.isArray(data.work_cards) || data.work_cards.length > MAX_CARDS) return false;
     return data.work_cards.every(card =>
       card && typeof card === "object" && fields.every(k =>
@@ -93,7 +97,24 @@
       }));
     }
     list.replaceChildren(...data.work_cards.map(cardNode));
+    const statusRows = document.querySelectorAll(".tablebox tbody tr");
+    statusRows.forEach(tr => {
+      const title = tr.querySelector("th")?.textContent?.trim();
+      const badge = tr.querySelector("td .state");
+      if (!badge) return;
+      if (title === "Windows 호스트 검증") {
+        badge.textContent = data.checks.windows_stage1;
+        badge.className = "state gray";
+      } else if (title === "독립 리뷰") {
+        badge.textContent = data.checks.independent_review;
+        badge.className = "state gray";
+      }
+    });
     const date = data.snapshot_date.replaceAll("-", ".");
+    for (const id of ["work-snapshot-date", "summary-snapshot-date"]) {
+      const span = by("#" + id);
+      if (span) span.textContent = date;
+    }
     const label = data.sync_mode === "AUTOMATED_ALLOWLIST" ?
       "자동 갱신 연결 · PUBLIC 허용 상태만 · 기준일 " + date :
       "초기 상태 게시 · 자동 발행 인증 설정 대기 · 기준일 " + date;
@@ -112,18 +133,43 @@
       });
     }
   }
+  // Recheck the same-origin PUBLIC file without a page reload.
+  // No PRIVATE calls, background worker, remote mutations or credential handling.
+  const POLL_MS = 120000;
+  let pending = false;
+  let lastChecked = 0;
+  let lastPayload = "";
   async function run() {
     const notice = by("#public-sync-status");
-    if (!notice) return;
+    if (!notice || pending || document.visibilityState === "hidden") return;
+    // A foreground/tab-focus event can coincide with the scheduled refresh.
+    if (Date.now() - lastChecked < 15000) return;
+    pending = true;
+    lastChecked = Date.now();
     try {
       const response = await fetch("./status.json", {cache: "no-store", credentials: "omit"});
       if (!response.ok) throw new Error("status unavailable");
       const data = await response.json();
       if (!valid(data)) throw new Error("invalid public schema");
-      update(data);
+      const signature = JSON.stringify(data);
+      if (signature !== lastPayload) {
+        update(data);
+        lastPayload = signature;
+      }
+      notice.textContent = (data.sync_mode === "AUTOMATED_ALLOWLIST" ?
+        "공개용 상태 자동 갱신 연결됨" : "초기 공개 상태 · 자동 게시 대기") +
+        " · 데이터 기준일 " + data.snapshot_date.replaceAll("-", ".") +
+        " · 열려 있는 화면 2분 간격 확인";
     } catch (_) {
-      notice.textContent = "마지막 게시 스냅샷 표시 중 · 자동 동기화 데이터 확인 필요";
+      notice.textContent = "최근 수신된 공개 상태 표시 중 · 자동 갱신 재확인 대기";
+    } finally {
+      pending = false;
     }
   }
   run();
+  window.setInterval(run, POLL_MS);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") run();
+  });
+  window.addEventListener("focus", run);
 })();
