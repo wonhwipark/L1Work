@@ -1,7 +1,7 @@
 {
   "checks": {
     "active_provider": "활성 리뷰 제공자 없음",
-    "independent_review": "기록 미관측",
+    "independent_review": "미실행·대기",
     "windows_stage1": "기록 미관측"
   },
   "counts": {
@@ -12,7 +12,7 @@
     "works": 6
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-13T11:06:32Z",
+  "generated_at": "2026-11-13T12:35:23Z",
   "schema": "COWORK_PUBLIC_STATUS_V1",
   "snapshot_date": "2026-11-13",
   "source": "APPROVED_AGGREGATE_ONLY",
