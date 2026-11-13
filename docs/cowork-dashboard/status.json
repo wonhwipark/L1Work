@@ -1,7 +1,7 @@
 {
   "checks": {
     "active_provider": "활성 리뷰 제공자 없음",
-    "independent_review": "기록 미관측",
+    "independent_review": "미실행·대기",
     "windows_stage1": "기록 미관측"
   },
   "counts": {
@@ -12,7 +12,7 @@
     "works": 6
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-13T17:30:10Z",
+  "generated_at": "2026-11-13T17:41:18Z",
   "schema": "COWORK_PUBLIC_STATUS_V1",
   "snapshot_date": "2026-11-14",
   "source": "APPROVED_AGGREGATE_ONLY",
@@ -23,8 +23,8 @@
       "category": "review-watcher",
       "next_action": "LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인",
       "owner": "협업 관리·업무 실행",
-      "phase_index": 0,
-      "phase_label": "단계 미확인",
+      "phase_index": 2,
+      "phase_label": "개발·시험 신고",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "협업 운송 전환"
