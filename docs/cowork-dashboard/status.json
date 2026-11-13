@@ -1,5 +1,6 @@
 {
   "checks": {
+    "active_provider": "활성 리뷰 제공자 없음",
     "independent_review": "기록 미관측",
     "windows_stage1": "기록 미관측"
   },
@@ -17,6 +18,7 @@
   "sync_mode": "AUTOMATED_ALLOWLIST",
   "work_cards": [
     {
+      "action_kind": "USER",
       "category": "review-watcher",
       "next_action": "승인된 환경 검증 근거 확인 후 전환 게이트 판정",
       "owner": "협업 관리·업무 실행",
@@ -27,6 +29,7 @@
       "title": "협업 운송 전환"
     },
     {
+      "action_kind": "OTHER",
       "category": "dashboard",
       "next_action": "HTML 화면 및 자동 갱신 상태 검증",
       "owner": "GPT",
@@ -37,6 +40,7 @@
       "title": "CoWork 대시보드"
     },
     {
+      "action_kind": "OTHER",
       "category": "skill-discovery",
       "next_action": "추가 확인이 필요한 스킬 근거 검토",
       "owner": "GPT",
@@ -47,6 +51,7 @@
       "title": "스킬 발견·재사용"
     },
     {
+      "action_kind": "OTHER",
       "category": "job-list",
       "next_action": "운영 적용 전 후보 시험 범위와 검증 게이트 확인",
       "owner": "GPT",
@@ -57,6 +62,7 @@
       "title": "업무 자동화 후보"
     },
     {
+      "action_kind": "OTHER",
       "category": "knowledge-design",
       "next_action": "실행 환경 확인 후 설계 검증",
       "owner": "GPT",
