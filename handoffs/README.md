@@ -1,5 +1,13 @@
 # 사내 GPT 인계 문서
 
+## 관리 스킬 기능 요약 (공개용 · 사내 GPT 인계)
+
+| 문서 | 용도 | 검증 범위 |
+|---|---|---|
+| [L1_SKILL_CAPABILITY_SUMMARY_INHOUSE_HANDOFF_r0001_20261113.md](L1_SKILL_CAPABILITY_SUMMARY_INHOUSE_HANDOFF_r0001_20261113.md) | 관리 스킬 **18개 + 별도 사내 연동 1개**의 역할·재사용 판단·현재 코드 MSC 활용 요약 | 기존 정적 카탈로그를 비민감 범위에서 요약. 사내 설치·실호출·독립 리뷰 미검증 |
+
+상세 기능 카탈로그와 검증 결과의 정본은 접근 권한이 필요한 CoWork PRIVATE에 있으며, 이 공개 인계에는 사내 코드·운영자료·인증정보를 포함하지 않는다. 스킬 설치·Job 실행·공개 배포를 승인하는 문서가 아니다.
+
 ## L1 Knowledge Updater × Workflow
 
 | 상태 | 문서 | 범위 |
