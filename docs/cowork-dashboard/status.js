@@ -1,4 +1,4 @@
-/* CoWork PUBLIC Executive v2 - same-origin, allowlisted status only.
+/* CoWork PUBLIC Executive v3 - same-origin, allowlisted status only.
  * Security boundary is the PRIVATE exporter, not the browser. No HTML injection,
  * PRIVATE API, account data, model invocation or external network request.
  */
@@ -6,6 +6,15 @@
   "use strict";
   const PHASES = ["요청", "개발", "리뷰", "판정", "완료"];
   const ALLOWED_KINDS = ["USER", "REVIEW", "BLOCKED", "OTHER"];
+  // Fixed, public-safe work explanations. Never built from PRIVATE free text.
+  const WORK_INFO = Object.freeze({
+    "review-watcher": { purpose: "스킬 개발 결과를 독립 리뷰와 GPT 최종 판정까지 안전하게 연결하는 협업 경로 정비", outcome: "검증 가능한 리뷰 요청·결과 연결과 전환 준비" },
+    "dashboard": { purpose: "여러 작업의 담당·진행 단계·확인할 일을 GitHub에서 자동 수집해 한 화면에 표시", outcome: "업데이트 시 자동 반영되는 업무 현황 화면" },
+    "skill-discovery": { purpose: "이미 보유한 스킬의 기능·적용 범위를 검토해 중복 개발 대신 재사용", outcome: "근거가 확인된 스킬 기능 목록과 재사용 기준" },
+    "job-list": { purpose: "Job-list 기반 작업 실행·결과 확인 절차를 검토하고 후보를 시험", outcome: "실행 환경 검증을 거친 원샷 자동화 흐름" },
+    "knowledge-design": { purpose: "업무별 지식과 이슈 이력을 구조화해 찾고 갱신하기 쉬운 방식 설계", outcome: "지식 분류 기준과 검색·갱신 구조" }
+  });
+  const UNKNOWN_INFO = Object.freeze({purpose:"공개 승인된 업무 범주의 목적 설명 확인 중",outcome:"공개 범위 검증 후 표시"});
   const STATUS_VALUES = ["미실행·대기", "기록 미관측", "추가 증거 검증 필요"];
   const PROVIDERS = ["활성 리뷰 제공자 없음", "Dropbox 리뷰 제공자 (문서 기록)", "기록 미확인"];
   const FIELDS = ["title", "category", "owner", "phase_label", "review_label", "test_label", "next_action"];
@@ -73,6 +82,11 @@
                    kind(w) === "REVIEW" ? "review" : ""), w.phase_label);
     header.append(badge);
     card.append(header, node("h3", "", w.title));
+    const info = WORK_INFO[w.category] || UNKNOWN_INFO;
+    card.append(node("p", "wk-purpose", info.purpose));
+    const outcome = node("div", "wk-outcome");
+    outcome.append(node("strong", "", "목표 결과"), node("span", "", info.outcome));
+    card.append(outcome);
     const stage = node("div", "wk-steps");
     stage.setAttribute("aria-label", "현재 문서상 단계 · 이전 단계 검증 완료를 의미하지 않음");
     PHASES.forEach((name, index) => {
@@ -95,6 +109,32 @@
     return card;
   }
 
+  function renderOverview() {
+    const tbody = $("#work-overview-rows");
+    if (!tbody || !data) return;
+    const all = [...data.work_cards].sort((a, b) =>
+      PRIORITY[kind(a)] - PRIORITY[kind(b)] || a.title.localeCompare(b.title, "ko"));
+    const rows = all.map(w => {
+      const info = WORK_INFO[w.category] || UNKNOWN_INFO;
+      const tr = node("tr");
+      const title = node("th", "portfolio-name");
+      title.setAttribute("scope", "row");
+      title.append(node("strong", "", w.title), node("small", "", w.category));
+      const objective = node("td", "portfolio-purpose", info.purpose);
+      objective.dataset.label = "무엇을 하는가";
+      const stage = node("td");
+      stage.dataset.label = "현재 단계";
+      stage.append(node("span", "portfolio-phase", w.phase_label));
+      const next = node("td", "portfolio-next", w.next_action);
+      next.dataset.label = "다음 확인";
+      tr.append(title, objective, stage, next);
+      return tr;
+    });
+    tbody.replaceChildren(...rows);
+    const count = $("#overview-visible-count");
+    if (count) count.textContent = "공개 " + all.length + "개 업무 · 전체 " + data.counts.works + "개 중";
+  }
+
   function renderCards() {
     const grid = $(".wk-grid"), empty = $("#work-filter-empty");
     if (!grid || !data) return;
@@ -102,7 +142,9 @@
       PRIORITY[kind(a)] - PRIORITY[kind(b)] || a.title.localeCompare(b.title, "ko"));
     const filtered = all.filter(w =>
       (selectedFilter === "all" || kind(w) === selectedFilter) &&
-      (w.title + " " + w.category + " " + w.phase_label + " " + w.next_action)
+      (w.title + " " + w.category + " " + w.phase_label + " " + w.next_action +
+       " " + (WORK_INFO[w.category] || UNKNOWN_INFO).purpose +
+       " " + (WORK_INFO[w.category] || UNKNOWN_INFO).outcome)
         .toLocaleLowerCase("ko").includes(search));
     grid.replaceChildren(...filtered.map(buildCard));
     if (empty) {
@@ -184,6 +226,7 @@
             "미등록 또는 공개 근거 미확인"));
       });
     }
+    renderOverview();
     renderCards();
   }
   const POLL_MS = 120000;
