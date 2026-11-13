@@ -12,6 +12,7 @@
     "works": 6
   },
   "cutover": "정식 전환 전",
+  "generated_at": "2026-11-13T11:03:42Z",
   "schema": "COWORK_PUBLIC_STATUS_V1",
   "snapshot_date": "2026-11-13",
   "source": "APPROVED_AGGREGATE_ONLY",
