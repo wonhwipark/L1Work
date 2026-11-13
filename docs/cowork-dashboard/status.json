@@ -5,14 +5,14 @@
     "windows_stage1": "기록 미관측"
   },
   "counts": {
-    "projects": 6,
+    "projects": 7,
     "receipts": 0,
     "requests": 0,
     "reviews": 0,
-    "works": 6
+    "works": 7
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-13T18:17:36Z",
+  "generated_at": "2026-11-13T18:36:01Z",
   "schema": "COWORK_PUBLIC_STATUS_V1",
   "snapshot_date": "2026-11-14",
   "source": "APPROVED_AGGREGATE_ONLY",
