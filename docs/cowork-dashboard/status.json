@@ -12,7 +12,7 @@
     "works": 6
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-13T11:03:42Z",
+  "generated_at": "2026-11-13T11:06:32Z",
   "schema": "COWORK_PUBLIC_STATUS_V1",
   "snapshot_date": "2026-11-13",
   "source": "APPROVED_AGGREGATE_ONLY",
@@ -21,7 +21,7 @@
     {
       "action_kind": "USER",
       "category": "review-watcher",
-      "next_action": "승인된 환경 검증 근거 확인 후 전환 게이트 판정",
+      "next_action": "LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인",
       "owner": "협업 관리·업무 실행",
       "phase_index": 0,
       "phase_label": "검증 게이트 대기",
