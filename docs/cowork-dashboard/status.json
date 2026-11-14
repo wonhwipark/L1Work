@@ -12,7 +12,7 @@
     "works": 9
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-14T15:50:56Z",
+  "generated_at": "2026-11-14T15:59:18Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -31,12 +31,12 @@
   "sync_mode": "AUTOMATED_ALLOWLIST",
   "work_cards": [
     {
-      "action_kind": "REVIEW",
+      "action_kind": "USER",
       "category": "review-watcher",
       "next_action": "LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인",
       "owner": "협업 관리·업무 실행",
-      "phase_index": 3,
-      "phase_label": "리뷰 단계 신고",
+      "phase_index": 0,
+      "phase_label": "검증 게이트 대기",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "협업 운송 전환"
