@@ -178,8 +178,33 @@ details[open]>.detail-summary em:before{content:"⌃ "}
  .wk-factlist{grid-template-columns:1fr}.wk-factlist .wk-fact-next,.wk-factlist .wk-fact-risk{grid-column:auto}
  .system-detail{padding:0 12px 15px}
 }
+
+/* Executive v4.1 — explicit PUBLIC handoff lifecycle, separate from Work */
+.handoff-panel{margin:22px 0 0;background:#fff;border:1px solid #d9e4ee;border-radius:18px;padding:22px;box-shadow:0 3px 17px #17315009}
+.handoff-heading{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:15px}
+.handoff-heading h2{font-size:21px;letter-spacing:-.04em;margin:5px 0}.handoff-heading p,.handoff-foot{color:#5d748e;font-size:13px}
+.handoff-count{font-size:12px;color:#40688e;border:1px solid #cddcea;border-radius:9px;padding:7px 11px}
+.handoff-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,410px),1fr));gap:12px}
+.handoff-card{border:1px solid #dce6ef;border-radius:14px;background:#fafcff;padding:18px;min-width:0}
+.handoff-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.handoff-type{font-size:11px;font-weight:800;letter-spacing:.04em;color:#55718e}
+.handoff-stage{font-size:12px;font-weight:750;background:#eaf2fc;color:#325d86;padding:5px 9px;border-radius:7px}
+.handoff-card h3{font-size:17px;line-height:1.4;margin:12px 0 6px}
+.handoff-description{font-size:13px;color:#576f86;margin:0 0 15px}
+.handoff-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;list-style:none;padding:0;margin:15px 0}
+.handoff-steps li{font-size:11px;color:#6f8094;text-align:center;min-width:0}
+.handoff-steps li:before{content:"";display:block;height:6px;background:#e1e7f0;border-radius:8px;margin-bottom:8px}
+.handoff-steps li.current{font-weight:850;color:#245d89}.handoff-steps li.current:before{background:#3b85bd}
+.handoff-facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 13px}
+.handoff-facts div{background:#eef4fa;border-radius:9px;padding:10px;min-width:0}
+.handoff-facts dt{font-size:11px;font-weight:750;color:#69829b}.handoff-facts dd{font-size:13px;margin:3px 0 0;overflow-wrap:anywhere}
+.handoff-next{border-left:3px solid #608ec1;padding:7px 0 7px 12px;margin:8px 0 15px;font-size:13px}
+.handoff-next strong{display:block;color:#54718d;font-size:11px;margin-bottom:3px}
+.handoff-link{display:inline-flex;min-height:44px;align-items:center;justify-content:center;border-radius:9px;background:#234e7a;color:white;padding:10px 15px;font-size:13px;font-weight:750;text-decoration:none}
+.handoff-link:hover{background:#173c65}.handoff-foot{margin-top:12px}
+@media(max-width:650px){.handoff-panel{padding:15px}.handoff-facts{grid-template-columns:1fr}.handoff-steps li{font-size:10px}}
 </style></head><body data-concept="01" data-status="verified-snapshot" data-current="MIGRATION_NOT_CUTOVER">
-<header class="top"><div class="topinner"><div class="brand"><span class="logo">C</span>CoWork <span class="tag">EXECUTIVE v4</span></div><nav class="nav"><a class="active" href="#work-overview">업무 한눈에</a><a href="#work-tracker">작업 상세</a><a href="#workflow-details">협업 구조</a><a href="#system-diagnostics">운영 진단</a><a href="concepts/">디자인 비교</a></nav></div></header>
+<header class="top"><div class="topinner"><div class="brand"><span class="logo">C</span>CoWork <span class="tag">EXECUTIVE v4</span></div><nav class="nav"><a class="active" href="#work-overview">업무 한눈에</a><a href="#handoff-status">인계·리뷰</a><a href="#work-tracker">작업 상세</a><a href="#workflow-details">협업 구조</a><a href="#system-diagnostics">운영 진단</a><a href="concepts/">디자인 비교</a></nav></div></header>
 <main class="shell">
 <div class="hero compact-hero">
 <div><div class="eyebrow">COWORK / WORK OVERVIEW</div>
@@ -202,6 +227,26 @@ details[open]>.detail-summary em:before{content:"⌃ "}
 <tr><th scope="row" class="portfolio-name"><strong>업무 자동화 후보</strong><span class="portfolio-phase">개발·시험 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">Job-list 기반 업무 실행·결과 확인 절차 검토</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">운영 적용 전 후보 시험 범위와 검증 게이트 확인</td></tr>
 <tr><th scope="row" class="portfolio-name"><strong>지식 구조 설계</strong><span class="portfolio-phase">리뷰 단계 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">업무 지식과 이슈 이력을 검색·갱신하기 쉽게 설계</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">실행 환경 확인 후 설계 검증</td></tr>
 </tbody></table></div><p class="portfolio-foot">공개된 기록만 표시합니다. 자체시험은 독립 리뷰가 아니며, 업무별 실제 변경 일시·구체적 차단 이유는 현재 공개 데이터에 포함되지 않습니다.</p></section>
+
+<section class="handoff-panel" id="handoff-status" aria-labelledby="handoff-title">
+ <div class="handoff-heading">
+  <div><div class="eyebrow">HANDOFF / REVIEW PIPELINE</div><h2 id="handoff-title">인계 · 리뷰 진행 현황</h2>
+  <p>Work와 별도로, 공개된 인계 문서의 전달·리뷰·판정·반영 단계를 추적합니다.</p></div>
+  <span class="handoff-count" id="handoff-count">공개 인계 1건 · 2026.11.14 문서 기준</span>
+ </div>
+ <div class="handoff-list" id="handoff-list">
+  <article class="handoff-card">
+   <div class="handoff-card-head"><span class="handoff-type">L1 지식 · 설계 리뷰</span><span class="handoff-stage">인계 게시 완료 · 리뷰 미실행</span></div>
+   <h3>MSC B 뷰어 — 생성·축적·게시·열람</h3>
+   <p class="handoff-description">HTML + SVG 뷰어 및 지식·Work 연결의 책임과 적용 범위를 검토하는 인계서입니다.</p>
+   <ol class="handoff-steps" aria-label="문서상 현재 단계"><li class="current">문서 게시</li><li>리뷰 요청</li><li>결과 접수</li><li>GPT 판정</li><li>후속 반영</li></ol>
+   <dl class="handoff-facts"><div><dt>문서</dt><dd>r0001 · 2026-11-14</dd></div><div><dt>독립 리뷰</dt><dd>미실행 · 결과 없음</dd></div></dl>
+   <div class="handoff-next"><strong>다음 동작</strong>설계 리뷰 수행 후 결과와 판정 근거 연결</div>
+   <a class="handoff-link" href="https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md">인계서 원문 확인</a>
+  </article>
+ </div>
+ <p class="handoff-foot">공개 허용된 인계만 표시합니다. 문서 게시 ≠ 리뷰 요청 또는 실행. 상태는 공개 등록 정보 기준이며, 실제 리뷰·시험·배포 증거와 구분합니다.</p>
+</section>
 <details class="section wtracker" id="work-tracker" aria-label="개별 Work 상세 현황"><summary class="detail-summary"><span><strong>업무별 상세 검증</strong><small>담당·목표 결과·단계·검증 기록</small></span><em>펼쳐 보기</em></summary><div class="detail-body"><div class="wk-bar"><div><div class="eyebrow">MULTI-WORK TRACKER</div><h2>선택한 업무의 상세 현황</h2></div><small>업무별 결과와 검증 한계를 구분합니다. 선택 없이 열면 전체 공개 업무를 표시합니다.</small></div><p id="public-sync-status" class="public-sync" role="status" aria-live="polite">최근 게시된 상태 표시 중 · 자동 갱신 데이터 연결 확인 중</p><div class="wk-coverage"><strong id="work-coverage">전체 작업·공개 범위 확인 중</strong><p id="work-coverage-note">미승인 작업은 상세 비공개</p></div>
 
 <div class="wk-controls" id="work-controls" hidden>
