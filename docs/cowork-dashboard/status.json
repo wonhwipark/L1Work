@@ -12,7 +12,19 @@
     "works": 7
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-14T00:20:29Z",
+  "generated_at": "2026-11-14T00:32:05Z",
+  "handoffs": [
+    {
+      "id": "msc-b-viewer",
+      "kind": "L1 지식 · 설계 리뷰",
+      "next_action": "설계 리뷰 수행 후 결과·판정 근거 연결",
+      "review_label": "독립 리뷰 미실행",
+      "source_url": "https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md",
+      "stage": "PUBLISHED",
+      "title": "MSC B 뷰어 — 생성·축적·게시·열람",
+      "updated_on": "2026-11-14"
+    }
+  ],
   "schema": "COWORK_PUBLIC_STATUS_V1",
   "snapshot_date": "2026-11-14",
   "source": "APPROVED_AGGREGATE_ONLY",
