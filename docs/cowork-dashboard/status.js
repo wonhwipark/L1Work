@@ -35,30 +35,68 @@
       return true;
     });
   }
-  function renderHandoffs(cards) {
+  // Handoff history is independent of the PRIVATE review/Work status exporter.
+  // All sources are already PUBLIC L1Work handoffs; never infer feedback state.
+  const HISTORY_FILENAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,179}\\.md$/;
+  const HISTORY_BASE = "https://github.com/wonhwipark/L1Work/blob/main/handoffs/";
+  let historyCached = "";
+  let historyInFlight = false;
+  function validHandoffHistory(obj) {
+    if (!obj || typeof obj !== "object" || Array.isArray(obj) ||
+        obj.schema !== "L1WORK_HANDOFF_HISTORY_V1" ||
+        !Array.isArray(obj.entries) || obj.entries.length > 3) return false;
+    const seen = new Set();
+    return obj.entries.every(entry => {
+      if (!entry || typeof entry !== "object" || Array.isArray(entry) ||
+          typeof entry.filename !== "string" ||
+          !HISTORY_FILENAME.test(entry.filename) ||
+          !entry.filename.toUpperCase().includes("HANDOFF") ||
+          seen.has(entry.filename) ||
+          typeof entry.title !== "string" ||
+          entry.title.length < 1 || entry.title.length > 130 ||
+          typeof entry.published_on !== "string" ||
+          !/^20\\d{2}-\\d{2}-\\d{2}$/.test(entry.published_on) ||
+          !Number.isFinite(Date.parse(entry.published_on))) return false;
+      seen.add(entry.filename);
+      return true;
+    });
+  }
+  function renderHandoffHistory(items) {
     const list = $("#handoff-list");
     if (!list) return;
-    const out = cards.map(h => {
-      const card = node("article","handoff-card"), head = node("div","handoff-card-head");
-      head.append(node("span","handoff-type",h.kind),node("span","handoff-stage",HANDOFF_STATUS[h.stage][0]));
-      card.append(head,node("h3","",h.title));
-      const steps=node("ol","handoff-steps");
-      steps.setAttribute("aria-label","문서상 단계 · 앞 단계 실증 PASS를 의미하지 않음");
-      HANDOFF_LABELS.forEach((s,i)=>steps.append(node("li", i+1===HANDOFF_STATUS[h.stage][1]?"current":"",s)));
-      card.append(steps);
-      const facts=node("dl","handoff-facts");
-      [["기준일",h.updated_on],["리뷰 상태",h.review_label]].forEach(([k,v])=>{
-        const wrap=node("div");wrap.append(node("dt","",k),node("dd","",v));facts.append(wrap);
-      });
-      card.append(facts);
-      const next=node("div","handoff-next");next.append(node("strong","","다음 동작"),node("span","",h.next_action));card.append(next);
-      const a=node("a","handoff-link","인계서 원문 확인");
-      a.href=HANDOFF_LINKS[h.id];card.append(a);
+    const cards = items.map((item, index) => {
+      const card = node("article", "handoff-card");
+      const head = node("div", "handoff-card-head");
+      const date = node("time", "handoff-date", "게시일 " + item.published_on);
+      date.dateTime = item.published_on;
+      head.append(node("span", "handoff-type", "공개 인계서 · " + (index + 1)), date);
+      const link = node("a", "handoff-link", "원문 열기");
+      link.href = HISTORY_BASE + encodeURIComponent(item.filename);
+      card.append(head, node("h3", "", item.title), link);
       return card;
     });
-    list.replaceChildren(...out);
-    const count=$("#handoff-count");
-    if(count)count.textContent="공개 인계 "+cards.length+"건 · 별도 Work 합계 아님";
+    list.replaceChildren(...cards);
+    const count = $("#handoff-count");
+    if (count) count.textContent = "최근 " + items.length + "건 · 공개 문서";
+  }
+  async function refreshHandoffHistory() {
+    if (historyInFlight || !$("#handoff-list")) return;
+    historyInFlight = true;
+    try {
+      const response = await fetch("./handoffs.json", {cache: "no-store", credentials: "omit"});
+      if (!response.ok) throw new Error("Public handoff history unavailable");
+      const obj = await response.json();
+      if (!validHandoffHistory(obj)) throw new Error("Public handoff history rejected");
+      const signature = JSON.stringify(obj);
+      if (signature !== historyCached) {
+        renderHandoffHistory(obj.entries);
+        historyCached = signature;
+      }
+    } catch (_) {
+      // Keep the three known PUBLIC document links from the static HTML fallback.
+    } finally {
+      historyInFlight = false;
+    }
   }
 
   const ALLOWED_KINDS = ["USER", "REVIEW", "BLOCKED", "OTHER"];
@@ -314,7 +352,6 @@
     if (selectedWork && !obj.work_cards.some(w => workKey(w) === selectedWork)) selectedWork = null;
     renderOverview();
     renderCards();
-    if (Array.isArray(obj.handoffs)) renderHandoffs(obj.handoffs);
   }
   const POLL_MS = 120000;
   async function refresh() {
@@ -323,6 +360,7 @@
         Date.now() - checkedAt < 15000) return;
     inFlight = true;
     checkedAt = Date.now();
+    void refreshHandoffHistory();
     try {
       const response = await fetch("./status.json", {cache: "no-store", credentials: "omit"});
       if (!response.ok) throw new Error("PUBLIC status unavailable");
