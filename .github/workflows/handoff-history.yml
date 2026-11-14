@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 concurrency:
   group: public-handoff-history-main
@@ -28,12 +29,14 @@ jobs:
       - name: Generate the latest three public documents
         run: python3 scripts/build_handoff_history.py
       - name: Commit history manifest when changed
+        id: publish
         shell: bash
         run: |
           set -euo pipefail
           git add docs/cowork-dashboard/handoffs.json
           if git diff --cached --quiet; then
             echo "HANDOFF_HISTORY=UNCHANGED"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
@@ -42,3 +45,12 @@ jobs:
           git pull --rebase origin main
           git push origin HEAD:main
           echo "HANDOFF_HISTORY=PUBLISHED"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+      - name: Request Pages build after action-authored commit
+        if: steps.publish.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --method POST "repos/${{ github.repository }}/pages/builds"
