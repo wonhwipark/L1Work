@@ -12,7 +12,7 @@
     "works": 8
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-14T13:46:29Z",
+  "generated_at": "2026-11-14T14:02:01Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -35,8 +35,8 @@
       "category": "review-watcher",
       "next_action": "LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인",
       "owner": "협업 관리·업무 실행",
-      "phase_index": 2,
-      "phase_label": "개발·시험 신고",
+      "phase_index": 4,
+      "phase_label": "판정·보완 신고",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "협업 운송 전환"
