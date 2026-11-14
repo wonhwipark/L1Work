@@ -1,4 +1,4 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; img-src 'none'; connect-src 'self'; font-src 'none'; form-action 'none'; base-uri 'none'"><title>CoWork | Executive 협업 현황 · Work Tracker</title><style>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow,noarchive"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self'; img-src 'none'; connect-src 'self'; font-src 'none'; form-action 'none'; base-uri 'none'"><title>CoWork | Executive v4 · 진행 업무 현황</title><style>
 :root{--bg:#f3f5f9;--ink:#182940;--muted:#718198;--line:#dae3ee;--navy:#112a48;--blue:#3968e8;--teal:#168b83;--amber:#bd7932;--white:#fff}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:14px/1.55 system-ui,-apple-system,'Malgun Gothic',sans-serif;color:var(--ink)}h1,h2,h3,p{margin:0}a{color:inherit;text-decoration:none}a:focus-visible{outline:3px solid #537bea;outline-offset:4px}button{font:inherit}
 .shell{max-width:1260px;padding:0 28px 75px;margin:auto}.top{background:#112640;color:#ecf2ff}.topinner{max-width:1260px;margin:auto;padding:19px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{display:flex;align-items:center;gap:11px;font-weight:850;font-size:17px;letter-spacing:-.03em}.logo{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#89f4dc,#5b79ff);display:grid;place-items:center;color:#122744;font-size:18px;font-weight:900}.tag{border:1px solid #506882;border-radius:30px;padding:5px 12px;color:#c9def3;font-size:11px;letter-spacing:.07em;white-space:nowrap}.nav{display:flex;gap:9px;flex-wrap:wrap}.nav a{padding:7px 12px;border-radius:9px;font-size:12px;color:#9fb8d2}.nav .active{background:#274564;color:#fff}
@@ -125,44 +125,98 @@
 .portfolio-table .portfolio-purpose{font-size:14px}.portfolio-table .portfolio-next{font-size:13px}
 }
 
+
+/* Executive v4: information-dense Work Overview, drill-down on demand. */
+.compact-hero{padding:22px 0 17px;grid-template-columns:minmax(0,1.6fr) minmax(245px,.64fr);gap:14px}
+.compact-hero h1{font-size:clamp(26px,3vw,39px);margin:5px 0 8px}
+.compact-hero .intro{font-size:14px}
+.compact-hero .hero-tags{margin-top:10px}
+.compact-status{min-height:auto;padding:17px;border-radius:14px}
+.compact-status .big{font-size:17px;line-height:1.45;margin:9px 0 5px}
+.compact-status:after{display:none}
+.executive-kpis{margin:0 0 15px}.executive-kpis .kpi{min-height:106px;padding:15px}
+.executive-kpis .kpi-num{font-size:29px;margin:8px 0 0}
+.portfolio{margin:0 0 18px}.portfolio-purpose{font-weight:500}
+.portfolio-name .portfolio-phase{display:inline-block;margin-top:7px}
+.portfolio-evidence{font-size:13px;color:#2b526a;line-height:1.55}
+.portfolio-evidence small{display:block;color:#6f8499;font-size:11px;margin-top:5px}
+.portfolio-open{border:1px solid #ccdeeb;background:#edf5fb;color:#245984;border-radius:8px;padding:5px 9px;min-height:38px;cursor:pointer;font-size:12px;font-weight:750;margin-top:9px}
+.portfolio-open:hover{background:#dfeefa}.portfolio-open:focus-visible{outline:3px solid #537bea;outline-offset:2px}
+.detail-summary{list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;padding:17px 20px;font-size:16px}
+.detail-summary::-webkit-details-marker{display:none}
+.detail-summary strong{display:block;font-size:17px;color:#234564}.detail-summary small{display:block;font-size:12px;font-weight:400;color:#708296;margin-top:3px}
+.detail-summary em{font-size:12px;font-style:normal;color:#356b8c;font-weight:800;white-space:nowrap}
+.detail-summary em:before{content:"⌄ ";font-size:19px}
+details[open]>.detail-summary em:before{content:"⌃ "}
+.wtracker{margin:0 0 16px!important;padding:0;overflow:hidden}
+.detail-body{padding:0 21px 21px}
+.wk-bar{margin-top:4px}.wk-outcome{margin-bottom:9px}
+.wk-steps{margin-top:15px}
+.wk-card{box-shadow:none}
+.wk-factlist{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:15px 0}
+.wk-factlist > div{background:#f3f7fa;border-radius:9px;padding:11px;min-width:0}
+.wk-factlist strong{display:block;font-size:11px;color:#667e95;margin-bottom:4px}
+.wk-factlist span{display:block;font-size:13px;color:#294c68;overflow-wrap:anywhere}
+.wk-factlist .wk-fact-next{grid-column:span 2;border-left:3px solid #69a5a7}
+.wk-factlist .wk-fact-next span{font-weight:650}
+.wk-factlist .wk-fact-risk{grid-column:span 2}
+.system-diagnostics{background:#fff;border:1px solid #d7e2ee;border-radius:18px;overflow:hidden;margin-top:16px}
+.system-detail{padding:0 20px 21px}.system-detail>.state-ribbon{margin-top:8px}
+.tech-counts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.tech-counts>div{padding:13px;background:#f4f8fc;border-radius:10px;display:flex;flex-direction:column;gap:4px}
+.tech-counts b{font-size:21px;line-height:1.2}.tech-counts span{font-size:12px;color:#647d97}
+.system-detail .section{margin-top:22px}
+@media(max-width:760px){
+ .compact-hero{grid-template-columns:1fr;padding-top:16px}
+ .compact-status{min-height:0}
+ .executive-kpis{gap:8px}.executive-kpis .kpi{min-height:96px;padding:13px}.executive-kpis .kpi-num{font-size:26px}
+ .portfolio{padding:15px 12px}
+ .portfolio-table .portfolio-name .portfolio-phase{margin:5px 0}
+ .portfolio-evidence{font-size:13px}
+ .detail-body{padding:0 12px 15px}
+ .detail-summary{padding:14px 15px}
+ .wk-factlist{grid-template-columns:1fr}.wk-factlist .wk-fact-next,.wk-factlist .wk-fact-risk{grid-column:auto}
+ .system-detail{padding:0 12px 15px}
+}
 </style></head><body data-concept="01" data-status="verified-snapshot" data-current="MIGRATION_NOT_CUTOVER">
-<header class="top"><div class="topinner"><div class="brand"><span class="logo">C</span>CoWork <span class="tag">EXECUTIVE v3</span></div><nav class="nav"><a class="active" href="#work-overview">업무 한눈에</a><a href="#work-tracker">작업 상세</a><a href="#workflow-details">협업 구조</a><a href="concepts/">디자인 비교</a></nav></div></header>
+<header class="top"><div class="topinner"><div class="brand"><span class="logo">C</span>CoWork <span class="tag">EXECUTIVE v4</span></div><nav class="nav"><a class="active" href="#work-overview">업무 한눈에</a><a href="#work-tracker">작업 상세</a><a href="#workflow-details">협업 구조</a><a href="#system-diagnostics">운영 진단</a><a href="concepts/">디자인 비교</a></nav></div></header>
 <main class="shell">
-<div class="hero"><div><div class="eyebrow">EXECUTIVE / WORK & STATUS</div><h1>지금 어떤 일을<br>진행하고 있나</h1><p class="intro">각 업무의 <strong>목적 → 현재 단계 → 다음 조치</strong>를 먼저 확인하세요. GitHub 상태 자동 갱신과 실제 리뷰·호스트 실행 여부는 구분해 표시합니다.</p><div class="hero-tags"><span>최신 상태 로딩 중</span><span>협업 관리 · 업무 실행</span><span>문서 검증과 운영 실행 구분</span></div></div>
-<aside class="hero-right"><div class="cap">OVERALL SYSTEM STATUS</div><div class="big">전환 준비 중</div><p><span id="active-provider-label">활성 리뷰 제공자 확인 중</span><br>GitHub 정식 전환은 승인 전</p><div class="hair"></div><div class="herostatus"><i class="dot"></i> MIGRATION_NOT_CUTOVER</div></aside></div>
+<div class="hero compact-hero">
+<div><div class="eyebrow">COWORK / WORK OVERVIEW</div>
+<h1>지금 진행 중인 업무</h1>
+<p class="intro">업무별 <strong>목적 · 확인된 기록 · 남은 작업</strong>을 한 화면에서 살펴보세요. 문서상 진행 단계와 독립 검증은 구분해 표시합니다.</p>
+<div class="hero-tags"><span id="work-snapshot-date">공개 상태 확인 중</span><span>공개 허용 작업만 표시</span></div></div>
+<aside class="hero-right compact-status" aria-label="협업 운영 상태"><div class="cap">REVIEW PROVIDER</div>
+<div class="big" id="active-provider-label">운영 상태 확인 중</div><p>GitHub LIVE 전환 전 · 대시보드 자동 갱신과 리뷰 실행은 별개</p></aside></div>
+<section class="kpis executive-kpis" aria-label="업무 진행 요약">
+<div class="kpi"><div class="kpi-top">전체 Work <span class="kpi-icon">▦</span></div><div class="kpi-num">7</div><div class="kpi-foot">PRIVATE 등록 합계 · 공개 범위 구분</div></div>
+<div class="kpi"><div class="kpi-top">공개 업무 <span class="kpi-icon">◎</span></div><div class="kpi-num">5</div><div class="kpi-foot">공개 허용된 Work 카드 수</div></div>
+<div class="kpi"><div class="kpi-top">검토 단계 <span class="kpi-icon">◇</span></div><div class="kpi-num">1</div><div class="kpi-foot">단계 신고 · 독립 리뷰 완료 아님</div></div>
+<div class="kpi"><div class="kpi-top">차단 분류 <span class="kpi-icon">!</span></div><div class="kpi-num">0</div><div class="kpi-foot">공개 분류 내 차단 · 전체와 다름</div></div></section>
 <section class="portfolio" id="work-overview" aria-label="진행 업무 목적과 다음 단계 요약">
-<div class="portfolio-head"><div><div class="eyebrow">WORK PORTFOLIO / AT A GLANCE</div><h2>진행 업무 한눈에 보기</h2><p>무엇을 해결하는 작업인가? 지금 어디까지 왔나? 다음 확인은 무엇인가?</p></div><span class="portfolio-count" id="overview-visible-count">공개 5개 업무 · 전체 6개 중</span></div>
-<div class="portfolio-table-wrap"><table class="portfolio-table"><colgroup><col style="width:19%"><col style="width:36%"><col style="width:16%"><col style="width:29%"></colgroup><thead><tr><th scope="col">진행 업무</th><th scope="col">무엇을 하는가</th><th scope="col">현재 단계</th><th scope="col">다음 확인</th></tr></thead><tbody id="work-overview-rows">
-<tr><th scope="row" class="portfolio-name"><strong>협업 운송 전환</strong><small>review-watcher</small></th><td class="portfolio-purpose" data-label="무엇을 하는가">스킬 개발 결과를 독립 리뷰와 GPT 최종 판정까지 안전하게 연결하는 협업 경로 정비</td><td data-label="현재 단계"><span class="portfolio-phase">개발·시험 신고</span></td><td class="portfolio-next" data-label="다음 확인">LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인</td></tr>
-<tr><th scope="row" class="portfolio-name"><strong>CoWork 대시보드</strong><small>dashboard</small></th><td class="portfolio-purpose" data-label="무엇을 하는가">여러 작업의 담당·진행 단계·확인할 일을 GitHub에서 자동 수집해 한 화면에 표시</td><td data-label="현재 단계"><span class="portfolio-phase">판정·보완 신고</span></td><td class="portfolio-next" data-label="다음 확인">HTML 화면 및 자동 갱신 상태 검증</td></tr>
-<tr><th scope="row" class="portfolio-name"><strong>스킬 발견·재사용</strong><small>skill-discovery</small></th><td class="portfolio-purpose" data-label="무엇을 하는가">이미 보유한 스킬의 기능·적용 범위를 검토해 중복 개발 대신 재사용</td><td data-label="현재 단계"><span class="portfolio-phase">판정·보완 신고</span></td><td class="portfolio-next" data-label="다음 확인">추가 확인이 필요한 스킬 근거 검토</td></tr>
-<tr><th scope="row" class="portfolio-name"><strong>업무 자동화 후보</strong><small>job-list</small></th><td class="portfolio-purpose" data-label="무엇을 하는가">Job-list 기반 작업 실행·결과 확인 절차를 검토하고 후보를 시험</td><td data-label="현재 단계"><span class="portfolio-phase">개발·시험 신고</span></td><td class="portfolio-next" data-label="다음 확인">운영 적용 전 후보 시험 범위와 검증 게이트 확인</td></tr>
-<tr><th scope="row" class="portfolio-name"><strong>지식 구조 설계</strong><small>knowledge-design</small></th><td class="portfolio-purpose" data-label="무엇을 하는가">업무별 지식과 이슈 이력을 구조화해 찾고 갱신하기 쉬운 방식 설계</td><td data-label="현재 단계"><span class="portfolio-phase">요구·설계</span></td><td class="portfolio-next" data-label="다음 확인">실행 환경 확인 후 설계 검증</td></tr>
-</tbody></table></div><p class="portfolio-foot">마지막 게시된 공개 스냅샷을 기본 표시합니다. 자동 상태 수신 시 갱신하며, 단계는 완료율이 아닌 문서상 위치입니다. 상세 원문·증거는 PRIVATE에서 관리합니다.</p></section>
-<section class="state-ribbon" aria-label="운영과 우선 확인 현황">
-<div class="state-panel primary"><div class="eyebrow">ACTIVE REVIEW PROVIDER</div><strong id="operational-state-label">운영 상태 확인 중</strong><p>대시보드 갱신과 Windows 리뷰 실행은 별개의 운영 기능입니다.</p></div>
-<div class="state-panel attention"><div class="eyebrow">내 조치 / 확인 필요</div><strong id="work-attention-count">–</strong><p id="work-priority-message">공개 작업 확인 중</p></div>
-<div class="state-panel sync"><div class="eyebrow">LAST PUBLIC STATUS</div><strong id="generated-time">생성 시각 확인 중</strong><p class="timetag">최근 웹 수신: <span id="last-check-time">확인 중</span></p></div></section>
-<section class="kpis" aria-label="GitHub 관측 요약">
-<div class="kpi"><div class="kpi-top">프로젝트 문서 <span class="kpi-icon">▦</span></div><div class="kpi-num">6</div><div class="kpi-foot">GitHub CURRENT 관측</div></div>
-<div class="kpi"><div class="kpi-top">요청 파일 <span class="kpi-icon">↗</span></div><div class="kpi-num">0</div><div class="kpi-foot">완료 건수와 무관</div></div>
-<div class="kpi"><div class="kpi-top">리뷰 결과 <span class="kpi-icon">◎</span></div><div class="kpi-num">0</div><div class="kpi-foot">GitHub 파일 관측</div></div>
-<div class="kpi"><div class="kpi-top">영수증 <span class="kpi-icon">✓</span></div><div class="kpi-num">0</div><div class="kpi-foot">GitHub 파일 관측</div></div></section>
-<section class="section wtracker" id="work-tracker" aria-label="개별 Work 진행 현황"><div class="wk-bar"><div><div class="eyebrow">MULTI-WORK TRACKER</div><h2>개별 작업 진행 현황</h2></div><small>여러 작업을 독립 추적하는 카드입니다. 단계와 자체시험은 독립 리뷰 승인 증거가 아닙니다.</small></div><p id="public-sync-status" class="public-sync" role="status" aria-live="polite">최근 게시된 상태 표시 중 · 자동 갱신 데이터 연결 확인 중</p><div class="wk-coverage"><strong id="work-coverage">전체 작업·공개 범위 확인 중</strong><p id="work-coverage-note">미승인 작업은 상세 비공개</p></div>
+<div class="portfolio-head"><div><div class="eyebrow">WORK PORTFOLIO / AT A GLANCE</div><h2>업무별 현재 진행 현황</h2><p>중요한 일부터 확인하세요. 해당 업무를 선택하면 상세 검증·담당·단계를 볼 수 있습니다.</p></div><span class="portfolio-count" id="overview-visible-count">공개 5개 · 전체 7개 중</span></div>
+<div class="portfolio-table-wrap"><table class="portfolio-table"><colgroup><col style="width:20%"><col style="width:29%"><col style="width:22%"><col style="width:29%"></colgroup><thead><tr><th scope="col">업무 · 단계</th><th scope="col">해결하려는 문제</th><th scope="col">확인된 기록</th><th scope="col">남은 작업</th></tr></thead><tbody id="work-overview-rows">
+<tr><th scope="row" class="portfolio-name"><strong>협업 운송 전환</strong><span class="portfolio-phase">개발·시험 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">스킬 개발 결과를 독립 리뷰와 GPT 판정까지 연결하는 협업 경로 정비</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인</td></tr>
+<tr><th scope="row" class="portfolio-name"><strong>CoWork 대시보드</strong><span class="portfolio-phase">판정·보완 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">Work별 진행 상황을 자동 수집·요약하는 가독성 높은 화면</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">HTML 화면 및 자동 갱신 상태 검증</td></tr>
+<tr><th scope="row" class="portfolio-name"><strong>스킬 발견·재사용</strong><span class="portfolio-phase">판정·보완 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">기존 스킬 기능을 찾아 검증하고 중복 개발을 줄이기</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">추가 확인이 필요한 스킬 근거 검토</td></tr>
+<tr><th scope="row" class="portfolio-name"><strong>업무 자동화 후보</strong><span class="portfolio-phase">개발·시험 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">Job-list 기반 업무 실행·결과 확인 절차 검토</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">운영 적용 전 후보 시험 범위와 검증 게이트 확인</td></tr>
+<tr><th scope="row" class="portfolio-name"><strong>지식 구조 설계</strong><span class="portfolio-phase">리뷰 단계 신고</span></th><td class="portfolio-purpose" data-label="무엇을 해결하나">업무 지식과 이슈 이력을 검색·갱신하기 쉽게 설계</td><td class="portfolio-evidence" data-label="확인된 기록">자체시험 기록 · 별도 검증<small>독립 리뷰 증거 미검증</small></td><td class="portfolio-next" data-label="남은 작업">실행 환경 확인 후 설계 검증</td></tr>
+</tbody></table></div><p class="portfolio-foot">공개된 기록만 표시합니다. 자체시험은 독립 리뷰가 아니며, 업무별 실제 변경 일시·구체적 차단 이유는 현재 공개 데이터에 포함되지 않습니다.</p></section>
+<details class="section wtracker" id="work-tracker" aria-label="개별 Work 상세 현황"><summary class="detail-summary"><span><strong>업무별 상세 검증</strong><small>담당·목표 결과·단계·검증 기록</small></span><em>펼쳐 보기</em></summary><div class="detail-body"><div class="wk-bar"><div><div class="eyebrow">MULTI-WORK TRACKER</div><h2>선택한 업무의 상세 현황</h2></div><small>업무별 결과와 검증 한계를 구분합니다. 선택 없이 열면 전체 공개 업무를 표시합니다.</small></div><p id="public-sync-status" class="public-sync" role="status" aria-live="polite">최근 게시된 상태 표시 중 · 자동 갱신 데이터 연결 확인 중</p><div class="wk-coverage"><strong id="work-coverage">전체 작업·공개 범위 확인 중</strong><p id="work-coverage-note">미승인 작업은 상세 비공개</p></div>
 
 <div class="wk-controls" id="work-controls" hidden>
-<label class="wk-searchbox" for="work-search">작업 검색<input type="search" id="work-search" placeholder="스킬·작업·다음 조치 검색" autocomplete="off"></label>
+<label class="wk-searchbox" for="work-search">작업 검색<input type="search" id="work-search" placeholder="업무·목적·검증 기록 검색" autocomplete="off"></label>
 <div class="wk-filters" role="group" aria-label="작업 상태 필터">
 <button type="button" class="wk-filter selected" aria-pressed="true" data-work-filter="all">전체</button>
 <button type="button" class="wk-filter" aria-pressed="false" data-work-filter="USER">내 조치</button>
-<button type="button" class="wk-filter" aria-pressed="false" data-work-filter="REVIEW">리뷰 대기</button>
+<button type="button" class="wk-filter" aria-pressed="false" data-work-filter="REVIEW">검토 단계</button>
 <button type="button" class="wk-filter" aria-pressed="false" data-work-filter="BLOCKED">차단</button>
 <button type="button" class="wk-reset" id="reset-work-filters">초기화</button></div></div>
 <p class="wk-countline" id="work-filter-count" aria-live="polite">공개 작업 확인 중</p><p class="wk-empty" id="work-filter-empty" hidden></p><div class="wk-grid"><article class="wk-card"><div class="wk-header"><span class="wk-skill">WORK 01 · review-watcher</span><span class="wk-status blocked">검증 게이트 대기</span></div><h3>운송 경로 전환</h3><p class="wk-purpose">스킬 개발 결과를 독립 리뷰와 GPT 최종 판정까지 안전하게 연결하는 협업 경로 정비</p><div class="wk-outcome"><strong>목표 결과</strong><span>검증 가능한 리뷰 요청·결과 연결과 전환 준비</span></div><div class="wk-steps" aria-label="단계 신고값이며 완료 여부 미검증"><span class=""><i></i>요청</span><span class=""><i></i>개발</span><span class=""><i></i>리뷰</span><span class=""><i></i>판정</span><span class=""><i></i>완료</span></div><div class="wk-meta"><div><b>담당</b><span>협업 관리 · 업무 실행</span></div><div><b>자체 시험</b><span>호스트 검증 증거 미완료</span></div><div><b>독립 리뷰</b><span>미실행</span></div></div><div class="wk-action"><strong>다음 조치</strong> · Windows 안전 게이트 판정 증거 확보</div><p class="wk-note">문서 기반 진행 단계입니다. 색상은 검증된 완료율이 아닙니다.</p></article>
 <article class="wk-card"><div class="wk-header"><span class="wk-skill">WORK 02 · dashboard</span><span class="wk-status ">개발·개선</span></div><h3>CoWork 대시보드</h3><p class="wk-purpose">여러 작업의 담당·진행 단계·확인할 일을 GitHub에서 자동 수집해 한 화면에 표시</p><div class="wk-outcome"><strong>목표 결과</strong><span>업데이트 시 자동 반영되는 업무 현황 화면</span></div><div class="wk-steps" aria-label="단계 신고값이며 완료 여부 미검증"><span class="past"><i></i>요청</span><span class="current"><i></i>개발</span><span class=""><i></i>리뷰</span><span class=""><i></i>판정</span><span class=""><i></i>완료</span></div><div class="wk-meta"><div><b>담당</b><span>GPT</span></div><div><b>자체 시험</b><span>GitHub Actions 자체시험 기록</span></div><div><b>독립 리뷰</b><span>미실행</span></div></div><div class="wk-action"><strong>다음 조치</strong> · 선택된 Executive 디자인 배포·확인</div><p class="wk-note">문서 기반 진행 단계입니다. 색상은 검증된 완료율이 아닙니다.</p></article>
 <article class="wk-card"><div class="wk-header"><span class="wk-skill">WORK 03 · skill-discovery</span><span class="wk-status review">판정·보완</span></div><h3>스킬 발견·재사용</h3><p class="wk-purpose">이미 보유한 스킬의 기능·적용 범위를 검토해 중복 개발 대신 재사용</p><div class="wk-outcome"><strong>목표 결과</strong><span>근거가 확인된 스킬 기능 목록과 재사용 기준</span></div><div class="wk-steps" aria-label="단계 신고값이며 완료 여부 미검증"><span class="past"><i></i>요청</span><span class="past"><i></i>개발</span><span class="past"><i></i>리뷰</span><span class="current"><i></i>판정</span><span class=""><i></i>완료</span></div><div class="wk-meta"><div><b>담당</b><span>GPT</span></div><div><b>자체 시험</b><span>문서 정적 검토</span></div><div><b>독립 리뷰</b><span>미실행</span></div></div><div class="wk-action"><strong>다음 조치</strong> · 미확인 스킬 원본·버전 근거 보완</div><p class="wk-note">문서 기반 진행 단계입니다. 색상은 검증된 완료율이 아닙니다.</p></article>
 <article class="wk-card"><div class="wk-header"><span class="wk-skill">WORK 04 · job-list</span><span class="wk-status ">개발 후보</span></div><h3>업무 자동화 후보</h3><p class="wk-purpose">Job-list 기반 작업 실행·결과 확인 절차를 검토하고 후보를 시험</p><div class="wk-outcome"><strong>목표 결과</strong><span>실행 환경 검증을 거친 원샷 자동화 흐름</span></div><div class="wk-steps" aria-label="단계 신고값이며 완료 여부 미검증"><span class="past"><i></i>요청</span><span class="current"><i></i>개발</span><span class=""><i></i>리뷰</span><span class=""><i></i>판정</span><span class=""><i></i>완료</span></div><div class="wk-meta"><div><b>담당</b><span>GPT</span></div><div><b>자체 시험</b><span>후보 시험 기록 · 호스트 미시험</span></div><div><b>독립 리뷰</b><span>미실행</span></div></div><div class="wk-action"><strong>다음 조치</strong> · 실행 환경 근거 검증 전 후보 상태 유지</div><p class="wk-note">문서 기반 진행 단계입니다. 색상은 검증된 완료율이 아닙니다.</p></article>
-<article class="wk-card"><div class="wk-header"><span class="wk-skill">WORK 05 · knowledge-design</span><span class="wk-status design">설계 진행</span></div><h3>지식 구조 설계</h3><p class="wk-purpose">업무별 지식과 이슈 이력을 구조화해 찾고 갱신하기 쉬운 방식 설계</p><div class="wk-outcome"><strong>목표 결과</strong><span>지식 분류 기준과 검색·갱신 구조</span></div><div class="wk-steps" aria-label="단계 신고값이며 완료 여부 미검증"><span class="current"><i></i>요청</span><span class=""><i></i>개발</span><span class=""><i></i>리뷰</span><span class=""><i></i>판정</span><span class=""><i></i>완료</span></div><div class="wk-meta"><div><b>담당</b><span>GPT</span></div><div><b>자체 시험</b><span>문서 점검 · 운영 미검증</span></div><div><b>독립 리뷰</b><span>미실행</span></div></div><div class="wk-action"><strong>다음 조치</strong> · 기초 환경 확인 후 설계 재검토</div><p class="wk-note">문서 기반 진행 단계입니다. 색상은 검증된 완료율이 아닙니다.</p></article></div><div class="wk-examples"><strong>스킬별 병렬 작업 등록 예시 · 아래 상태는 최신 공개 데이터 확인 후 갱신됩니다.</strong><div class="wk-pills"><span>l1-fix-workflow <em>미등록 · 현황 미확인</em></span><span>l1-github <em>미등록 · 현황 미확인</em></span></div><p>PRIVATE의 개별 Work 등록 시 새 카드가 생성되며, 공개용 허용목록에 속하는 작업만 이 화면에 반영됩니다.</p></div><p class="wk-note">상태 출처: <span id="work-snapshot-date">마지막 공개 게시일 확인 중</span> 공개용 요약 · PRIVATE 상세 결과·식별자·영수증은 포함하지 않습니다.</p></section>
+<article class="wk-card"><div class="wk-header"><span class="wk-skill">WORK 05 · knowledge-design</span><span class="wk-status design">설계 진행</span></div><h3>지식 구조 설계</h3><p class="wk-purpose">업무별 지식과 이슈 이력을 구조화해 찾고 갱신하기 쉬운 방식 설계</p><div class="wk-outcome"><strong>목표 결과</strong><span>지식 분류 기준과 검색·갱신 구조</span></div><div class="wk-steps" aria-label="단계 신고값이며 완료 여부 미검증"><span class="current"><i></i>요청</span><span class=""><i></i>개발</span><span class=""><i></i>리뷰</span><span class=""><i></i>판정</span><span class=""><i></i>완료</span></div><div class="wk-meta"><div><b>담당</b><span>GPT</span></div><div><b>자체 시험</b><span>문서 점검 · 운영 미검증</span></div><div><b>독립 리뷰</b><span>미실행</span></div></div><div class="wk-action"><strong>다음 조치</strong> · 기초 환경 확인 후 설계 재검토</div><p class="wk-note">문서 기반 진행 단계입니다. 색상은 검증된 완료율이 아닙니다.</p></article></div><p class="wk-note">공개용 요약 · PRIVATE 상세 결과·식별자·영수증은 포함하지 않습니다.</p></div></details>
 <details class="flow-fold" id="workflow-details"><summary>협업 7단계 설계 흐름도 <span>펼쳐 보기</span></summary><section class="section"><div class="sectionhead"><h2>협업 워크플로</h2><p>실제 완료 단계가 아닌 설계된 실행 경로</p></div><div class="process"><div class="flowline">
 <div class="node"><div class="bubble">✦</div><b>요구·범위</b><small>GPT</small></div>
 <div class="node"><div class="bubble">▤</div><b>REQUEST<br>READY</b><small>GitHub PRIVATE</small></div>
@@ -172,6 +226,16 @@
 <div class="node"><div class="bubble">☷</div><b>GPT 판정</b><small>피드백 관리</small></div>
 <div class="node"><div class="bubble">◉</div><b>상태 시각화</b><small>HTML Dashboard</small></div>
 </div><div class="paths"><div class="path current"><div class="sub">CURRENT · 활성 리뷰 제공자</div><p class="seq" id="active-provider-path">최신 제공자 확인 중</p><p>리뷰 제공자와 GitHub 정식 전환 상태를 별도로 표시합니다.</p></div><div class="path target"><div class="sub">TARGET · GitHub 전환 예정</div><p class="seq">GPT → GitHub → 검증 → 리뷰 → GPT 판정</p><p>필수 게이트와 별도 LIVE 승인 이후에만 전환합니다.</p></div></div></div></section></details>
+<details class="system-diagnostics" id="system-diagnostics"><summary class="detail-summary"><span><strong>운영 상태 · 기술 진단</strong><small>리뷰 제공자, 전환 게이트, GitHub 요청·리뷰·영수증 집계</small></span><em>펼쳐 보기</em></summary>
+<div class="system-detail">
+<section class="state-ribbon" aria-label="운영과 우선 확인 현황">
+<div class="state-panel primary"><div class="eyebrow">ACTIVE REVIEW PROVIDER</div><strong id="operational-state-label">운영 상태 확인 중</strong><p>대시보드 갱신과 Windows 리뷰 실행은 별개의 운영 기능입니다.</p></div>
+<div class="state-panel attention"><div class="eyebrow">내 조치 / 확인 필요</div><strong id="work-attention-count">–</strong><p id="work-priority-message">공개 작업 확인 중</p></div>
+<div class="state-panel sync"><div class="eyebrow">LAST PUBLIC STATUS</div><strong id="generated-time">생성 시각 확인 중</strong><p class="timetag">최근 웹 수신: <span id="last-check-time">확인 중</span></p></div></section>
+<div class="tech-counts" aria-label="GitHub 기록 관측">
+<div><b id="tech-requests">0</b><span>REQUEST 파일 관측</span></div>
+<div><b id="tech-reviews">0</b><span>REVIEW 파일 관측</span></div>
+<div><b id="tech-receipts">0</b><span>RECEIPT 파일 관측</span></div></div>
 <section class="section"><div class="sectionhead"><h2>검증 현황과 다음 조치</h2><p>문서 기록으로 확인된 범위만 표시</p></div><div class="grid"><div class="tablebox"><h3>운영 준비 상태</h3><table><tbody>
 <tr><th scope="row">활성 리뷰 제공자</th><td><span id="review-provider-badge" class="state gray">확인 중</span></td></tr>
 <tr><th scope="row">GitHub 정식 전환</th><td><span class="state">전환 전</span></td></tr>
@@ -180,5 +244,7 @@
 <tr><th scope="row">공개 Pages HTML</th><td><span class="state ok">배포 확인</span></td></tr></tbody></table></div>
 <div class="nextbox"><h3>다음 실행 항목</h3><div class="nextitem"><span class="n">1</span><div><b>운영 검증·사용자 승인</b><p>활성 제공자 없음 · 운영 검증과 승인 항목 구분</p></div></div><div class="nextitem"><span class="n">2</span><div><b>독립 리뷰 증거 확보</b><p>자체 시험과 구분해 영수증 확인</p></div></div><div class="nextitem"><span class="n">3</span><div><b>LIVE 전환 별도 승인</b><p>안전 게이트 완료 이전에 실행하지 않음</p></div></div></div></div>
 <p class="note">이 화면은 공개 허용 범위에서 정제한 상태를 보여줍니다. 최신 데이터 기준일: <b id="summary-snapshot-date">확인 중</b>. PRIVATE 상세 업무 정보는 포함하지 않으며, GitHub 관측 0건은 전체 업무 완료 0건을 뜻하지 않습니다.</p></section>
+
+</div></details>
 <footer><div class="swap"><span>다른 표현 보기</span><a class="selected" href="./" aria-current="page">01 · Executive</a><a href="concepts/02/">02 · Topology</a><a href="concepts/03/">03 · Journey</a><a href="concepts/">3개 비교</a></div><p style="margin-top:22px">CoWork · Executive 기본 대시보드 · 실제 진행 상태는 검증 시점의 공개 가능 요약</p></footer>
 </main><script src="./status.js" defer></script></body></html>

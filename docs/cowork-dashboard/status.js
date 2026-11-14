@@ -1,4 +1,4 @@
-/* CoWork PUBLIC Executive v3 - same-origin, allowlisted status only.
+/* CoWork PUBLIC Executive v4 - same-origin, allowlisted status only.
  * Security boundary is the PRIVATE exporter, not the browser. No HTML injection,
  * PRIVATE API, account data, model invocation or external network request.
  */
@@ -27,6 +27,7 @@
   };
   let data = null;
   let selectedFilter = "all";
+  let selectedWork = null;
   let search = "";
   let inFlight = false;
   let checkedAt = 0;
@@ -73,22 +74,37 @@
   }
   const PRIORITY = {USER: 0, BLOCKED: 1, REVIEW: 2, OTHER: 3};
 
-  function buildCard(w, i) {
+  const workKey = w => w.category + "|" + w.title;
+
+  function buildCard(w) {
     const card = node("article", "wk-card");
     const header = node("div", "wk-header");
     header.append(node("span", "wk-skill", w.category));
-    const badge = node("span", "wk-status " + (kind(w) === "USER" ? "user" :
-                   kind(w) === "BLOCKED" ? "blocked" :
-                   kind(w) === "REVIEW" ? "review" : ""), w.phase_label);
-    header.append(badge);
+    header.append(node("span",
+      "wk-status " + (kind(w) === "BLOCKED" ? "blocked" : kind(w) === "REVIEW" ? "review" : ""),
+      w.phase_label));
     card.append(header, node("h3", "", w.title));
     const info = WORK_INFO[w.category] || UNKNOWN_INFO;
     card.append(node("p", "wk-purpose", info.purpose));
     const outcome = node("div", "wk-outcome");
-    outcome.append(node("strong", "", "목표 결과"), node("span", "", info.outcome));
+    outcome.append(node("strong", "", "목표 산출물"), node("span", "", info.outcome));
     card.append(outcome);
+
+    const facts = node("div", "wk-factlist");
+    const addFact = (label, value, className = "") => {
+      const el = node("div", className);
+      el.append(node("strong", "", label), node("span", "", value));
+      facts.append(el);
+    };
+    addFact("현재 확인 가능한 시험 기록", w.test_label);
+    addFact("독립 검증 상태", w.review_label);
+    addFact("남은 작업 · 다음 조치", w.next_action, "wk-fact-next");
+    if (kind(w) === "BLOCKED")
+      addFact("차단 분류", "공개 상태에서 차단 분류됨 · 구체적 사유는 공개 자료에 없음", "wk-fact-risk");
+    card.append(facts);
+
     const stage = node("div", "wk-steps");
-    stage.setAttribute("aria-label", "현재 문서상 단계 · 이전 단계 검증 완료를 의미하지 않음");
+    stage.setAttribute("aria-label", "문서상 현재 단계만 강조 · 이전 단계 완료를 뜻하지 않음");
     PHASES.forEach((name, index) => {
       const step = node("span", w.phase_index === index + 1 ? "current" : "", name);
       step.prepend(node("i"));
@@ -96,17 +112,25 @@
     });
     card.append(stage);
     const meta = node("div", "wk-meta");
-    [["담당", w.owner], ["자체시험", w.test_label], ["독립 리뷰", w.review_label]].forEach(([a,b]) => {
-      const cell = node("div");
-      cell.append(node("b", "", a), node("span", "", b));
-      meta.append(cell);
-    });
+    const owner = node("div");
+    owner.append(node("b", "", "담당"), node("span", "", w.owner));
+    meta.append(owner);
     card.append(meta);
-    const action = node("div", "wk-action");
-    action.append(node("strong", "", "다음 조치"), document.createTextNode(" · " + w.next_action));
-    card.append(action);
-    card.append(node("p", "wk-note", "문서 신고 단계 · 검증된 완료율 아님"));
+    card.append(node("p", "wk-note", "문서상 단계·자체시험 기록은 실제 완료 및 독립 리뷰 PASS를 의미하지 않습니다."));
     return card;
+  }
+
+  function openWorkDetail(w) {
+    selectedWork = workKey(w);
+    selectedFilter = "all";
+    search = "";
+    const input = $("#work-search");
+    if (input) input.value = "";
+    const details = $("#work-tracker");
+    if (details) details.open = true;
+    renderCards();
+    if (details && typeof details.scrollIntoView === "function")
+      details.scrollIntoView({block: "start", behavior: "smooth"});
   }
 
   function renderOverview() {
@@ -119,20 +143,26 @@
       const tr = node("tr");
       const title = node("th", "portfolio-name");
       title.setAttribute("scope", "row");
-      title.append(node("strong", "", w.title), node("small", "", w.category));
+      title.append(node("strong", "", w.title), node("span", "portfolio-phase", w.phase_label));
+      const open = node("button", "portfolio-open", "상세 보기");
+      open.type = "button";
+      open.setAttribute("aria-label", w.title + " 상세 검증 펼쳐 보기");
+      open.setAttribute("aria-controls", "work-tracker");
+      open.addEventListener("click", () => openWorkDetail(w));
+      title.append(open);
       const objective = node("td", "portfolio-purpose", info.purpose);
-      objective.dataset.label = "무엇을 하는가";
-      const stage = node("td");
-      stage.dataset.label = "현재 단계";
-      stage.append(node("span", "portfolio-phase", w.phase_label));
+      objective.dataset.label = "무엇을 해결하나";
+      const evidence = node("td", "portfolio-evidence");
+      evidence.dataset.label = "확인된 기록";
+      evidence.append(node("span", "", w.test_label), node("small", "", w.review_label));
       const next = node("td", "portfolio-next", w.next_action);
-      next.dataset.label = "다음 확인";
-      tr.append(title, objective, stage, next);
+      next.dataset.label = "남은 작업";
+      tr.append(title, objective, evidence, next);
       return tr;
     });
     tbody.replaceChildren(...rows);
     const count = $("#overview-visible-count");
-    if (count) count.textContent = "공개 " + all.length + "개 업무 · 전체 " + data.counts.works + "개 중";
+    if (count) count.textContent = "공개 " + all.length + "개 · 전체 " + data.counts.works + "개 중";
   }
 
   function renderCards() {
@@ -141,10 +171,12 @@
     const all = [...data.work_cards].sort((a, b) =>
       PRIORITY[kind(a)] - PRIORITY[kind(b)] || a.title.localeCompare(b.title, "ko"));
     const filtered = all.filter(w =>
+      (selectedWork === null || workKey(w) === selectedWork) &&
       (selectedFilter === "all" || kind(w) === selectedFilter) &&
       (w.title + " " + w.category + " " + w.phase_label + " " + w.next_action +
        " " + (WORK_INFO[w.category] || UNKNOWN_INFO).purpose +
-       " " + (WORK_INFO[w.category] || UNKNOWN_INFO).outcome)
+       " " + (WORK_INFO[w.category] || UNKNOWN_INFO).outcome +
+       " " + w.test_label + " " + w.review_label)
         .toLocaleLowerCase("ko").includes(search));
     grid.replaceChildren(...filtered.map(buildCard));
     if (empty) {
@@ -166,9 +198,19 @@
     data = obj;
     const counts = obj.counts;
     const kpis = document.querySelectorAll(".kpi-num");
-    [counts.projects, counts.requests, counts.reviews, counts.receipts].forEach((v, i) => {
+    [counts.works, obj.work_cards.length,
+      obj.work_cards.filter(w => kind(w) === "REVIEW").length,
+      obj.work_cards.filter(w => kind(w) === "BLOCKED").length].forEach((v, i) => {
       if (kpis[i]) kpis[i].textContent = String(v);
     });
+    for (const [selector, value] of [
+      ["#tech-requests", counts.requests],
+      ["#tech-reviews", counts.reviews],
+      ["#tech-receipts", counts.receipts]
+    ]) {
+      const el = $(selector);
+      if (el) el.textContent = String(value);
+    }
     const visible = obj.work_cards.length;
     const hidden = Math.max(0, counts.works - visible);
     const covered = $("#work-coverage");
@@ -213,19 +255,7 @@
     if (upper) upper.textContent = date + " 기준";
     const controls = $("#work-controls");
     if (controls) controls.hidden = false;
-    const examples = $(".wk-examples");
-    if (examples) {
-      const title = $("strong", examples);
-      if (title) title.textContent = "스킬별 Work 등록 · 공개 허용 목록에 있는 경우 카드로 표시";
-      examples.querySelectorAll(".wk-pills span").forEach(el => {
-        const label = el.textContent.includes("l1-fix-workflow") ?
-          "l1-fix-workflow" : "l1-github";
-        const exists = obj.work_cards.some(w => w.title.startsWith(label));
-        el.replaceChildren(document.createTextNode(label + " "),
-          node("em", "", exists ? "등록 확인 · 카드에서 단계 확인" :
-            "미등록 또는 공개 근거 미확인"));
-      });
-    }
+    if (selectedWork && !obj.work_cards.some(w => workKey(w) === selectedWork)) selectedWork = null;
     renderOverview();
     renderCards();
   }
@@ -265,19 +295,28 @@
 
   const input = $("#work-search");
   if (input) input.addEventListener("input", () => {
+    selectedWork = null;
     search = input.value.trim().toLocaleLowerCase("ko");
     renderCards();
   });
   document.querySelectorAll("[data-work-filter]").forEach(button => {
     button.addEventListener("click", () => {
+      selectedWork = null;
       selectedFilter = button.dataset.workFilter;
       renderCards();
     });
   });
   const reset = $("#reset-work-filters");
   if (reset) reset.addEventListener("click", () => {
-    selectedFilter = "all"; search = "";
+    selectedWork = null; selectedFilter = "all"; search = "";
     if (input) input.value = "";
+    renderCards();
+  });
+  const detailLink = document.querySelector('a[href="#work-tracker"]');
+  if (detailLink) detailLink.addEventListener("click", () => {
+    const details = $("#work-tracker");
+    if (details) details.open = true;
+    selectedWork = null;
     renderCards();
   });
   refresh();
