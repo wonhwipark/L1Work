@@ -179,32 +179,23 @@ details[open]>.detail-summary em:before{content:"⌃ "}
  .system-detail{padding:0 12px 15px}
 }
 
-/* Executive v4.1 — explicit PUBLIC handoff lifecycle, separate from Work */
+/* Executive v4.2 — latest published handoff documents, not review progress */
 .handoff-panel{margin:22px 0 0;background:#fff;border:1px solid #d9e4ee;border-radius:18px;padding:22px;box-shadow:0 3px 17px #17315009}
 .handoff-heading{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:15px}
-.handoff-heading h2{font-size:21px;letter-spacing:-.04em;margin:5px 0}.handoff-heading p,.handoff-foot{color:#5d748e;font-size:13px}
+.handoff-heading h2{font-size:21px;letter-spacing:-.04em;margin:5px 0}.handoff-heading p,.handoff-foot{color:#5d748e;font-size:13px;line-height:1.6}
 .handoff-count{font-size:12px;color:#40688e;border:1px solid #cddcea;border-radius:9px;padding:7px 11px}
-.handoff-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,410px),1fr));gap:12px}
-.handoff-card{border:1px solid #dce6ef;border-radius:14px;background:#fafcff;padding:18px;min-width:0}
-.handoff-card-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.handoff-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,310px),1fr));gap:12px}
+.handoff-card{border:1px solid #dce6ef;border-radius:14px;background:#fafcff;padding:18px;min-width:0;display:flex;flex-direction:column;gap:11px}
+.handoff-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .handoff-type{font-size:11px;font-weight:800;letter-spacing:.04em;color:#55718e}
-.handoff-stage{font-size:12px;font-weight:750;background:#eaf2fc;color:#325d86;padding:5px 9px;border-radius:7px}
-.handoff-card h3{font-size:17px;line-height:1.4;margin:12px 0 6px}
-.handoff-description{font-size:13px;color:#576f86;margin:0 0 15px}
-.handoff-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;list-style:none;padding:0;margin:15px 0}
-.handoff-steps li{font-size:11px;color:#6f8094;text-align:center;min-width:0}
-.handoff-steps li:before{content:"";display:block;height:6px;background:#e1e7f0;border-radius:8px;margin-bottom:8px}
-.handoff-steps li.current{font-weight:850;color:#245d89}.handoff-steps li.current:before{background:#3b85bd}
-.handoff-facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 13px}
-.handoff-facts div{background:#eef4fa;border-radius:9px;padding:10px;min-width:0}
-.handoff-facts dt{font-size:11px;font-weight:750;color:#69829b}.handoff-facts dd{font-size:13px;margin:3px 0 0;overflow-wrap:anywhere}
-.handoff-next{border-left:3px solid #608ec1;padding:7px 0 7px 12px;margin:8px 0 15px;font-size:13px}
-.handoff-next strong{display:block;color:#54718d;font-size:11px;margin-bottom:3px}
+.handoff-date{font-size:12px;color:#58738e}
+.handoff-card h3{font-size:16px;line-height:1.5;margin:0;overflow-wrap:anywhere;flex:1}
 .handoff-link{display:inline-flex;min-height:44px;align-items:center;justify-content:center;border-radius:9px;background:#234e7a;color:white;padding:10px 15px;font-size:13px;font-weight:750;text-decoration:none}
 .handoff-link:hover{background:#173c65}.handoff-foot{margin-top:12px}
-@media(max-width:650px){.handoff-panel{padding:15px}.handoff-facts{grid-template-columns:1fr}.handoff-steps li{font-size:10px}}
+.handoff-directory{color:#234e7a;font-weight:750}
+@media(max-width:650px){.handoff-panel{padding:15px}.handoff-list{grid-template-columns:1fr}}
 </style></head><body data-concept="01" data-status="verified-snapshot" data-current="MIGRATION_NOT_CUTOVER">
-<header class="top"><div class="topinner"><div class="brand"><span class="logo">C</span>CoWork <span class="tag">EXECUTIVE v4</span></div><nav class="nav"><a class="active" href="#work-overview">업무 한눈에</a><a href="#handoff-status">인계·리뷰</a><a href="#work-tracker">작업 상세</a><a href="#workflow-details">협업 구조</a><a href="#system-diagnostics">운영 진단</a><a href="concepts/">디자인 비교</a></nav></div></header>
+<header class="top"><div class="topinner"><div class="brand"><span class="logo">C</span>CoWork <span class="tag">EXECUTIVE v4</span></div><nav class="nav"><a class="active" href="#work-overview">업무 한눈에</a><a href="#handoff-status">인계 이력</a><a href="#work-tracker">작업 상세</a><a href="#workflow-details">협업 구조</a><a href="#system-diagnostics">운영 진단</a><a href="concepts/">디자인 비교</a></nav></div></header>
 <main class="shell">
 <div class="hero compact-hero">
 <div><div class="eyebrow">COWORK / WORK OVERVIEW</div>
@@ -230,22 +221,28 @@ details[open]>.detail-summary em:before{content:"⌃ "}
 
 <section class="handoff-panel" id="handoff-status" aria-labelledby="handoff-title">
  <div class="handoff-heading">
-  <div><div class="eyebrow">HANDOFF / REVIEW PIPELINE</div><h2 id="handoff-title">인계 · 리뷰 진행 현황</h2>
-  <p>Work와 별도로, 공개된 인계 문서의 전달·리뷰·판정·반영 단계를 추적합니다.</p></div>
-  <span class="handoff-count" id="handoff-count">공개 인계 1건 · 2026.11.14 문서 기준</span>
+  <div><div class="eyebrow">HANDOFF / RECENT DOCUMENTS</div><h2 id="handoff-title">최근 핸드오프 이력</h2>
+   <p>GitHub PUBLIC에 게시된 최신 인계서 3건입니다. 다른 GPT의 피드백이나 리뷰 진행 상태를 자동 추정하지 않습니다.</p></div>
+  <span class="handoff-count" id="handoff-count">최근 3건 · 공개 문서</span>
  </div>
  <div class="handoff-list" id="handoff-list">
-  <article class="handoff-card">
-   <div class="handoff-card-head"><span class="handoff-type">L1 지식 · 설계 리뷰</span><span class="handoff-stage">인계 게시 완료 · 리뷰 미실행</span></div>
-   <h3>MSC B 뷰어 — 생성·축적·게시·열람</h3>
-   <p class="handoff-description">HTML + SVG 뷰어 및 지식·Work 연결의 책임과 적용 범위를 검토하는 인계서입니다.</p>
-   <ol class="handoff-steps" aria-label="문서상 현재 단계"><li class="current">문서 게시</li><li>리뷰 요청</li><li>결과 접수</li><li>GPT 판정</li><li>후속 반영</li></ol>
-   <dl class="handoff-facts"><div><dt>문서</dt><dd>r0001 · 2026-11-14</dd></div><div><dt>독립 리뷰</dt><dd>미실행 · 결과 없음</dd></div></dl>
-   <div class="handoff-next"><strong>다음 동작</strong>설계 리뷰 수행 후 결과와 판정 근거 연결</div>
-   <a class="handoff-link" href="https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md">인계서 원문 확인</a>
-  </article>
+   <article class="handoff-card">
+    <div class="handoff-card-head"><span class="handoff-type">공개 인계서 · 1</span><time class="handoff-date" datetime="2026-11-14">게시일 2026-11-14</time></div>
+    <h3>L1 Knowledge MSC B 뷰어 — 생성·축적·게시·열람 연계 GPT 리뷰 인계서</h3>
+    <a class="handoff-link" href="https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md">원문 열기</a>
+   </article>
+   <article class="handoff-card">
+    <div class="handoff-card-head"><span class="handoff-type">공개 인계서 · 2</span><time class="handoff-date" datetime="2026-11-13">게시일 2026-11-13</time></div>
+    <h3>L1 관리 스킬 기능 요약 — 업무용 GPT 인계용 (r0001)</h3>
+    <a class="handoff-link" href="https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_SKILL_CAPABILITY_SUMMARY_INHOUSE_HANDOFF_r0001_20261113.md">원문 열기</a>
+   </article>
+   <article class="handoff-card">
+    <div class="handoff-card-head"><span class="handoff-type">공개 인계서 · 3</span><time class="handoff-date" datetime="2026-11-11">게시일 2026-11-11</time></div>
+    <h3>L1 Knowledge Updater K5.8/K6 × Workflow — G0 인계 r0005</h3>
+    <a class="handoff-link" href="https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_KNOWLEDGE_UPDATER_WORKFLOW_INHOUSE_HANDOFF_r0005_1111.md">원문 열기</a>
+   </article>
  </div>
- <p class="handoff-foot">공개 허용된 인계만 표시합니다. 문서 게시 ≠ 리뷰 요청 또는 실행. 상태는 공개 등록 정보 기준이며, 실제 리뷰·시험·배포 증거와 구분합니다.</p>
+ <p class="handoff-foot">목록은 공개 문서의 최초 Git 게시일 기준이며, 새 인계서 게시 시 최신 3건만 유지합니다. <a class="handoff-directory" href="https://github.com/wonhwipark/L1Work/tree/main/handoffs">전체 인계서 보기</a></p>
 </section>
 <details class="section wtracker" id="work-tracker" aria-label="개별 Work 상세 현황"><summary class="detail-summary"><span><strong>업무별 상세 검증</strong><small>담당·목표 결과·단계·검증 기록</small></span><em>펼쳐 보기</em></summary><div class="detail-body"><div class="wk-bar"><div><div class="eyebrow">MULTI-WORK TRACKER</div><h2>선택한 업무의 상세 현황</h2></div><small>업무별 결과와 검증 한계를 구분합니다. 선택 없이 열면 전체 공개 업무를 표시합니다.</small></div><p id="public-sync-status" class="public-sync" role="status" aria-live="polite">최근 게시된 상태 표시 중 · 자동 갱신 데이터 연결 확인 중</p><div class="wk-coverage"><strong id="work-coverage">전체 작업·공개 범위 확인 중</strong><p id="work-coverage-note">미승인 작업은 상세 비공개</p></div>
 
