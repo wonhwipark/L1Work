@@ -16,6 +16,14 @@
 
 공개 가상 샘플을 참고한 컨셉 리뷰 입력. 실제 스킬 변경·코드 분석·Job 실행·지식 게시·호스팅 변경을 요청하지 않는다. B 자동 생성·연결과 첫 실제 분석 E2E는 아직 미검증이며 후속 확인으로 구분한다.
 
+## CL/PR 이슈 분석 → Workspace 축적 — 구현·회귀시험
+
+| 상태 | 문서 | 범위 |
+|---|---|---|
+| **GPT 판정 후 구현 원샷 · 실행 대기** | [L1_CLPR_ISSUE_ANALYSIS_IMPLEMENTATION_AND_REGRESSION_ONESHOT_r0001_20261114.md](L1_CLPR_ISSUE_ANALYSIS_IMPLEMENTATION_AND_REGRESSION_ONESHOT_r0001_20261114.md) | P4 CL 단독 입력, GitHub Merged PR 반영 SHA, 이슈별 그룹핑, 코드 근거/Work Evidence, Python 호환·회귀시험·PUBLIC 최종 ZIP 조건 |
+
+이 문서는 기존 스킬을 재사용해 분석·축적하는 **실행 인계**이며, 수정된 스킬 ZIP 또는 실제 회귀시험 완료 결과가 아니다. 추가 독립 리뷰 요청은 포함하지 않으며, 코드 변경·시험·PUBLIC 루트 스킬 ZIP 게시에는 각각 실증된 안전·호환·릴리스 게이트가 적용된다.
+
 ## L1 Knowledge Updater × Workflow
 
 | 상태 | 문서 | 범위 |
