@@ -29,7 +29,7 @@
           typeof h.kind !== "string" || h.kind.length > 50 ||
           typeof h.review_label !== "string" || h.review_label.length > 90 ||
           typeof h.next_action !== "string" || h.next_action.length > 140 ||
-          typeof h.updated_on !== "string" || !/^20\\d{2}-\\d{2}-\\d{2}$/.test(h.updated_on) ||
+          typeof h.updated_on !== "string" || !/^20[0-9]{2}-[0-9]{2}-[0-9]{2}$/.test(h.updated_on) ||
           h.source_url !== HANDOFF_LINKS[h.id]) return false;
       seen.add(h.id);
       return true;
