@@ -5,14 +5,14 @@
     "windows_stage1": "기록 미관측"
   },
   "counts": {
-    "projects": 7,
+    "projects": 8,
     "receipts": 1,
     "requests": 1,
     "reviews": 1,
-    "works": 7
+    "works": 8
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-14T12:48:24Z",
+  "generated_at": "2026-11-14T12:50:04Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
