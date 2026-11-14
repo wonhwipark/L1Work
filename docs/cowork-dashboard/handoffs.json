@@ -1,0 +1,20 @@
+{
+  "schema": "L1WORK_HANDOFF_HISTORY_V1",
+  "entries": [
+    {
+      "filename": "L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md",
+      "title": "L1 Knowledge MSC B 뷰어 — 생성·축적·게시·열람 연계 GPT 리뷰 인계서",
+      "published_on": "2026-11-14"
+    },
+    {
+      "filename": "L1_SKILL_CAPABILITY_SUMMARY_INHOUSE_HANDOFF_r0001_20261113.md",
+      "title": "L1 관리 스킬 기능 요약 — 업무용 GPT 인계용 (r0001)",
+      "published_on": "2026-11-13"
+    },
+    {
+      "filename": "L1_KNOWLEDGE_UPDATER_WORKFLOW_INHOUSE_HANDOFF_r0005_1111.md",
+      "title": "L1 Knowledge Updater K5.8/K6 × Workflow — 사내 G0 인계 r0005",
+      "published_on": "2026-11-11"
+    }
+  ]
+}
