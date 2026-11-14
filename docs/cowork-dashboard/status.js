@@ -37,7 +37,7 @@
   }
   // Handoff history is independent of the PRIVATE review/Work status exporter.
   // All sources are already PUBLIC L1Work handoffs; never infer feedback state.
-  const HISTORY_FILENAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,179}\\.md$/;
+  const HISTORY_FILENAME = /^[A-Za-z0-9][A-Za-z0-9_.-]{0,179}\.md$/;
   const HISTORY_BASE = "https://github.com/wonhwipark/L1Work/blob/main/handoffs/";
   let historyCached = "";
   let historyInFlight = false;
@@ -55,7 +55,7 @@
           typeof entry.title !== "string" ||
           entry.title.length < 1 || entry.title.length > 130 ||
           typeof entry.published_on !== "string" ||
-          !/^20\\d{2}-\\d{2}-\\d{2}$/.test(entry.published_on) ||
+          !/^20\d{2}-\d{2}-\d{2}$/.test(entry.published_on) ||
           !Number.isFinite(Date.parse(entry.published_on))) return false;
       seen.add(entry.filename);
       return true;
