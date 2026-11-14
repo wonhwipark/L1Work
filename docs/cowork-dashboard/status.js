@@ -5,6 +5,62 @@
 (() => {
   "use strict";
   const PHASES = ["요청", "개발", "리뷰", "판정", "완료"];
+
+  const HANDOFF_LINKS = Object.freeze({
+    "msc-b-viewer": "https://github.com/wonhwipark/L1Work/blob/main/handoffs/L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md"
+  });
+  const HANDOFF_LABELS = ["문서 게시", "리뷰 요청", "결과 접수", "GPT 판정", "후속 반영"];
+  const HANDOFF_STATUS = {
+    PUBLISHED: ["인계 게시 완료 · 리뷰 미실행", 1],
+    REQUESTED: ["리뷰 요청 기록 · 실행 확인 전", 2],
+    RECEIVED: ["리뷰 결과 접수 기록", 3],
+    DECIDED: ["GPT 판정 기록", 4],
+    APPLIED: ["후속 반영 기록 · 검증 별도", 5]
+  };
+  function validHandoffs(cards) {
+    if (cards === undefined) return true; // V1 snapshot created before this feature
+    if (!Array.isArray(cards) || cards.length > 8) return false;
+    const seen = new Set();
+    return cards.every(h => {
+      if (!h || typeof h !== "object" || Array.isArray(h) ||
+          !Object.hasOwn(HANDOFF_LINKS,h.id) || seen.has(h.id) ||
+          !Object.hasOwn(HANDOFF_STATUS,h.stage) ||
+          typeof h.title !== "string" || h.title.length > 100 ||
+          typeof h.kind !== "string" || h.kind.length > 50 ||
+          typeof h.review_label !== "string" || h.review_label.length > 90 ||
+          typeof h.next_action !== "string" || h.next_action.length > 140 ||
+          typeof h.updated_on !== "string" || !/^20\\d{2}-\\d{2}-\\d{2}$/.test(h.updated_on) ||
+          h.source_url !== HANDOFF_LINKS[h.id]) return false;
+      seen.add(h.id);
+      return true;
+    });
+  }
+  function renderHandoffs(cards) {
+    const list = $("#handoff-list");
+    if (!list) return;
+    const out = cards.map(h => {
+      const card = node("article","handoff-card"), head = node("div","handoff-card-head");
+      head.append(node("span","handoff-type",h.kind),node("span","handoff-stage",HANDOFF_STATUS[h.stage][0]));
+      card.append(head,node("h3","",h.title));
+      const steps=node("ol","handoff-steps");
+      steps.setAttribute("aria-label","문서상 단계 · 앞 단계 실증 PASS를 의미하지 않음");
+      HANDOFF_LABELS.forEach((s,i)=>steps.append(node("li", i+1===HANDOFF_STATUS[h.stage][1]?"current":"",s)));
+      card.append(steps);
+      const facts=node("dl","handoff-facts");
+      [["기준일",h.updated_on],["리뷰 상태",h.review_label]].forEach(([k,v])=>{
+        const wrap=node("div");wrap.append(node("dt","",k),node("dd","",v));facts.append(wrap);
+      });
+      card.append(facts);
+      const next=node("div","handoff-next");next.append(node("strong","","다음 동작"),node("span","",h.next_action));card.append(next);
+      const a=node("a","handoff-link","인계서 원문 확인");
+      a.href=HANDOFF_LINKS[h.id];card.append(a);
+      return card;
+    });
+    list.replaceChildren(...out);
+    const count=$("#handoff-count");
+    if(count)count.textContent="공개 인계 "+cards.length+"건 · 별도 Work 합계 아님";
+  }
+
   const ALLOWED_KINDS = ["USER", "REVIEW", "BLOCKED", "OTHER"];
   // Fixed, public-safe work explanations. Never built from PRIVATE free text.
   const WORK_INFO = Object.freeze({
@@ -54,7 +110,7 @@
         !PROVIDERS.includes(obj.checks.active_provider || "기록 미확인")) return false;
     if (!Array.isArray(obj.work_cards) || obj.work_cards.length > 30 ||
         obj.work_cards.length > obj.counts.works) return false;
-    return obj.work_cards.every(w => w && typeof w === "object" &&
+    return validHandoffs(obj.handoffs) && obj.work_cards.every(w => w && typeof w === "object" &&
       FIELDS.every(k => typeof w[k] === "string" && w[k].length <= 180) &&
       Number.isInteger(w.phase_index) && w.phase_index >= 0 && w.phase_index <= 5 &&
       (w.action_kind === undefined || ALLOWED_KINDS.includes(w.action_kind)));
@@ -258,6 +314,7 @@
     if (selectedWork && !obj.work_cards.some(w => workKey(w) === selectedWork)) selectedWork = null;
     renderOverview();
     renderCards();
+    if (Array.isArray(obj.handoffs)) renderHandoffs(obj.handoffs);
   }
   const POLL_MS = 120000;
   async function refresh() {
