@@ -20,7 +20,8 @@
 
 | 상태 | 문서 | 범위 |
 |---|---|---|
-| **GPT 판정 후 구현 원샷 · 실행 대기** | [L1_CLPR_ISSUE_ANALYSIS_IMPLEMENTATION_AND_REGRESSION_ONESHOT_r0001_20261114.md](L1_CLPR_ISSUE_ANALYSIS_IMPLEMENTATION_AND_REGRESSION_ONESHOT_r0001_20261114.md) | P4 CL 단독 입력, GitHub Merged PR 반영 SHA, 이슈별 그룹핑, 코드 근거/Work Evidence, Python 호환·회귀시험·PUBLIC 최종 ZIP 조건 |
+| **기존 구현 원샷 지침 (보존)** | [L1_CLPR_ISSUE_ANALYSIS_IMPLEMENTATION_AND_REGRESSION_ONESHOT_r0001_20261114.md](L1_CLPR_ISSUE_ANALYSIS_IMPLEMENTATION_AND_REGRESSION_ONESHOT_r0001_20261114.md) | 기존 스킬 5종 최소 수정·회귀·ZIP 배포 게이트 요구사항 |
+| **2026-11-14 실제 수정 후보 5종, 최종 배포 차단** | [L1_CLPR_IMPLEMENTATION_STATUS_r0001_20261114.md](L1_CLPR_IMPLEMENTATION_STATUS_r0001_20261114.md) | PRIVATE 후보 ZIP 5종 원격 SHA/CRC PASS. Python 회귀/E3 NOT_RUN, PUBLIC 루트 최종 ZIP 미게시 |
 
 이 문서는 기존 스킬을 재사용해 분석·축적하는 **실행 인계**이며, 수정된 스킬 ZIP 또는 실제 회귀시험 완료 결과가 아니다. 추가 독립 리뷰 요청은 포함하지 않으며, 코드 변경·시험·PUBLIC 루트 스킬 ZIP 게시에는 각각 실증된 안전·호환·릴리스 게이트가 적용된다.
 
