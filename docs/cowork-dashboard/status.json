@@ -12,7 +12,7 @@
     "works": 7
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-14T07:37:32Z",
+  "generated_at": "2026-11-14T08:43:23Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -75,12 +75,12 @@
       "title": "업무 자동화 후보"
     },
     {
-      "action_kind": "BLOCKED",
+      "action_kind": "OTHER",
       "category": "knowledge-design",
       "next_action": "실행 환경 확인 후 설계 검증",
       "owner": "GPT",
       "phase_index": 0,
-      "phase_label": "검증 게이트 대기",
+      "phase_label": "단계 미확인",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "지식 구조 설계"
