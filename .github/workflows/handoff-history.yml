@@ -1,0 +1,44 @@
+name: Publish public handoff history
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'handoffs/*.md'
+      - 'scripts/build_handoff_history.py'
+      - '.github/workflows/handoff-history.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: public-handoff-history-main
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out public repository history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Generate the latest three public documents
+        run: python3 scripts/build_handoff_history.py
+      - name: Commit history manifest when changed
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add docs/cowork-dashboard/handoffs.json
+          if git diff --cached --quiet; then
+            echo "HANDOFF_HISTORY=UNCHANGED"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs(pages): refresh recent public handoff history"
+          git pull --rebase origin main
+          git push origin HEAD:main
+          echo "HANDOFF_HISTORY=PUBLISHED"
