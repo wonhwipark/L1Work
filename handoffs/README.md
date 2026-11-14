@@ -8,6 +8,14 @@
 
 상세 기능 카탈로그와 검증 결과의 정본은 접근 권한이 필요한 CoWork PRIVATE에 있으며, 이 공개 인계에는 회사 코드·운영자료·인증정보를 포함하지 않는다. 스킬 설치·Job 실행·공개 배포를 승인하는 문서가 아니다.
 
+## MSC B 뷰어 — 생성·축적·게시·열람 컨셉 리뷰
+
+| 상태 | 문서 | 범위 |
+|---|---|---|
+| **설계 리뷰 인계 r0001** | [L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md](L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md) | doc-converter의 HTML+SVG 생성, Workflow/Kernel/Updater 연결, 사람의 보기 URL과 AI의 원문 재사용. 모듈·Feature 목록 검토는 1단계 유지 |
+
+공개 가상 샘플을 참고한 컨셉 리뷰 입력. 실제 스킬 변경·코드 분석·Job 실행·지식 게시·호스팅 변경을 요청하지 않는다. B 자동 생성·연결과 첫 실제 분석 E2E는 아직 미검증이며 후속 확인으로 구분한다.
+
 ## L1 Knowledge Updater × Workflow
 
 | 상태 | 문서 | 범위 |
@@ -18,7 +26,7 @@
 
 저장소 `wonhwipark/L1Work`, branch `main`. 현재 인계는 G0 READ_ONLY와 G1 설계표 작성이며 기존 knowledge/metadata·Work/Evidence·record/schema를 변경하지 않는다. SourceSnapshot·CAS·N:M·복구는 기존 Kernel/Updater/Git 제공자를 우선 재사용하고 미확인 API/record는 추가 확인 또는 BLOCKED로 남긴다.
 
-작업 PC G0는 아직 NOT_RUN이므로 확인된 설치본 사실은 없다. 신규 엔진·schema 확장은 실제 gap이 확인된 최소 범위의 후속 설계 후보로만 검토한다. 구현·그룹 write·설치·모델 호출·외부 전송을 승인하지 않는다. 파일을 내려받아 업무용 GPT에 첨부하고 마지막 원샷 요청을 사용한다.
+r0005의 G0 전체 미수행 표기는 작성 당시 상태로 보존한다. 2026-11-14에는 일부 기존 기능의 호스트 확인 보고를 확보한 상태이며, 원본 설치/API·독립 리뷰·통합 전체 PASS를 뜻하지 않는다. 실제 저장·MSC/source/Evidence·게시/역링크·AI 본문 활용은 첫 승인된 분석 후속으로 확인한다. 신규 엔진·schema 확장은 확인된 gap의 최소 후보로만 검토하며, 이 목록은 구현·그룹 write·설치·모델 호출·외부 전송을 승인하지 않는다. 파일을 내려받아 업무용 GPT에 첨부해 해당 문서의 리뷰 요청을 사용한다.
 
 ## 용어·접근 지침
 
