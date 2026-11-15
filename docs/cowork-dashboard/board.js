@@ -189,6 +189,9 @@
        route.append(btn);
      });
      right.append(route);
+     if(lane.id==='analysis'){
+       right.append(el('p','note','③ Kernel의 Source Revision도 ⑤ 문서화 입력으로 연결됩니다. ④ 코드 분석 근거와 함께 사용합니다.'));
+     }
      if(lane.id==='knowledge'){
        const branches=el('div','l1-branches');
        for(const [name,note,kind,step] of [
