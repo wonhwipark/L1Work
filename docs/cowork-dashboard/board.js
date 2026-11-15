@@ -15,13 +15,121 @@
    {name:'판정·후속 기록',match:n=>n===4||n===5}
  ];
  const STEPS = [
-   ['요구·업무 Work','Workflow / Kernel','기존 업무 Work 선택·재개. 승인된 범위·원본 revision을 확인'],
-   ['코드·자료 분석','분석·변환 스킬','코드 사실·설계 가정·미확인을 구분해 분석'],
-   ['Evidence 보존','업무 Work','원본과 근거·시험·결정을 기존 Work에 보존'],
-   ['지식 후보·대조','Knowledge Updater','기존 기술 지식과 중복·충돌 대조, Preview 작성'],
-   ['보완·승인 판단','사용자 / 담당 스킬','부족 근거 보완, 기존 승인 범위 확인'],
-   ['그룹 게시·readback','권한 있는 기존 writer','유효 승인 후 게시하고 고정 revision·실제 본문 확인'],
-   ['역링크·재사용 검증','Workflow / Knowledge','원래 Work에 게시 결과 연결, 검색·RAG 소비는 별도 시험']
+  [
+   "사용자 요청",
+   "업무 GPT · 모바일 Agent",
+   "업무 목표·범위를 접수하고 입력 소스·승인 범위를 확인"
+  ],
+  [
+   "Workflow",
+   "요청 분류 · 기존 Work 검색·재개",
+   "같은 목적의 기존 Work를 우선 재개하고 필요한 작업만 연결"
+  ],
+  [
+   "Kernel",
+   "Work ID · Source Revision 관리",
+   "원본 revision과 근거·상태 연결을 고정. 문서 등록 자체가 호스트 실행은 아님"
+  ],
+  [
+   "code-analyzer / issue-analyzer",
+   "코드 분석 · 이슈 사실 구분",
+   "코드 사실과 설계 가정·미확인을 구분해 근거 생성"
+  ],
+  [
+   "doc-converter / hld-composer",
+   "코드 분석 · HLD · MSC HTML",
+   "허용된 근거를 문서·HLD·MSC HTML로 구성. 실제 내용 검증은 별도"
+  ],
+  [
+   "l1-workspace",
+   "분석 결과 · 결정 · Evidence 보존",
+   "해당 업무 Work에 원본, 분석 결과, 판정, Evidence, 미해결 항목을 보존"
+  ],
+  [
+   "l1-knowledge-updater",
+   "지식 후보 작성",
+   "확인된 분석 근거에서 지식 후보를 만들고 기존 writer와 연결"
+  ],
+  [
+   "Module → Feature → Scenario",
+   "중복·충돌 대조 · Preview",
+   "기존 기술 지식과 비교하고 AS-IS/TO-BE·분류 적합성 및 Preview 검토"
+  ],
+  [
+   "근거 검증 및 게시 판정",
+   "승인 / 보완 필요 / 개인 유지",
+   "보완은 같은 Work로 돌아가 근거 보충, 개인 유지는 후보 보존, 승인은 게시 진행"
+  ],
+  [
+   "l1sw-dev-knowledge",
+   "검증된 기술 지식 게시",
+   "유효한 게시 승인과 권한을 확인한 경우에만 그룹 기술 지식 정본에 게시"
+  ],
+  [
+   "게시 revision · 원격 readback",
+   "게시 결과를 실제 바이트로 검증",
+   "게시된 revision과 원격 본문을 재조회하여 일치 여부 확인"
+  ],
+  [
+   "원래 Work 역링크",
+   "지식 게시 결과 연결",
+   "원래 업무 Work에 지식 revision·판정·근거의 역링크 기록"
+  ],
+  [
+   "검색 / RAG / 후속 분석 재사용",
+   "재사용 실증은 별도",
+   "검증된 지식을 탐색·재사용하는 후속 단계. 실제 RAG 호출 성공은 별도로 시험"
+  ]
+ ];
+ const L1_LANES = [
+  {
+   "id": "request",
+   "name": "요청·재개",
+   "range": [
+    1,
+    2,
+    3
+   ],
+   "detail": "사용자 요청 → Workflow → Kernel"
+  },
+  {
+   "id": "analysis",
+   "name": "분석·문서화",
+   "range": [
+    4,
+    5
+   ],
+   "detail": "분석 스킬 → 문서·HLD·MSC"
+  },
+  {
+   "id": "evidence",
+   "name": "Work·Evidence",
+   "range": [
+    6
+   ],
+   "detail": "업무 결과·판정·Evidence 보존"
+  },
+  {
+   "id": "knowledge",
+   "name": "지식 후보·검증",
+   "range": [
+    7,
+    8,
+    9
+   ],
+   "detail": "후보 작성 → 기존 지식 대조 → 게시 판정"
+  },
+  {
+   "id": "publish",
+   "name": "게시·재사용",
+   "range": [
+    10,
+    11,
+    12,
+    13
+   ],
+   "detail": "그룹 게시 → readback → 역링크 → 재사용"
+  }
  ];
  let cards=[], pub=null, mode='board', filter='', focused=null, latestHistory=[];
  const $=id=>document.getElementById(id);
@@ -60,8 +168,61 @@
  function renderTodo(){const p=$('todolist');p.replaceChildren();cards.forEach(c=>{const b=card(c);b.classList.add('todoitem');p.append(b)});if(!cards.length)p.append(el('p','note','허용된 최신 업무 정보 없음'))}
  function open(c){focused=document.activeElement;$('detail').replaceChildren(el('span','mini',c.phase_label),el('h2','',c.title),el('p','', '담당: '+c.owner),el('h3','','기록된 자체시험'),el('p','',c.test_label),el('h3','','기록된 독립 리뷰'),el('p','',c.review_label),el('h3','','다음 행동'),el('p','',c.next_action),el('p','source','공개 상태 스냅샷 기준. 최신 원본 정합성·실행 증거는 별도 검증'));$('veil').classList.add('show');$('drawer').classList.add('show');$('drawer').setAttribute('aria-hidden','false');$('close').focus()}
  function close(){if(!$('drawer').classList.contains('show'))return;$('veil').classList.remove('show');$('drawer').classList.remove('show');$('drawer').setAttribute('aria-hidden','true');if(focused)focused.focus()}
- function renderSteps(){const c=$('l1steps');STEPS.forEach((s,i)=>{const b=el('button','step');b.append(el('span','num','STEP '+(i+1)),el('strong','',s[0]),el('small','',s[1]));b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>selectStep(i));c.append(b)});selectStep(0)}
- function selectStep(i){for(const [idx,b] of [...$('l1steps').children].entries())b.setAttribute('aria-pressed',String(idx===i));$('l1detail').replaceChildren(el('h3','',STEPS[i][0]),el('p','',STEPS[i][2]),el('p','note','이 단계의 관계는 설계 기준입니다. 실제 호출·결과·readback은 별도 검증 대상입니다.'))}
+ function renderSteps(){
+   const map=$('l1map')||$('l1steps');
+   if(!map)return;
+   map.replaceChildren();
+   L1_LANES.forEach((lane,li)=>{
+     const wrap=el('section','l1-lane l1-lane--'+lane.id);
+     wrap.setAttribute('aria-label',String(li+1)+'단계 '+lane.name);
+     const h=el('div','l1-lane-label');
+     h.append(el('span','l1-lane-order','0'+(li+1)),el('strong','',lane.name),el('small','',lane.detail));
+     const right=el('div','l1-lane-right'),route=el('div','l1-route');
+     lane.range.forEach((num,index)=>{
+       if(index)route.append(el('span','l1-route-arrow','→'));
+       const btn=el('button','l1-node'+(num===9?' l1-node--decision':''));
+       btn.type='button';btn.dataset.l1Step=String(num);
+       btn.setAttribute('aria-pressed','false');
+       btn.setAttribute('aria-label',num+'단계 '+STEPS[num-1][0]+' 자세히 보기');
+       btn.append(el('span','l1-node-num',String(num)),el('strong','',STEPS[num-1][0]),el('small','',STEPS[num-1][1]));
+       btn.addEventListener('click',()=>selectStep(num-1));
+       route.append(btn);
+     });
+     right.append(route);
+     if(lane.id==='knowledge'){
+       const branches=el('div','l1-branches');
+       for(const [name,note,kind,step] of [
+         ['보완 필요 ↩','같은 Work에서 근거 보완 → ⑤ 문서·MSC 단계','rework',4],
+         ['개인 유지 ↗','개인 Work에 지식 후보 보존','hold',8],
+         ['승인 ↓','⑩ 그룹 기술 지식 게시 단계로 진행','approve',9]
+       ]){
+         const btn=el('button','l1-branch l1-branch--'+kind);
+         btn.type='button';btn.append(el('strong','',name),el('small','',note));
+         btn.addEventListener('click',()=>{
+           selectStep(step);
+           if(kind==='hold')$('l1detail').append(el('p','note','개인 유지 분기: 현재 Work에 후보를 보존하며 그룹 지식에 게시하지 않습니다.'));
+         });
+         branches.append(btn);
+       }
+       right.append(branches);
+     }
+     wrap.append(h,right);map.append(wrap);
+     if(li<L1_LANES.length-1){const down=el('div','l1-down','↓');down.setAttribute('aria-hidden','true');map.append(down)}
+   });
+   map.append(el('p','l1-feedback','↶ ⑬ 검색·RAG·후속 분석 결과는 새로운 요청 또는 같은 목적의 기존 Work 재개(①~②)로 연결'));
+   selectStep(0);
+ }
+ function selectStep(i){
+   if(!Number.isInteger(i)||i<0||i>=STEPS.length)return;
+   const map=$('l1map')||$('l1steps');
+   if(!map)return;
+   for(const b of map.querySelectorAll('[data-l1-step]'))b.setAttribute('aria-pressed',String(Number(b.dataset.l1Step)===i+1));
+   $('l1detail').replaceChildren(
+     el('span','mini','STEP '+(i+1)+' / 13 · 설계 책임'),
+     el('h3','',STEPS[i][0]),el('p','',STEPS[i][2]),
+     el('p','note','이 연결은 설계상의 책임·데이터 이동 경로입니다. 자동 스킬 호출, Knowledge 게시 및 검색·RAG 실사용 성공을 의미하지 않습니다.')
+   );
+ }
  function validateHistory(h){if(!h||h.schema!=='L1WORK_HANDOFF_HISTORY_V1'||!Array.isArray(h.entries)||h.entries.length>3)return false;const seen=new Set();return h.entries.every(e=>e&&typeof e.filename==='string'&&/^[A-Za-z0-9][A-Za-z0-9_.-]{0,179}\.md$/.test(e.filename)&&e.filename.toUpperCase().includes('HANDOFF')&&!seen.has(e.filename)&&seen.add(e.filename)&&str(e.title,130)&&/^20\d\d-\d\d-\d\d$/.test(e.published_on))}
  function renderHistory(){const box=$('handoffs');box.replaceChildren();if(!latestHistory.length){box.append(el('p','note','허용된 공개 인계 문서 이력이 없거나 현재 확인되지 않았습니다.'));return}for(const h of latestHistory){const a=el('article');a.append(el('span','',h.published_on),el('b','',h.title));const link=el('a','', 'PUBLIC 원문 열기');link.target='_blank';link.rel='noopener noreferrer';link.href='https://github.com/wonhwipark/L1Work/blob/main/handoffs/'+encodeURIComponent(h.filename);a.append(link);box.append(a)}}
  async function update(){try{const r=await fetch('status.json',{cache:'no-store'});if(!r.ok)throw Error('status '+r.status);const j=await r.json();if(!valid(j))throw Error('public schema');pub=j;cards=j.work_cards;stamp();kpis();renderWork();renderTodo()}catch(e){pub=null;cards=[];stamp();kpis();renderWork();renderTodo()}}
