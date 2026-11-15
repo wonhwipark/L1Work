@@ -12,7 +12,7 @@
     "works": 10
   },
   "cutover": "GitHub LIVE (호스트 보고 수용)",
-  "generated_at": "2026-11-15T14:30:43Z",
+  "generated_at": "2026-11-15T15:00:50Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -26,7 +26,7 @@
     }
   ],
   "schema": "COWORK_PUBLIC_STATUS_V1",
-  "snapshot_date": "2026-11-15",
+  "snapshot_date": "2026-11-16",
   "source": "APPROVED_AGGREGATE_ONLY",
   "sync_mode": "AUTOMATED_ALLOWLIST",
   "work_cards": [
