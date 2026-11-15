@@ -1,0 +1,110 @@
+name: Approved read-only NR L1 Tx Job-list v0.4.38 PUBLIC delivery
+on:
+  push:
+    paths:
+      - .github/workflows/joblist-v0438-public-once.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build_test_publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - name: Checkout PUBLIC repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Verify pinned baseline, build approved v0.4.38 ZIP, and static checks
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e job-list_v0_4_38_1115.zip
+          curl -fLsS --retry 2 --max-time 75 -o baseline.zip "https://raw.githubusercontent.com/wonhwipark/L1Work/main/job-list_v0_4_36_1112.zip"
+          test "$(wc -c < baseline.zip)" -eq 1563658
+          echo 'cbe17dc15199593e2a9bce6aa2b8857c1f011336ebd2cd3d4c8ee3cce0eee3f6  baseline.zip' | sha256sum -c -
+          python3 .github/joblist-v0438-once/build_debug_release.py baseline.zip candidate
+          test -s candidate/job-list_v0_4_38_1115.zip
+          test "$(wc -c < candidate/job-list_v0_4_38_1115.zip)" -eq 1570759
+          echo '0cdda16fe214f86811d4df25cc04f3453ec93789ddc9bc2b0769e730bb9c16e0  candidate/job-list_v0_4_38_1115.zip' | sha256sum -c -
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, hashlib, stat, zipfile
+          p=Path('candidate/job-list_v0_4_38_1115.zip')
+          with zipfile.ZipFile(p) as z:
+              assert z.testzip() is None
+              infos=z.infolist()
+              assert len(infos)==len(set(x.filename for x in infos))
+              for x in infos:
+                  assert x.filename.startswith('job-list_v0_4_38/')
+                  assert '..' not in Path(x.filename).parts
+                  assert not stat.S_ISLNK(x.external_attr >> 16)
+              z.extractall('stage')
+          root=Path('stage/job-list_v0_4_38')
+          release=json.loads((root/'.skill-release.json').read_text())
+          assert release['name']=='job-list' and release['version']=='0.4.38'
+          assert release['channel']=='stable'
+          a=json.loads((root/'requests/one-shot-jobs.json').read_text())['jobs']
+          assert len(a)==1
+          assert a[0]['job_id']=='JOB-20261115-NR-L1TX-INIT-RACH-EXEC-01'
+          assert a[0]['profile']=='nr-l1tx-init-rach-analysis-linux' and a[0]['params']=={}
+          for key in ('VERSION','SKILL.md','scripts/job_core.py','scripts/nrtx_init_rach_linux_job.py','references/NR_TX_INIT_RACH_CODE_ANALYSIS_v0438.md','PACKAGE_CONTENTS.sha256'):
+              assert (root/key).is_file()
+          worker=(root/'scripts/nrtx_init_rach_linux_job.py').read_text()
+          prompt=(root/'references/NR_TX_INIT_RACH_CODE_ANALYSIS_v0438.md').read_text()
+          assert 'code-analyzer' in prompt and 'L2_L1_TX_REQ' in prompt
+          for bad in ('/home/whpark','CoWork-Skill-Collab','github_pat_','ghp_','BEGIN OPENSSH PRIVATE KEY'):
+              assert bad not in worker and bad not in prompt
+          for required in ('"edit": "deny"','"write": "deny"','"apply_patch": "deny"','"webfetch": "deny"'):
+              assert required in worker
+          print('STATIC_PACKAGE_CHECK=PASS ACTIVE_JOB=1 NO_SOURCE_WRITE=PASS')
+          PY
+          python3 -m py_compile stage/job-list_v0_4_38/scripts/job_core.py stage/job-list_v0_4_38/scripts/nrtx_init_rach_linux_job.py
+          python3 stage/job-list_v0_4_38/scripts/job_core.py validate --root stage/job-list_v0_4_38
+      - name: Run targeted core and new one-shot regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/python" -m pip install -q pytest
+          cd stage/job-list_v0_4_38
+          "$RUNNER_TEMP/venv/bin/python" -m pytest -q \
+            tests/test_v0434_dependency_gate.py \
+            tests/test_v0432_knowledge_workflow_bridge.py \
+            tests/test_v0431_knowledge_input_stage.py \
+            tests/test_v0436_nrtx_active.py \
+            tests/test_v0438_init_rach_active.py
+      - name: Publish exact approved ZIP without overwrite
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e job-list_v0_4_38_1115.zip
+          cp candidate/job-list_v0_4_38_1115.zip job-list_v0_4_38_1115.zip
+          echo '0cdda16fe214f86811d4df25cc04f3453ec93789ddc9bc2b0769e730bb9c16e0  job-list_v0_4_38_1115.zip' | sha256sum -c -
+          git add -- job-list_v0_4_38_1115.zip
+          git diff --cached --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'release(job-list): user-approved read-only NR Tx Init RACH debug v0.4.38'
+          git push origin HEAD:main
+          COMMIT="$(git rev-parse HEAD)"
+          echo "PUBLISHED_PUBLIC_COMMIT=$COMMIT"
+          echo "PUBLISHED_ZIP_BYTES=1570759"
+          echo "PUBLISHED_ZIP_SHA256=0cdda16fe214f86811d4df25cc04f3453ec93789ddc9bc2b0769e730bb9c16e0"
+      - name: Verify exact remote bytes from pushed commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          COMMIT="$(git rev-parse HEAD)"
+          URL="https://raw.githubusercontent.com/wonhwipark/L1Work/$COMMIT/job-list_v0_4_38_1115.zip"
+          for i in 1 2 3 4 5 6; do
+            if curl -fLsS --retry 1 --max-time 55 -o /tmp/readback.zip "$URL"; then
+              if test "$(wc -c < /tmp/readback.zip)" -eq 1570759 && echo '0cdda16fe214f86811d4df25cc04f3453ec93789ddc9bc2b0769e730bb9c16e0  /tmp/readback.zip' | sha256sum -c -; then
+                echo "PUBLIC_REMOTE_READBACK=PASS COMMIT=$COMMIT"
+                exit 0
+              fi
+            fi
+            sleep 5
+          done
+          echo 'PUBLIC_REMOTE_READBACK=FAIL'
+          exit 1
