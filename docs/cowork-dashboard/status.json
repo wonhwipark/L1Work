@@ -12,7 +12,7 @@
     "works": 10
   },
   "cutover": "GitHub LIVE (호스트 보고 수용)",
-  "generated_at": "2026-11-15T11:47:58Z",
+  "generated_at": "2026-11-15T11:50:12Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -33,7 +33,7 @@
     {
       "action_kind": "OTHER",
       "category": "review-watcher",
-      "next_action": "LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인",
+      "next_action": "첫 신규 유효 요청의 실제 리뷰·영수증, 알림 수신 및 지속 가동 검증",
       "owner": "협업 관리·업무 실행",
       "phase_index": 5,
       "phase_label": "완료 신고 · 증빙 별도",
