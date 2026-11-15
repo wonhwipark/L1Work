@@ -1,0 +1,42 @@
+participant Controller
+participant Resource
+participant TxMngr
+participant HAL
+participant RF
+participant PHY
+Controller -> Resource : 1. 설정 시작
+Resource -> TxMngr : 2. 자원 요청
+TxMngr -> Resource : 3. 자원 응답
+Resource -> TxMngr : 4. 송신 설정 요청
+TxMngr -> HAL : 5. RF 설정 전달
+HAL -> RF : 6. 주파수 설정
+RF -> HAL : 7. 설정 완료
+HAL -> PHY : 8. PHY 준비 요청
+PHY -> HAL : 9. 준비 완료
+TxMngr -> HAL : 10. 활성화 요청
+HAL -> TxMngr : 11. 활성화 완료
+TxMngr -> Controller : 12. 결과 보고
+Controller -> Resource : 13. 설정 시작
+Resource -> TxMngr : 14. 자원 요청
+TxMngr -> Resource : 15. 자원 응답
+Resource -> TxMngr : 16. 송신 설정 요청
+TxMngr -> HAL : 17. RF 설정 전달
+HAL -> RF : 18. 주파수 설정
+RF -> HAL : 19. 설정 완료
+HAL -> PHY : 20. PHY 준비 요청
+PHY -> HAL : 21. 준비 완료
+TxMngr -> HAL : 22. 활성화 요청
+HAL -> TxMngr : 23. 활성화 완료
+TxMngr -> Controller : 24. 결과 보고
+Controller -> Resource : 25. 설정 시작
+Resource -> TxMngr : 26. 자원 요청
+TxMngr -> Resource : 27. 자원 응답
+Resource -> TxMngr : 28. 송신 설정 요청
+TxMngr -> HAL : 29. RF 설정 전달
+HAL -> RF : 30. 주파수 설정
+RF -> HAL : 31. 설정 완료
+HAL -> PHY : 32. PHY 준비 요청
+PHY -> HAL : 33. 준비 완료
+TxMngr -> HAL : 34. 활성화 요청
+HAL -> TxMngr : 35. 활성화 완료
+TxMngr -> Controller : 36. 결과 보고
