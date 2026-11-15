@@ -151,6 +151,7 @@
    for(const t of document.querySelectorAll('[data-tab]'))t.setAttribute('aria-selected',String(t.dataset.tab===tab));
    for(const p of document.querySelectorAll('section.panel'))p.classList.toggle('active',p.id===tab);
    if(tab==='collab')$('search').focus({preventScroll:true});
+   if(tab==='l1')requestAnimationFrame(drawWorkspaceWriteback);
  }
  function stamp(){
    $('asof').textContent=pub&&pub.generated_at?'공개 정보 마지막 변경 · '+new Date(pub.generated_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}):'공개 상태 확인 필요';
@@ -210,11 +211,43 @@
        right.append(branches);
      }
      wrap.append(h,right);map.append(wrap);
-     if(li<L1_LANES.length-1){const down=el('div','l1-down','↓');down.setAttribute('aria-hidden','true');map.append(down)}
+     if(li<L1_LANES.length-1){const down=el('div','l1-down'+(lane.id==='evidence'?' l1-down--writeback':''),'↓');down.setAttribute('aria-hidden','true');map.append(down)}
    });
    map.append(el('p','l1-feedback','↶ ⑬ 검색·RAG·후속 분석 결과는 새로운 요청 또는 같은 목적의 기존 Work 재개(①~②)로 연결'));
+   addWorkspaceWriteback(map);
    selectStep(0);
+   requestAnimationFrame(drawWorkspaceWriteback);
  }
+ function addWorkspaceWriteback(map){
+   const svg=(tag,attrs)=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);for(const [k,v] of Object.entries(attrs||{}))n.setAttribute(k,String(v));return n};
+   const overlay=svg('svg',{'class':'l1-writeback-svg','role':'img','aria-label':'⑦ l1-knowledge-updater에서 ⑥ l1-workspace로 분석·초안·결정을 저장·갱신하는 연결선'});
+   const defs=svg('defs'),marker=svg('marker',{id:'l1-writeback-head',viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:8,markerHeight:8,orient:'auto',markerUnits:'userSpaceOnUse'});
+   marker.append(svg('path',{d:'M 0 0 L 10 5 L 0 10 Z',fill:'#128365'}));defs.append(marker);overlay.append(defs);
+   overlay.append(svg('path',{'class':'l1-writeback-path',fill:'none',stroke:'#128365','stroke-width':3,'stroke-linejoin':'round','marker-end':'url(#l1-writeback-head)'}),svg('circle',{'class':'l1-writeback-source',r:4,fill:'#128365'}));
+   const label=el('button','l1-writeback-label');label.type='button';label.setAttribute('aria-label','⑦ → ⑥ 분석·초안·결정 저장/갱신 연결 자세히 보기');
+   label.append(el('strong','','⑦ → ⑥'),el('small','','분석·초안·결정 저장/갱신'));
+   label.addEventListener('click',()=>{selectStep(5);$('l1detail').append(el('p','note','⑦ Updater가 직접 분석하거나 검토한 결과를 ⑥ 같은 Workspace Work에 저장·갱신하는 경로입니다. 그룹 게시 여부와 별개이며 실제 저장 성공은 별도로 검증합니다.'))});
+   map.append(overlay,label);
+ }
+ function workspaceWritebackPath(source,target){
+   const rail=Math.max(8,Math.min(source.x,target.x)-18);
+   return 'M '+source.x+' '+source.y+' H '+rail+' V '+target.y+' H '+target.x;
+ }
+ function drawWorkspaceWriteback(){
+   const map=$('l1map');if(!map)return;
+   const from=map.querySelector('[data-l1-step="7"]'),to=map.querySelector('[data-l1-step="6"]');
+   const overlay=map.querySelector('.l1-writeback-svg'),label=map.querySelector('.l1-writeback-label'),gap=map.querySelector('.l1-down--writeback');
+   if(!from||!to||!overlay||!label||!gap)return;
+   const box=map.getBoundingClientRect();if(!box.width||!box.height)return;
+   const a=from.getBoundingClientRect(),b=to.getBoundingClientRect(),g=gap.getBoundingClientRect();
+   const source={x:a.left-box.left-1,y:a.top-box.top+a.height/2},target={x:b.left-box.left-1,y:b.top-box.top+b.height/2};
+   overlay.setAttribute('viewBox','0 0 '+box.width+' '+box.height);
+   overlay.querySelector('.l1-writeback-path').setAttribute('d',workspaceWritebackPath(source,target));
+   const dot=overlay.querySelector('.l1-writeback-source');dot.setAttribute('cx',source.x);dot.setAttribute('cy',source.y);
+   label.style.left=(target.x+12)+'px';label.style.top=(g.top-box.top+g.height/2-20)+'px';
+   label.style.maxWidth=Math.max(132,Math.min(270,box.width-target.x-64))+'px';
+ }
+ window.addEventListener('resize',()=>requestAnimationFrame(drawWorkspaceWriteback));
  function selectStep(i){
    if(!Number.isInteger(i)||i<0||i>=STEPS.length)return;
    const map=$('l1map')||$('l1steps');
