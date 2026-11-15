@@ -18,12 +18,12 @@
   [
    "사용자 요청",
    "업무 GPT · 모바일 Agent",
-   "업무 목표·범위를 접수하고 입력 소스·승인 범위를 확인"
+   "Updater의 Procedure/Feature 직접 분석 요청과 Workflow 업무 요청을 모두 접수. 두 진입 모두 같은 Work에 분석 이력을 보존"
   ],
   [
    "Workflow",
    "요청 분류 · 기존 Work 검색·재개",
-   "같은 목적의 기존 Work를 우선 재개하고 필요한 작업만 연결"
+   "두 진입 모두 같은 목적의 기존 Work를 우선 재개. Updater 직접 분석도 기존 Work 기록 경로를 사용하며 필요한 작업만 연결"
   ],
   [
    "Kernel",
@@ -42,13 +42,13 @@
   ],
   [
    "l1-workspace",
-   "분석 결과 · 결정 · Evidence 보존",
-   "해당 업무 Work에 원본, 분석 결과, 판정, Evidence, 미해결 항목을 보존"
+   "개인 업무용 Git · 분석·초안 보존",
+   "Updater 직접 분석과 Workflow 업무 결과 모두 개인 업무용 l1-workspace의 같은 Work에 분석·초안·근거·결정·미확인을 보존. 그룹 반영 여부와 별개이며 실제 저장/readback은 미검증"
   ],
   [
    "l1-knowledge-updater",
-   "지식 후보 작성",
-   "확인된 분석 근거에서 지식 후보를 만들고 기존 writer와 연결"
+   "직접 분석 접수 · 지식 후보 작성",
+   "직접 받은 Procedure/Feature 분석 요청도 기존 Work·분석 경로와 연결하고 결과는 ⑥ Workspace에 보존. 기존 Workflow 결과는 재분석 없이 재사용해 후보·Preview 구성"
   ],
   [
    "Module → Feature → Scenario",
@@ -62,8 +62,8 @@
   ],
   [
    "l1sw-dev-knowledge",
-   "검증된 기술 지식 게시",
-   "유효한 게시 승인과 권한을 확인한 경우에만 그룹 기술 지식 정본에 게시"
+   "그룹 공용 스킬 · 승인 지식 반영",
+   "l1sw-dev-knowledge는 그룹 공용 스킬. 검증·승인된 지식만 기존 게시 경로로 반영하며 실제 저장 위치·권한을 확인. 그룹 보류·실패에도 ⑥의 개인 분석 이력은 보존"
   ],
   [
    "게시 revision · 원격 readback",
@@ -107,7 +107,7 @@
    "range": [
     6
    ],
-   "detail": "업무 결과·판정·Evidence 보존"
+   "detail": "두 진입의 개인 분석·근거 보존"
   },
   {
    "id": "knowledge",
@@ -196,14 +196,14 @@
        const branches=el('div','l1-branches');
        for(const [name,note,kind,step] of [
          ['보완 필요 ↩','같은 Work에서 근거 보완 → ⑤ 문서·MSC 단계','rework',4],
-         ['개인 유지 ↗','개인 Work에 지식 후보 보존','hold',8],
+         ['개인 유지 ↗','분석은 ⑥에 보존 · 그룹 후보는 개인 유지','hold',8],
          ['승인 ↓','⑩ 그룹 기술 지식 게시 단계로 진행','approve',9]
        ]){
          const btn=el('button','l1-branch l1-branch--'+kind);
          btn.type='button';btn.append(el('strong','',name),el('small','',note));
          btn.addEventListener('click',()=>{
            selectStep(step);
-           if(kind==='hold')$('l1detail').append(el('p','note','개인 유지 분기: 현재 Work에 후보를 보존하며 그룹 지식에 게시하지 않습니다.'));
+           if(kind==='hold')$('l1detail').append(el('p','note','두 진입의 분석은 ⑥ Workspace에 보존하는 설계입니다. 개인 유지 분기는 후보의 그룹 반영을 보류하며, 분석 저장 여부를 선택하는 단계가 아닙니다.'));
          });
          branches.append(btn);
        }
