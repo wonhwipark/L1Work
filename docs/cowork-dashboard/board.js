@@ -27,11 +27,15 @@
  const $=id=>document.getElementById(id);
  const el=(type,cls,content)=>{const n=document.createElement(type); if(cls)n.className=cls; if(content!==undefined)n.textContent=String(content);return n};
  const str=(s,max=165)=>typeof s==='string'&&s.length<=max&&!/[<>]/.test(s);
- const fresh=d=>{const t=Date.parse(d);return Number.isFinite(t)&&t<=Date.now()+3600000&&Date.now()-t<6*3600000};
+ const validStamp=d=>{const t=Date.parse(d);return Number.isFinite(t)&&t<=Date.now()+3600000};
  const hashTab=()=>['collab','l1','todo'].includes(location.hash.slice(1))?location.hash.slice(1):'collab';
  const phase=c=>Number.isInteger(c.phase_index)?c.phase_index:0;
  function valid(j){
-   if(!j||j.schema!=='COWORK_PUBLIC_STATUS_V1'||!Array.isArray(j.work_cards)||j.work_cards.length>5||!j.counts||typeof j.counts!=='object'||!str(j.generated_at,40))return false;
+   if(!j||j.schema!=='COWORK_PUBLIC_STATUS_V1'||!Array.isArray(j.work_cards)||j.work_cards.length>5||!j.counts||typeof j.counts!=='object'||!str(j.generated_at,40)||!validStamp(j.generated_at))return false;
+   const provider=j.checks&&j.checks.active_provider;
+   const live=(j.cutover==='GitHub LIVE (호스트 보고 수용)'&&provider==='GitHub 리뷰 운송 LIVE (호스트 보고 수용)');
+   const legacy=(j.cutover==='정식 전환 전'&&['활성 리뷰 제공자 없음','Dropbox 리뷰 제공자 (문서 기록)','기록 미확인'].includes(provider));
+   if(!live&&!legacy)return false;
    const seen=new Set();
    return j.work_cards.every(c=>c&&Object.hasOwn(CATS,c.category)&&!seen.has(c.category)&&seen.add(c.category)&&c.title===CATS[c.category]&&Number.isInteger(c.phase_index)&&c.phase_index>=0&&c.phase_index<=5&&['title','owner','phase_label','test_label','review_label','next_action'].every(k=>str(c[k],180)));
  }
@@ -41,9 +45,10 @@
    if(tab==='collab')$('search').focus({preventScroll:true});
  }
  function stamp(){
-   $('asof').textContent=pub&&pub.generated_at?'공개 상태 기준 · '+new Date(pub.generated_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}):'공개 상태 확인 필요';
-   const stale=!pub||!fresh(pub.generated_at);
-   $('alert').textContent=stale?'공개 상태 자료가 오래되었거나 확인되지 않았습니다. 운영 LIVE 여부와 개별 리뷰 완료를 이 화면의 과거 기록으로 판단하지 마세요.':'승인된 공개 업무 정보입니다. 개별 리뷰·호스트·지식 게시 완료는 별도 실증 근거가 필요합니다.';
+   $('asof').textContent=pub&&pub.generated_at?'공개 정보 마지막 변경 · '+new Date(pub.generated_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}):'공개 상태 확인 필요';
+   $('alert').textContent=pub
+     ? '공개 운영 상태: '+pub.cutover+' · 이 표시는 호스트 보고 및 GPT 판정 수용 범위입니다. 변경 시각은 원본 최종 검증 시각이 아니며 무변경 자체는 갱신 실패를 뜻하지 않습니다. 개별 리뷰·지식 게시 완료는 별도 근거가 필요합니다.'
+     : '공개 상태 JSON 수신·검증 실패로 현재 운영 상태 판단을 보류합니다. PRIVATE 정본과 실제 실행 근거를 확인해야 합니다.';
  }
  function kpis(){const c=pub?.counts||{}; for(const [id,key] of [['kReq','requests'],['kRev','reviews'],['kRec','receipts']])$(id).textContent=Number.isSafeInteger(c[key])&&c[key]>=0?String(c[key]):'—';$('kWork').textContent=String(cards.length)}
  function txtBlock(c){let p=el('p','',c.next_action||'다음 행동 확인 필요');return p}
