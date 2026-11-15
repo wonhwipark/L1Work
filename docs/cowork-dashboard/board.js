@@ -21,9 +21,9 @@
    "Updater의 Procedure/Feature 직접 분석 요청과 Workflow 업무 요청을 모두 접수. 두 진입 모두 같은 Work에 분석 이력을 보존"
   ],
   [
-   "Workflow",
-   "요청 분류 · 기존 Work 검색·재개",
-   "두 진입 모두 같은 목적의 기존 Work를 우선 재개. Updater 직접 분석도 기존 Work 기록 경로를 사용하며 필요한 작업만 연결"
+   "l1-fix-workflow",
+   "Work 선택·재개 · 분석 결과 갱신",
+   "l1-fix-workflow도 l1-knowledge-updater도 개인 l1-workspace를 갱신하는 주체. Workflow는 업무 분석·수정/시험·결정 이력을 저장하며 기존 Work·Kernel 기록 경로를 재사용"
   ],
   [
    "Kernel",
@@ -43,7 +43,7 @@
   [
    "l1-workspace",
    "개인 업무용 Git · 분석·초안 보존",
-   "Updater 직접 분석과 Workflow 업무 결과 모두 개인 업무용 l1-workspace의 같은 Work에 분석·초안·근거·결정·미확인을 보존. 그룹 반영 여부와 별개이며 실제 저장/readback은 미검증"
+   "l1-knowledge-updater와 l1-fix-workflow 모두 개인 업무용 l1-workspace의 같은 Work에 자기 분석·초안·근거·결정·후속 결과를 저장·갱신. 공통 Kernel/기존 writer를 재사용하며 실제 저장/readback은 각 스킬별 미검증"
   ],
   [
    "l1-knowledge-updater",
