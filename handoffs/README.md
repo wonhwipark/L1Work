@@ -1,5 +1,10 @@
 # 업무용 GPT 인계 문서
 
+## L1 Knowledge Updater — Claude R1 완료, 업무 GPT 상세 G0 인계 (2026-11-17)
+
+- **[Knowledge Updater R1 판정 반영·개인/그룹 동기화 상세 인계 r0002](L1_KNOWLEDGE_UPDATER_R1_G0_DETAILED_HANDOFF_r0002_20261117_KST.md)** — 사용자 확정 ①~④, Claude R1 독립 설계 리뷰 `ACCEPT_WITH_CHANGE`(BLOCKING 1/MAJOR 4/MINOR 2)와 GPT 보완, G01~G16 실제 설치본 READ_ONLY 검증 질문, Base/Ours/Theirs·CAS·부분실패 복구, T01~T10 후속 수락 기준. 설계 정적 검토 완료, 코드/호스트/Knowledge 쓰기는 미실행. **기존 11-16 인계의 미수신 표기보다 최신**.
+
+
 ## 관리 스킬 기능 요약 (공개용 · 업무용 GPT 인계)
 
 | 문서 | 용도 | 검증 범위 |
