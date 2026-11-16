@@ -12,7 +12,7 @@
     "works": 10
   },
   "cutover": "GitHub LIVE (호스트 보고 수용)",
-  "generated_at": "2026-11-16T15:09:41Z",
+  "generated_at": "2026-11-16T15:31:15Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -75,12 +75,12 @@
       "title": "업무 자동화 후보"
     },
     {
-      "action_kind": "REVIEW",
+      "action_kind": "OTHER",
       "category": "knowledge-design",
       "next_action": "실행 환경 확인 후 설계 검증",
       "owner": "GPT",
-      "phase_index": 3,
-      "phase_label": "리뷰 단계 신고",
+      "phase_index": 0,
+      "phase_label": "단계 미확인",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "지식 구조 설계"
