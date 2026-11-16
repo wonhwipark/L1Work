@@ -6,13 +6,13 @@
   },
   "counts": {
     "projects": 10,
-    "receipts": 4,
+    "receipts": 5,
     "requests": 8,
-    "reviews": 4,
+    "reviews": 5,
     "works": 10
   },
   "cutover": "GitHub LIVE (호스트 보고 수용)",
-  "generated_at": "2026-11-15T15:00:50Z",
+  "generated_at": "2026-11-16T02:55:54Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
