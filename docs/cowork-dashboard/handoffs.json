@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_KNOWLEDGE_UPDATER_R1_G0_DETAILED_HANDOFF_r0002_20261117_KST.md",
+      "title": "업무 GPT 인계 — L1 Knowledge Updater ↔ Workflow ↔ 개인/그룹 Knowledge 동기화·충돌 처리 상세 설계 및 G0 실측 요청",
+      "published_on": "2026-11-17"
+    },
+    {
       "filename": "L1_WORKSPACE_KNOWLEDGE_FOLDER_UPDATER_HANDOFF_r0001_20261116_KST.md",
       "title": "업무 GPT 인계 — L1 Workspace `works/`·`knowledge/` 분리와 Workflow × Knowledge Updater 연결 설계",
       "published_on": "2026-11-16"
@@ -10,11 +15,6 @@
       "filename": "L1_MSC_LINK_SKILL_G0_REVIEW_HANDOFF_r0001_20261116_KST.md",
       "title": "L1 MSC → Procedure/Feature MD 링크 — 업무 GPT G0 검토 인계",
       "published_on": "2026-11-16"
-    },
-    {
-      "filename": "L1_KNOWLEDGE_MSC_B_VIEWER_GPT_REVIEW_HANDOFF_r0001_20261114_KST.md",
-      "title": "L1 Knowledge MSC B 뷰어 — 생성·축적·게시·열람 연계 GPT 리뷰 인계서",
-      "published_on": "2026-11-14"
     }
   ]
 }
