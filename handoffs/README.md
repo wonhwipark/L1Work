@@ -33,6 +33,7 @@
 
 | 상태 | 문서 | 범위 |
 |---|---|---|
+| **업무 GPT G0 검토 요청 (2026-11-16)** | [L1_WORKSPACE_KNOWLEDGE_34_BUSINESS_GPT_REVIEW_REQUEST_r0001_20261116_KST.md](L1_WORKSPACE_KNOWLEDGE_34_BUSINESS_GPT_REVIEW_REQUEST_r0001_20261116_KST.md) | ③·④: Knowledge 폴더 Updater 단독 WRITE / Workflow READ_ONLY, Work 이력, 그룹 게시·readback·역링크. **2,702자, 읽기 전용 G0 확인·TO-BE 제안**, 구현/운영 쓰기 지시 아님 |
 | **최신 ③·④ 설계 검토 인계 (2026-11-16)** | [L1_WORKSPACE_KNOWLEDGE_FOLDER_UPDATER_HANDOFF_r0001_20261116_KST.md](L1_WORKSPACE_KNOWLEDGE_FOLDER_UPDATER_HANDOFF_r0001_20261116_KST.md) | `works/` 원본 유지 · 물리적 `knowledge/` 탐색 제안 · Updater만 WRITE / Workflow READ_ONLY · 공통 Evidence 인계 · 승인된 그룹 게시·역링크. 독립 설계 리뷰 미수신, 실제 설치·E2E 미검증. **READ_ONLY G0 점검용** |
 | **현재 인계 r0005** | [L1_KNOWLEDGE_UPDATER_WORKFLOW_INHOUSE_HANDOFF_r0005_1111.md](L1_KNOWLEDGE_UPDATER_WORKFLOW_INHOUSE_HANDOFF_r0005_1111.md) | G0 설치 사실 / G1 가정 분리, K5.8 설계표만, 기존 기능 우선 재사용 |
 | 이전 r0004 | [L1_KNOWLEDGE_UPDATER_WORKFLOW_INHOUSE_HANDOFF_r0004_1111.md](L1_KNOWLEDGE_UPDATER_WORKFLOW_INHOUSE_HANDOFF_r0004_1111.md) | 이전 보완 계약, 과거 기록 보존 |
