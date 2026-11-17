@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## L1 Workspace Linux 로컬 웹 뷰어 안전 전환 G0 (2026-11-18)
+
+- **[로컬 Workspace·웹 열람 전환 G0 읽기 전용 16항목 인계](L1_WORKSPACE_LOCAL_WEB_VIEWER_LINUX_G0_READONLY_HANDOFF_r0001_20261118_KST.md)** — Kernel·Workflow 실제 원격 의존성, 로컬 백업·기존 웹/인증·공유 ACL·그룹 Knowledge writer 확인. A~P 숫자 회신. 신규 설치·Git 변경·웹 공유·Knowledge 쓰기·Job/모델 호출 없이 읽기 전용 상태 검토.
+
 ## MSC 두 진입 writer G0 읽기 전용 확인 (2026-11-18)
 
 - **[MSC 두 진입 Updater·Kernel writer G0 숫자 확인 인계 r0001](L1_MSC_DUAL_ENTRY_WRITER_G0_READONLY_HANDOFF_r0001_20261118_KST.md)** — 업무 GPT/허용된 Linux Agent에서 기존 설치본·writer/HTML published_path·수동 편집 보호 계약을 **READ_ONLY**로 확인. 회신은 A~J 10개 숫자. 현재 개발 ZIP은 최종 PUBLIC 배포 게이트 미충족으로 게시하지 않음. 스킬 설치·Job 실행·지식 쓰기 승인 아님.
