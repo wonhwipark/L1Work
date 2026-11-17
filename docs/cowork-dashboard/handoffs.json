@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_WORKSPACE_LOCAL_WEB_VIEWER_LINUX_G0_READONLY_HANDOFF_r0001_20261118_KST.md",
+      "title": "업무 GPT / Linux 로컬 Agent — L1 Workspace 로컬·웹 전환 G0 읽기 전용 확인",
+      "published_on": "2026-11-18"
+    },
+    {
       "filename": "L1_MSC_DUAL_ENTRY_WRITER_G0_READONLY_HANDOFF_r0001_20261118_KST.md",
       "title": "L1 MSC 두 진입 — 업무 GPT / Linux Agent writer G0 읽기 전용 확인",
       "published_on": "2026-11-18"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_KNOWLEDGE_UPDATER_R1_G0_DETAILED_HANDOFF_r0002_20261117_KST.md",
       "title": "업무 GPT 인계 — L1 Knowledge Updater ↔ Workflow ↔ 개인/그룹 Knowledge 동기화·충돌 처리 상세 설계 및 G0 실측 요청",
-      "published_on": "2026-11-17"
-    },
-    {
-      "filename": "JOBLIST_V0438_MCP_RECOVERY_STATUS_HANDOFF_r0001_20261117_KST.md",
-      "title": "Job-list v0.4.38 / Linux MCP 복구 현황 인계",
       "published_on": "2026-11-17"
     }
   ]
