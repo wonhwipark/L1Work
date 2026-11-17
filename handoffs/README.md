@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## MSC 두 진입 writer G0 읽기 전용 확인 (2026-11-18)
+
+- **[MSC 두 진입 Updater·Kernel writer G0 숫자 확인 인계 r0001](L1_MSC_DUAL_ENTRY_WRITER_G0_READONLY_HANDOFF_r0001_20261118_KST.md)** — 업무 GPT/허용된 Linux Agent에서 기존 설치본·writer/HTML published_path·수동 편집 보호 계약을 **READ_ONLY**로 확인. 회신은 A~J 10개 숫자. 현재 개발 ZIP은 최종 PUBLIC 배포 게이트 미충족으로 게시하지 않음. 스킬 설치·Job 실행·지식 쓰기 승인 아님.
+
 ## ACE·PEC-HOP·ACON 지식 Updater 설계 적용 제안 (2026-11-18)
 
 - **[업무 GPT 검토용 설계 적용 제안서 r0001](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — 최신 접근 가능한 스킬 원문·기존 Work/Evidence 재사용 기준을 바탕으로 Updater에 ACE 맥락 유지, PEC-HOP 근거 보존, ACON 실패 기반 압축 개선을 적용할 수 있는지 **실제 업무 설치본 READ_ONLY G0 리뷰** 요청. 스킬 수정·설치·Knowledge 게시·Job/유료 실행 승인 아님. 기존 11-17 Knowledge 동기화 R1 리뷰와 구분.
