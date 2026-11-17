@@ -12,7 +12,7 @@
     "works": 10
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-17T14:17:28Z",
+  "generated_at": "2026-11-17T15:01:06Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -26,7 +26,7 @@
     }
   ],
   "schema": "COWORK_PUBLIC_STATUS_V1",
-  "snapshot_date": "2026-11-17",
+  "snapshot_date": "2026-11-18",
   "source": "APPROVED_AGGREGATE_ONLY",
   "sync_mode": "AUTOMATED_ALLOWLIST",
   "work_cards": [
