@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## ACE·PEC-HOP·ACON 지식 Updater 설계 적용 제안 (2026-11-18)
+
+- **[업무 GPT 검토용 설계 적용 제안서 r0001](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — 최신 접근 가능한 스킬 원문·기존 Work/Evidence 재사용 기준을 바탕으로 Updater에 ACE 맥락 유지, PEC-HOP 근거 보존, ACON 실패 기반 압축 개선을 적용할 수 있는지 **실제 업무 설치본 READ_ONLY G0 리뷰** 요청. 스킬 수정·설치·Knowledge 게시·Job/유료 실행 승인 아님. 기존 11-17 Knowledge 동기화 R1 리뷰와 구분.
+
 ## CL·Jira 기반 이슈 시나리오·복구 지점 분석 (2026-11-17)
 
 - **[CL·Jira 복구 지점 분석 프롬프트 r0001](L1_CL_JIRA_RECOVERY_ANALYSIS_PROMPT_r0001_20261117_KST.md)** — CL 번호 1개로 시작해 description의 Jira 연결, Problem/Cause/Solution·코멘트·diff/revision 대조, 정상/실패 시나리오와 검출 지점·소유자 복구 경로를 분석하는 업무 LLM 전달용 문서. p4-code-owner·l1-github·code-analyzer, 로그가 있을 때 issue-analyzer와 기존 Workflow/Kernel·doc-converter를 재사용.
