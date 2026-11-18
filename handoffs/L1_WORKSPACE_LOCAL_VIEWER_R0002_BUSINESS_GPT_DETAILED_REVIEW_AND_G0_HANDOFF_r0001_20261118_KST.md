@@ -226,6 +226,16 @@ NEXT_ONE_ACTION: 정확히 1개
 - 리뷰 생략 사실은 명시적으로 유지: `INDEPENDENT_REVIEW=NOT_RUN`. 이 문서에서의 GPT 검토는 독립 코드 리뷰·호스트 E3·보안 운영 인증을 대체하지 않는다.
 - **다음 한 동작:** 업무 GPT가 이 문서의 **r0002 정적 상세 검토 + 읽기 전용 G0 A~S**를 기존 설치 근거로 수행하고, 차단 항목·가장 작은 후속 시험/승인 범위를 한 번에 판정. Linux 서비스 기동·네트워크 공유·writer 전환·Group Knowledge 게시 등은 이후 별도 승인 전까지 수행하지 않는다.
 
+## 12. 참고 정본 경로(접근 가능한 경우에만 조회; 이 문서 단독으로도 1차 검토 가능)
+
+- CoWork PRIVATE `main`: `collab/CONTEXT_BRIEF.md`
+- 같은 Work `CURRENT.md` (상태·승인·중복·최신 결과 원장)
+- 같은 Work `L1_WORKSPACE_LOCAL_FIRST_WEB_VIEWER_SAFE_TRANSITION_DESIGN_r0001_20261118_KST.md` (보존한 이전 설계·T01~T26)
+- 같은 Work `L1_WORKSPACE_FULL_TREE_WEB_RENDER_VIEWER_DESIGN_DELTA_r0002_20261118_KST.md` (**최신 요구 우선**, T27~T34)
+- 같은 Work `L1_WORKSPACE_LOCAL_VIEWER_LINUX_PROPOSAL_AND_WORK_ORDER_DRAFT_r0001_20261118_KST.md` (과거 초안·이 문서로 업데이트)
+- L1Work PUBLIC `handoffs/L1_WORKSPACE_LOCAL_VIEWER_SAFE_STOP_HANDOFF_r0001_20261118_KST.md` (이전 안전 중지 이력)
+- L1Work PUBLIC `handoffs/L1_WORKSPACE_LOCAL_WEB_VIEWER_LINUX_G0_READONLY_HANDOFF_r0001_20261118_KST.md` (이전 A~P 질문·r0002 A~S가 우선)
+
 ## 13. 개인 Linux PC 웹 서비스 실제 구현을 위한 업무 GPT → 업무 LLM 지시
 
 > **2026-11-18 추가 운영 인계 — 사용자의 목적을 명확화:** 업무 GPT가 개인 Linux PC의 기존 `l1-workspace` 업무 문서를 실제 웹 URL로 열람하도록 만드는 일을 **검토·계획·허용된 실행 Agent/업무 LLM에 위임하고 결과를 판정**하는 것이 최종 목표. 단순 G0 조사서로 종료하지 않는다. 이 절은 실무 실행의 **순서·구현 상세·증거·승인 경계**를 제공하며, 이번 GitHub 문서 변경이 곧 Linux 서비스 실행/설치 권한은 아니다.
@@ -311,15 +321,5 @@ PUBLIC 또는 CoWork PRIVATE에 복사하지 마.
 | 지원 불가 항목과 필요한 승인 종류를 구분해 한 번에 제시 | 업무 Git 원본 전환(G5), 그룹 Knowledge 쓰기(G6): **별도 목표/승인**, Viewer 성공으로 자동 실행 금지 |
 
 **인계 완료 기준:** 업무 GPT가 이 문서만으로 개인 Linux PC를 대상으로 G0 점검→웹 서비스 후보 결정→업무 LLM용 실제 구현 지시→증거 기반 호스트 검증까지 **전체 순서를 계획·관리할 수 있게 하는 것**. 이 문서만으로 Linux 웹 서비스가 이미 생성되었다거나 호스트 변경이 승인되었다는 뜻은 아니다.
-
-## 12. 참고 정본 경로(접근 가능한 경우에만 조회; 이 문서 단독으로도 1차 검토 가능)
-
-- CoWork PRIVATE `main`: `collab/CONTEXT_BRIEF.md`
-- 같은 Work `CURRENT.md` (상태·승인·중복·최신 결과 원장)
-- 같은 Work `L1_WORKSPACE_LOCAL_FIRST_WEB_VIEWER_SAFE_TRANSITION_DESIGN_r0001_20261118_KST.md` (보존한 이전 설계·T01~T26)
-- 같은 Work `L1_WORKSPACE_FULL_TREE_WEB_RENDER_VIEWER_DESIGN_DELTA_r0002_20261118_KST.md` (**최신 요구 우선**, T27~T34)
-- 같은 Work `L1_WORKSPACE_LOCAL_VIEWER_LINUX_PROPOSAL_AND_WORK_ORDER_DRAFT_r0001_20261118_KST.md` (과거 초안·이 문서로 업데이트)
-- L1Work PUBLIC `handoffs/L1_WORKSPACE_LOCAL_VIEWER_SAFE_STOP_HANDOFF_r0001_20261118_KST.md` (이전 안전 중지 이력)
-- L1Work PUBLIC `handoffs/L1_WORKSPACE_LOCAL_WEB_VIEWER_LINUX_G0_READONLY_HANDOFF_r0001_20261118_KST.md` (이전 A~P 질문·r0002 A~S가 우선)
 
 **이 상세 인계는 운영 배포·설치 명령이 아니라 사용자가 선택한 ‘Claude 리뷰 없이 업무 GPT로 직접 설계 검토’의 정본 작업 자료다.**
