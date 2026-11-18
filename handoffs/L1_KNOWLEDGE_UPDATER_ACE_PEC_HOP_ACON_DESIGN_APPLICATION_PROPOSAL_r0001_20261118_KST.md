@@ -287,3 +287,16 @@ PY
 - **다음 수행의 완료 기준:** 현재 버전과 호환되는 기존 스킬 경로에 필요한 순수 연결만 추가 → 기존 기능·보안·호환 전체 회귀 및 독립 코드 리뷰 → 필수 릴리스 게이트 PASS → 새 최종 스킬 ZIP을 L1Work/main **루트**에 게시해 바이트/SHA 원격 검증. 업무 환경의 설치/활성화·동작 시험은 그 후 별도 HOST 결과로 정산. 조건 미달이면 계속 `BLOCKED_NOT_POSTED`.
 
 **현재 분리 판정:** `DEV_SOURCE=POSTED_PRIVATE_READBACK_PASS`; `SYNTHETIC_UNIT_TESTS=19_PASS`; `SOURCE_SKILL_INTEGRATION=NOT_RUN`; `INDEPENDENT_CODE_REVIEW=NOT_RUN`; `PUBLIC_FINAL_ZIP=BLOCKED_NOT_POSTED`; `BUSINESS_HOST_INSTALL=NOT_RUN`; `DESIGN_REVIEW_R1=CLOSED`. 이 공개 문서는 **실제 ZIP 배포/자동 업데이트/업무 호스트 적용 신호가 아님**.
+
+## 12. 2026-11-19 KST — Workflow v1.6.73 실제 패키지 내 통합·20단위시험 PASS·최종 배포 대기
+
+**업무 GPT 인계용 최신 사실(2026-11-19 KST):**
+
+- CoWork PRIVATE `COWORK-SKILL-DISCOVERY-20261112-001`에서 기존 Workflow v1.6.70 원본과 MSC v1.6.72 패치 계보를 재사용해 **v1.6.73 개발 ZIP을 실제 생성**. `l1_fix_workflow/ace_pec_acon_readonly.py`에 ACE 결정 후보/HOLD, PEC 원문 raw byte+SHA 검증, ACON 기존 반복 결과 비교 함수를 포함.
+- [실제 GitHub Actions 개발 CI 44422077963](https://github.com/wonhwipark/CoWork-Skill-Collab/actions/runs/44422077963): **SUCCESS**, `l1-fix-workflow_v1_6_73_1119.zip` 760,970 B / SHA256 `4e435a165a692f9c77c816067d6dd7d11f920def4c808d4ecb06b44b613a5c77`. 패키지의 실제 모듈을 import한 비민감 Python 단위시험 **20 PASS/0 FAIL**, MSC 기존 계약 3 PASS, ZIP 311 members/manifest 310, CRC/버전/두 번 빌드 바이트 동일 PASS.
+- **중요한 미완료:** 이 ZIP의 release channel은 `development_not_for_deployment`. Windows Claude Code **신규 코드 독립 리뷰 미완료**, 업무 Linux **실제 설치/권한/G0 미확인**, Git writer의 raw Git credential·동시 writer/충돌 보호와 전체 호환/보안 게이트 미검증. ZIP은 **현재 L1Work main 루트에 게시하지 않았음(`PUBLIC_FINAL_SKILL_ZIP=BLOCKED_NOT_POSTED`)**. 기존 L1Work 구버전 ZIP은 그대로 유지. 사용자 공개 배송 지시는 유효하게 보존.
+- 비민감 현장 협업: 업무 GPT/허용된 Linux Agent는 실제 활성 Workflow/Kernel/Analyzer 버전·read-only 호출 가능성, Knowledge Updater 기능(지원/미지원/미확인), Writer 권한/충돌 보호의 **관련 G0 델타만** 회신. Updater 원본·SKILL.md·회사 코드/로그/MSC를 CoWork 또는 L1Work에 반출하지 않음.
+- Windows Claude Code 독립 코드 리뷰는 CoWork PRIVATE 동일 Work의 `ACE_PEC_ACON_WORKFLOW_V1673_INDEPENDENT_CODE_REVIEW_AND_RELEASE_GATES_r0001_20261119_KST.md`에 범위·고정 소스·CI·LIVE 사전승인 Gate를 기록. 실제 호스트 정책/보호 위임 합치지 않는 한 REQUEST/READY/유료 리뷰 호출 0; 기존 완료된 디자인 R1은 CLOSED.
+- **최종 다음 행동:** 관련 업무 G0와 독립 코드 리뷰/릴리스 Gate PASS 후, 검증된 신규 최종 채널 패키지만 `wonhwipark/L1Work/main` 루트에 게시하여 실제 바이트 SHA-256 readback. 공개 ZIP 전달과 `skill-updater` Linux 설치·실업무 결과는 각각 별도 판정.
+
+`HOST_INSTALL=NOT_RUN`; `WORKFLOW_V1673_DEV_CI=PASS`; `INDEPENDENT_CODE_REVIEW=NOT_RUN`; `PUBLIC_SKILL_ZIP=BLOCKED_NOT_POSTED`; `BUSINESS_UPDATER_SOURCE_EXPORT=NOT_REQUIRED`.
