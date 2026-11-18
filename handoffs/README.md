@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## L1 Workspace 최신 책임 변경·가독성 개선 논의 (2026-11-18)
+
+- **[개인 Knowledge 관리 및 그룹 Knowledge 연계: 업무 GPT 현장 설계 / Knowledge Updater 전담, 웹 뷰어 UX 문제 OPEN — 최신 15절](L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md#15-최신-사용자-결정--knowledge-updater-전담업무-gpt-현장-설계-및-viewer-ux-별도-논의-2026-11-18)**. 기존 13·14절 유지. 메타정보·실제 스킬/G0는 업무 GPT가 조사, UI 화면 변경은 사용자 논의 후. 인계 문서 게시만 수행; Linux 운영·Knowledge WRITE 미실행.
+
 ## L1 Workspace r0002 업무 GPT 직접 상세 검토 인계 (2026-11-18)
 
 - **[전체 Workspace 트리·형식별 렌더링·보안/기존 스킬/G0 A~S/수락시험 T01~T34 상세 검토·작업 지시서](L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md)** — **최신 사용자 결정: Claude 독립 리뷰 생략, 업무 GPT 직접 검토.** 기존 r0002 설계의 요구·리스크·근거·19개 현장 질문과 단계별 Gate를 단독 검토 가능한 수준으로 수록. **13절 추가: 개인 Linux PC의 실제 웹 서비스 구축을 위한 업무 GPT→업무 LLM/Agent E0~E5 단계별 구현·시험·승인·롤백 지시문 포함.** **14절 추가: 사용자·업무 GPT의 개인 Knowledge 축적/탐색 TO-BE 합의(D-1~D-4, Module→Feature→Scenario, Work/Evidence/Revision/Coverage, 그룹 포맷 변환/승인 게시, Workflow knowledge/ WRITE 차단) 및 PK-G01~G08 인계.** `INDEPENDENT_REVIEW=NOT_RUN`, Linux G0·서비스/원본 전환·그룹 Knowledge 게시 `NOT_RUN`. 지금은 허용된 읽기 전용 G0·설계 검토에 한정; Linux 운영 변경은 별도 승인.
