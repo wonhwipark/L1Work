@@ -145,6 +145,8 @@ CHECKS = {
         ("scripts/ca_core/provenance_resolver.py", "resolve"),
     ],
 }
+if len(sys.argv) != 4:
+    raise SystemExit("HOLD: exactly three verified skill roots required")
 def symbols(tree):
     found = {}
     for item in tree.body:
@@ -158,13 +160,23 @@ def symbols(tree):
 
 results = []
 for role, value in zip(CHECKS, sys.argv[1:]):
-    root = pathlib.Path(value).expanduser().resolve(strict=True)
-    if not root.is_dir():
-        raise SystemExit("HOLD: verified root is not a directory")
+    try:
+        root = pathlib.Path(value).expanduser().resolve(strict=True)
+        if not root.is_dir():
+            raise ValueError("not a directory")
+    except (OSError, ValueError, RuntimeError):
+        raise SystemExit("HOLD: verified skill root unavailable (path redacted)")
     for relative, symbol in CHECKS[role]:
         candidate = root / relative
         row = {"role": role, "module": relative, "symbol": symbol}
-        if candidate.is_symlink() or not candidate.is_file():
+        at = root
+        symlink_in_path = False
+        for component in pathlib.Path(relative).parts:
+            at = at / component
+            if at.is_symlink():
+                symlink_in_path = True
+                break
+        if symlink_in_path or not candidate.is_file():
             row["status"] = "NOT_VERIFIED"
         else:
             try:
