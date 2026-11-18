@@ -20,6 +20,10 @@
 
 - **[MSC 두 진입 Updater·Kernel writer G0 숫자 확인 인계 r0001](L1_MSC_DUAL_ENTRY_WRITER_G0_READONLY_HANDOFF_r0001_20261118_KST.md)** — 업무 GPT/허용된 Linux Agent에서 기존 설치본·writer/HTML published_path·수동 편집 보호 계약을 **READ_ONLY**로 확인. 회신은 A~J 10개 숫자. 현재 개발 ZIP은 최종 PUBLIC 배포 게이트 미충족으로 게시하지 않음. 스킬 설치·Job 실행·지식 쓰기 승인 아님.
 
+## ACE·PEC-HOP·ACON: 업무 스킬 실제 사용·모바일 수정 요청 협업 (2026-11-19)
+
+- **[실사용 패키지·업무 전용 Updater 원본 비반출·모바일 오류 수정 요청의 책임/회신 경계 — 기존 인계서 최신 10절](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md#10-2026-11-19-kst--실제-업무-사용업무-전용-updater모바일-수정-요청-협업-경계)** — 사용자 확인: 스킬 패키지는 업무 환경에 전달되어 실제 사용 중. Updater 원본 코드는 GitHub 제공 불필요, 업무 GPT의 비민감 기능/실행 판정만 회수. 문제가 생기면 모바일 Agent로 기존 Work에 수정 요청 → 소유 스킬별 개발·시험·유효 승인/배포 Gate → 실제 업무 적용 확인. 설치 활성 버전과 HOST E2E는 별도 증빙, 문서 게시 자체는 실행·설치 트리거 아님.
+
 ## ACE·PEC-HOP·ACON 지식 Updater 설계 적용 제안 (2026-11-18)
 
 - **[업무 GPT 검토용 설계 적용 제안서 r0001 + 실제 Linux 설치본 READ_ONLY G0 원샷(9절)](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md#9-2026-11-18-kst--acepec-hopsafe-실제-linux-설치본-g0-읽기-전용-원샷)** — ACE 최신 Work 결정·PEC-HOP Evidence 원문 바이트·SAFE 무변경을 **실제 설치본에서 읽기 전용**으로 확인하기 위한 AST/SHA-256 점검 스니펫·synthetic fixture 경계·단일 비민감 결과 양식 포함. 업무 GPT/허용된 Linux Agent가 실행하는 절차이며 현재 **호스트 미실행**. 스킬 수정·설치·Knowledge 게시·Job·유료 호출 승인 아님. 기존 11-17 Knowledge 동기화 R1 리뷰와 구분.
