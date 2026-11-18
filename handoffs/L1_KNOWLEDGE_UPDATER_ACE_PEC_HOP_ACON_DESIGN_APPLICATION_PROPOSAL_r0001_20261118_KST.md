@@ -226,4 +226,6 @@ PY
 | Updater/그룹 | 실제 Knowledge Updater 설치/Writer 및 그룹 게시 계약 **읽기 전용 G0**; 최신 개인 Knowledge 관리 전담 결정(기존 15절) 유지 |
 | 판정 | 항목별 `PASS/FAIL/SKIP/NOT_RUN`, REUSE/CONNECT/입증된 gap만 EXTEND 후보, 잔여 차단·최소 다음 동작 |
 
+**점검 스니펫 자체 QA(업무 호스트가 아닌 격리 합성 환경):** GitHub 본문 내 Python 코드 3,027 B, SHA-256 `9fc117c5754b096f01f98d9130461aa0d92bd469b46b98ae280c63cda2fd024b`; 동일 실제 바이트를 대상으로 구문 파싱/정상 9개 함수/`mkdir` 탐지/모듈 누락/루트 누락 시 경로 비노출/인수 누락/symlink 거부를 실행해 **PASS**. 실제 업무 설치본 함수 실행·권한·부수효과 검증은 **NOT_RUN**.
+
 현재 이 문서 추가는 `HANDOFF_UPDATED`일 뿐 `LINUX_HOST_G0=NOT_RUN`. 업무 GPT 회신 전에는 실제 통합 기능의 PASS/배포 가능 판정을 내리지 않는다. 리뷰 R1은 **CLOSED_NO_AUTOMATIC_REREVIEW**, ACON 모델 3+3 시험은 별도 유효 권한·예산 확인 전 **NOT_RUN**.
