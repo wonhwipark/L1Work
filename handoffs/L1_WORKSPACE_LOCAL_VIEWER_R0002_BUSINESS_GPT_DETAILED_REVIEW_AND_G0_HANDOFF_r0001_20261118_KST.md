@@ -1,6 +1,6 @@
 # 업무 GPT 상세 검토·실행 게이트 인계 — L1 Workspace 전체 트리 로컬 웹 뷰어 r0002
 
-- 문서 개정: r0001 + 개인 Linux PC 웹서비스 실행 인계 보강 / 2026-11-18 KST
+- 문서 개정: r0001 + 13절 Linux 실행 인계 + 14절 개인 Knowledge TO-BE 합의 반영 / 2026-11-18 KST
 - 기존 협업 Work ID: `L1-WORKSPACE-RAG-20261111-001` (같은 Work 재개, 신규 Work 생성 금지)
 - 작업 정본: GitHub PRIVATE `wonhwipark/CoWork-Skill-Collab`, `main`, `collab/projects/L1-WORKSPACE-RAG-20261111-001/CURRENT.md`
 - 인계 위치: GitHub PUBLIC `wonhwipark/L1Work`, `main`, `handoffs/`
@@ -323,3 +323,59 @@ PUBLIC 또는 CoWork PRIVATE에 복사하지 마.
 **인계 완료 기준:** 업무 GPT가 이 문서만으로 개인 Linux PC를 대상으로 G0 점검→웹 서비스 후보 결정→업무 LLM용 실제 구현 지시→증거 기반 호스트 검증까지 **전체 순서를 계획·관리할 수 있게 하는 것**. 이 문서만으로 Linux 웹 서비스가 이미 생성되었다거나 호스트 변경이 승인되었다는 뜻은 아니다.
 
 **이 상세 인계는 운영 배포·설치 명령이 아니라 사용자가 선택한 ‘Claude 리뷰 없이 업무 GPT로 직접 설계 검토’의 정본 작업 자료다.**
+
+---
+
+## 14. 사용자 제공 업무 GPT 변경 합의 — 개인 Knowledge 축적·탐색 TO-BE (2026-11-18)
+
+**변경 근거:** 사용자가 제공한 업무 GPT 협의 결과 화면 2장. **기존 1~13절 r0002 웹 뷰어 요구는 유지**하며, 개인 Knowledge의 축적·탐색과 기존 `l1-knowledge-updater`의 그룹 게시 연계를 추가 검토한다. 원본 사진·Linux 개인 절대 경로·업무 자료는 이 PUBLIC 문서에 포함하지 않는다.
+
+### 14.1 변경된 개념 및 유지 항목
+
+- **목적:** `l1-knowledge-updater`의 기존 분석 기능 유지 + 개인 `l1-workspace/knowledge/`를 단순 `PERSONAL_DETAILED` 후보 분류 장소에서 **실제 축적·탐색 가능한 개인 지식 공간**으로 확장.
+- **개인 저장:** 화면상 D-1~D-4 DEFER 해소를 위해 개인 후보 저장·관리 기능을 최소 확장. 현재 Updater 세션 디렉터리/Preview에서 실제 업무 Linux 개인 Workspace Knowledge 저장 경로로 연결하는 방식부터 확인. 화면의 '기존 v1.8'은 협의 문서의 비교 기준 표현이며, 현장 설치/구현 완료를 뜻하지 않음.
+- **탐색:** 개인 Knowledge는 **Module → Feature → Scenario** 중심. 그룹 Knowledge의 물리 폴더 트리를 복사하지 않음. 기존 Procedure/Feature 분석 입력·교차 탐색은 유지하고 구체 물리 경로/스키마는 G0 실측 전 미확정.
+- **추적:** Work ID·Evidence·Revision·Coverage·검증·그룹 게시 상태를 개인 후보와 연결. 개인은 풍부한 분석/진행 메타정보를 보존하며, `works/`·Evidence 원본 이동·삭제·덮어쓰기 금지.
+- **그룹 반영:** 개인 결과의 **검증된 기술 사실과 필요한 메타정보**만 기존 그룹 포맷에 Preview/선별 변환. K5.8 Tier·K7 Placement를 활용해 개인/그룹 Target Store를 구분하고, K8은 **read-only Handoff**를 유지. **별도 유효 승인 후** 기존 `l1-github` 게시·readback·고정 그룹 Revision을 개인 Knowledge 및 원래 Work에 연결.
+- **Workflow 권한:** `l1-fix-workflow`의 `works/`·Evidence 기록 기능은 보존. Bootstrap에서 **`knowledge/` WRITE 금지**는 별도 최소 보호 변경 후보로 분리. Updater의 인가된 개인 Knowledge 저장과 혼동하지 않음.
+- **회귀:** 기존 K5.8 회귀 러너 연결 여부는 별도 품질 점검이며 이번 문서에서 PASS 처리하지 않음.
+- **변경하지 않음:** K0~K8 분석 파이프라인, K5.5/K5.6/K5.7/K5.8, K6 대표 MSC 정책, Classification Baseline v0.9.1, 기존 Work/Kernel 원장, 그룹 Knowledge 정본 구조와 승인 게이트, Viewer 읽기 전용 원칙.
+
+### 14.2 r0002 Viewer와 Updater 실행 책임 분리
+
+| 영역 | Viewer r0002 (기존 유지) | 개인 Knowledge TO-BE (추가 검토) |
+|---|---|---|
+| 데이터 | Workspace 전체 업무 트리 열람·검색·MD/MSC/형식별 렌더 | 개인 후보 축적·수정/추적, 그룹 후보 Preview |
+| 권한 | 서비스 identity **READ_ONLY**, 비밀·root 이탈·HTML active content 보호 | Updater만 실제 권한/기존 writer 계약을 확인한 뒤 개인 후보 저장 |
+| 공유 | 업무망 동료 열람은 별도 보안 승인. 개인 분석 메타정보의 공유 허용 여부 G0 재확인 | 개인 진행 메타정보 전체를 그룹 또는 동료에게 자동 공개·게시하지 않음 |
+| 기록 | Viewer 자체 Writer/정본 없음 | 기존 Work/Kernel Evidence 재사용, 그룹 고정 Revision 역링크 |
+| 배포 | E3 localhost·E4 업무망은 별도 승인 | 신규 스킬 설치/코드 변경/그룹 게시도 별도 승인 |
+
+**주의:** 13.4의 업무 GPT 전달 지시문을 실행할 때 **본 14절을 함께 읽되 Viewer 설치가 Updater 변경 실행 승인을 뜻하지 않음**.
+
+### 14.3 추가 READ_ONLY G0 및 미실행 수락시험
+
+업무 GPT는 기존 Viewer A~S 미확인 항목을 재사용하고 다음만 추가 실측:
+
+| 식별자 | 업무 GPT → 업무 LLM/Agent 확인 항목 |
+|---|---|
+| PK-G01 | 개인 Workspace Knowledge 실제 위치·접근/쓰기 소유자·현재 존재 여부 (실경로는 업무 Linux에만 기록) |
+| PK-G02 | Updater D-1~D-4·`PERSONAL_DETAILED`·세션 Preview→개인 지속 저장 기존 지원 |
+| PK-G03 | Work/Evidence/Revision/Coverage/검증·게시 상태의 현재 연결/저장 계약 |
+| PK-G04 | Module→Feature→Scenario 탐색 및 Procedure와 Work 교차 링크 지원 |
+| PK-G05 | K5.8 Tier/K7 Placement/K8 read-only Handoff, 그룹 포맷·승인 후 `l1-github` readback |
+| PK-G06 | Workflow Bootstrap `knowledge/` WRITE 방지 및 `works/` 기존 쓰기 유지 |
+| PK-G07 | Viewer 개인 메타정보의 승인 사용자 범위·검색색인/캐시·비밀 필터/HTML 격리 |
+| PK-G08 | 기존 K5.8 회귀 러너 통합 범위와 변경 후 회귀 계획 |
+
+계획 수락시험 PK-T01~PK-T10: 기존 분석 무변경, 개인 저장/재조회, Module/Feature/Scenario 탐색, Work/Evidence 무변조, 그룹 포맷 Preview, 미승인 그룹 쓰기 0·승인 readback·고정 Revision, Workflow Bootstrap 권한분리, Viewer 탐색/렌더, 보안 부정시험, K5.8 회귀. **현재 전부 NOT_RUN**. 필요한 실행 승인/호스트 기능이 미확인인 단계는 개별 HOLD/NOT_VERIFIED.
+
+### 14.4 업무 GPT에 추가로 지시할 내용
+
+기존 13.4 지시문 뒤에 다음 추가 범위를 적용할 것:
+
+> Viewer r0002의 기능·E0~E5·보안/승인 게이트는 유지한다. 동시에 사용자와 합의한 개인 Knowledge TO-BE를 기존 Updater 설치본에 대해 **PK-G01~G08 읽기 전용 확인**한다. D-1~D-4 개인 후보 저장/관리, Module→Feature→Scenario 개인 탐색, Work/Evidence/Revision/Coverage·검증/게시 링크, 기존 그룹 포맷 Preview/승인 후 `l1-github` readback, 고정 Revision 역링크, Workflow Bootstrap `knowledge/` WRITE 금지를 **REUSE → CONNECT → 입증된 GAP만 최소 EXTEND**로 분리해 계획하라. 기존 K0~K8/분류·K6 MSC/Work/Kernel/Group 구조를 바꾸거나 `works/`·Evidence를 이동·삭제하지 말 것. Viewer는 열람 전용이고 Updater Writer와 별개다. 확인된 근거·수정 영향 파일·시험/보안/롤백·승인 필요 항목을 한 번에 보고하되 승인 전 호스트 변경/그룹 게시/새 리뷰는 실행하지 말 것.
+
+**상세 설계 정본:** PRIVATE `wonhwipark/CoWork-Skill-Collab/main/collab/projects/L1-WORKSPACE-RAG-20261111-001/L1_WORKSPACE_VIEWER_PERSONAL_KNOWLEDGE_TOBE_DELTA_r0003_20261118_KST.md`.
+
+**변경 반영 범위:** 협의 내용의 문서 인계만 `POSTED`. 실제 Updater 코드/메타데이터/데이터 이관·Viewer 호스트 기능은 `NOT_VERIFIED/NOT_RUN`, 그룹 지식 `WRITE=NOT_RUN`, Claude 독립 리뷰 생략 유지.
