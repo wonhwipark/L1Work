@@ -379,3 +379,59 @@ PUBLIC 또는 CoWork PRIVATE에 복사하지 마.
 **상세 설계 정본:** PRIVATE `wonhwipark/CoWork-Skill-Collab/main/collab/projects/L1-WORKSPACE-RAG-20261111-001/L1_WORKSPACE_VIEWER_PERSONAL_KNOWLEDGE_TOBE_DELTA_r0003_20261118_KST.md`.
 
 **변경 반영 범위:** 협의 내용의 문서 인계만 `POSTED`. 실제 Updater 코드/메타데이터/데이터 이관·Viewer 호스트 기능은 `NOT_VERIFIED/NOT_RUN`, 그룹 지식 `WRITE=NOT_RUN`, Claude 독립 리뷰 생략 유지.
+
+---
+
+## 15. 최신 사용자 결정 — Knowledge Updater 전담·업무 GPT 현장 설계 및 Viewer UX 별도 논의 (2026-11-18)
+
+> **최신 변경 우선:** 기존 1~14절의 Viewer 기능·보안·실행 Gate 및 개인 Knowledge TO-BE는 보존. 15절은 **실제 메타정보 설계 책임과 지식 반영 주체를 명확히 하는 수정**이며, 기존 r0002/r0003을 폐기하거나 Linux 설치·지식 게시·UI 수정의 승인을 부여하지 않는다.
+
+### 15.1 책임과 설계 주체 확정
+
+| 역할 | 맡을 작업 | 하지 않을 작업 |
+|---|---|---|
+| **업무 GPT** | 업무 환경의 설치된 `l1-knowledge-updater`, `l1-fix-workflow`, `work-ledger-kernel`, 그룹 `l1sw-dev-knowledge`를 실제 접근 가능한 범위에서 대조. 개인 지식/그룹 게시에 필요한 **기존 메타정보·분류·연동 계약을 현장에서 설계·판정**, 업무 LLM/Agent에 검증 지시 | CoWork 문서에 나온 필드를 설치된 API·schema로 단정하거나, GPT 자신이 Linux/그룹 writer를 직접 실행했다고 보고 |
+| **`l1-knowledge-updater`** | 허용된 기존 Work/이슈 분석·Evidence를 참조하여 개인 `knowledge/` 후보 저장·축적·갱신·탐색 연결, 검증/분류·그룹 포맷 Preview, **유효 승인 후** 기존 그룹 게시 경로·readback·revision 역링크 관리 | Workflow/Kernel의 Work 기록을 이관·덮어쓰기, K8 read-only Handoff만으로 승인 없이 그룹 WRITE |
+| **`l1-fix-workflow` + `work-ledger-kernel`** | 업무 이슈/코드 분석, `works/`·Work ID·결정/분석·Evidence·source revision 관리. Updater가 권한 내 읽기/참조 가능하도록 기존 계약 재사용 | Workflow의 개인 `knowledge/` 직접 WRITE를 새로 허용하거나 중복 원장 생성 |
+| **그룹 `l1sw-dev-knowledge` / 기존 `l1-github`** | 그룹 정본/분류/게시 계약 유지, 승인된 writer를 통한 선별 반영·readback | 개인 저장 트리를 물리적으로 복제하거나 공개 문서만으로 자동 게시 |
+| **웹 뷰어** | 승인된 읽기 전용 범위의 Workspace/개인 Knowledge 탐색·Markdown/MSC·형식별 표시 | Knowledge 저장·분류 확정·게시·Writer 권한 수행 |
+
+**업무 GPT 필수 점검:** 개인→그룹 동시 접근, 기존 Work/Evidence 참조, 기존 그룹 필수 메타정보, 승인된 게시 계층을 **실제 확인**한다. 설치된 저장 API, 메타데이터 필드, 폴더 스키마를 미리 만들지 않는다. 기존 PK-G01~G08은 검사 기준으로 재사용하고, 결과는 `REUSE / CONNECT / EXTEND_PROVEN_GAP / NOT_VERIFIED` 및 증거 종류를 함께 표기한다. `Procedure/Feature` 기존 분석 분류와 `Module→Feature→Scenario` 탐색은 혼동하지 않는다.
+
+### 15.2 웹 뷰어 가독성: 사용자 관찰을 반영한 OPEN 이슈
+
+- **사용자 실제 관찰:** 열린 웹 뷰어 페이지의 가독성이 낮고 보기가 불편했음. 이 판단을 UX 결함 제보로 기록하되, 이번 인계에는 뷰어의 실제 URL/운영 리비전/화면 근거가 없어 원인·설치 완료 상태를 임의로 단정하지 않는다.
+- **`VIEWER_UX_READABILITY=USER_REPORTED/OPEN`**, **`UX_REDESIGN=DISCUSSION_PENDING`**, **`UI_CODE_CHANGE=NOT_RUN`**.
+- 다음 **사용자와의 별도 UX 디스커션**에서 트리/Work/Knowledge 탐색, 제목·본문 계층과 Markdown 너비/표/코드블록, MSC HTML/SVG 레이아웃, PC·모바일 화면, 검색·링크·브레드크럼·선택 상태를 평가. 가능한 기존 웹 서비스·렌더러 활용, 필요 근거가 있는 최소 UI 수정을 후보로 논의.
+- **UX가 확정되기 전에는 CSS/화면 구조/웹 서비스 설정·프로세스를 임의 변경하지 말 것.** r0002의 기능/보안 Gate와 **시각적 사용성 수락**을 따로 판정한다.
+
+### 15.3 업무 GPT에 전달할 최신 요청
+
+```text
+대상: wonhwipark/L1Work / main /
+  handoffs/L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md
+Work: L1-WORKSPACE-RAG-20261111-001
+최신 15절을 먼저 적용하고 13절(웹 Viewer 실행)·14절(개인 Knowledge)을 함께 유지해줘.
+
+이번에는 실제 업무 환경의 Knowledge Updater, Workflow, Work Ledger Kernel,
+L1 Workspace 기존 이슈/분석 Work/Evidence, 그룹 l1sw-dev-knowledge 정본·writer를
+허용된 Linux Agent/MCP로 READ_ONLY 확인해줘. 기존 설치본의 API/메타정보/분류
+/게시 계약과 접근권을 확인한 후, Knowledge Updater가 개인 Knowledge 관리부터
+그룹 형식 Preview·승인된 게시/readback/역링크까지 전담하는 최소 설계를 작성해줘.
+Work/Evidence는 옮기지 말고 기존 참조를 재사용해줘. 부족한 부분만 EXTEND로 분류해줘.
+
+개인과 그룹의 메타정보 필드/물리 폴더/API를 CoWork 추정만으로 확정하지 마.
+기존 K0~K8, Work/Kernel/Workflow writer와 그룹 지식 정본/승인 계약은 유지해.
+이전 Viewer 가독성이 크게 떨어진다는 사용자 관찰은 OPEN 이슈로 기록하고,
+UI 개선안·화면 수정·설치/재기동은 사용자와 별도 디스커션 전 착수하지 마.
+기존 뷰어를 직접 관찰한 사실과 이번 G0에서 검증된 호스트 사실을 구분해줘.
+
+결과: 기존 계약 인벤토리, 메타정보 최소 매핑/분류 비교, 권한·게시 Gate,
+REUSE/CONNECT/증명된 최소 EXTEND, 테스트 계획과 PASS/FAIL/SKIP/NOT_RUN,
+UX 가독성 OPEN 및 NEXT_ONE_ACTION 1개. 코드/로그/제한 자료/호스트 주소는
+업무 Linux에만 보존. 새로운 리뷰 REQUEST/READY·유료 작업·쓰기·배포 자동 시작 금지.
+```
+
+**연결된 PRIVATE 최신 델타:** `wonhwipark/CoWork-Skill-Collab/main/collab/projects/L1-WORKSPACE-RAG-20261111-001/L1_WORKSPACE_KNOWLEDGE_UPDATER_OWNERSHIP_AND_VIEWER_UX_DELTA_r0004_20261118_KST.md`.
+
+**상태:** 본 문서는 비민감 설계 인계만 게시. `HOST_CAPABILITY/SCHEMA=NOT_VERIFIED`, `UPDATER_CODE/REGRESSION=NOT_RUN`, `VIEWER_UI_CHANGE=NOT_RUN`, `LINUX_SERVICE/NETWORK_CHANGE_BY_THIS_TASK=NOT_RUN`, `GROUP_WRITE=NOT_RUN`, `INDEPENDENT_REVIEW=NOT_RUN/USER_WAIVED_THIS_HANDOFF`.
