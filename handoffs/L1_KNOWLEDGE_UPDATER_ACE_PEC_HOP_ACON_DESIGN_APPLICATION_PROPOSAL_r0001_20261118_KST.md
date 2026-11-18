@@ -276,3 +276,14 @@ PY
 `DESIGN_R1=ACCEPT_WITH_CHANGE/CLOSED` (기존 완료 리뷰 재사용), `SYNTHETIC_CONTRACT=26_PASS`, `USER_CONFIRMED_SKILLS_IN_USE=YES`, `ACTIVE_INSTALLED_REVISIONS=NOT_VERIFIED`, `UPDATER_SOURCE_EXPORT=NOT_REQUIRED`, `UPDATER_RUNTIME_CONTRACT=HOST_REPORTED_OR_PENDING`, `NEW_HOST_TEST/MODEL_CALL/INSTALL/KNOWLEDGE_WRITE=NOT_RUN_BY_THIS_DOC`.
 
 **NEXT_ONE_ACTION:** ACE·PEC-HOP·ACON을 실제 업무에 연결할 때 또는 모바일 오류 수정 요청이 들어올 때, 업무 GPT가 **문제와 관련된 미확인 기능만** 읽기 전용으로 확인하여 10.2 표의 비민감 결과를 회신. GPT는 기존 Work/공개 스킬 근거와 대조해 최소 변경·검증·배송 여부를 판정. 현재 정상 사용 중인 스킬에 대한 일괄 재설치·전체 기능 재조사 요구 없음.
+
+## 11. 2026-11-19 KST — GPT 순수 읽기 전용 구현 후보·L1Work ZIP 배포 게이트 판정
+
+- **사용자 실행 지시:** ACE·PEC-HOP·ACON을 기존 스킬에 적용하고 L1Work에 최종 ZIP까지 배포 요청. 이번 단계에서 실제 수행 가능한 비민감 순수 연결 후보와 합성 단위시험은 완료했으나, **최종 스킬 ZIP은 L1Work에 게시하지 않음(`PUBLIC_SKILL_ZIP=BLOCKED_NOT_POSTED`)**.
+- GPT가 GitHub PRIVATE CoWork 기존 Work에 새 스킬/영속 원장 없이 READ_ONLY 순수 연결 후보 1개를 작성함. ACE: 동일 Work 결정 원문·append/유효 근거가 없으면 HOLD. PEC-HOP: pinned raw bytes/발췌 위치·SHA-256 비교, 1-byte 변조 FAIL. ACON: *이미 있는* 고정 모델·revision의 baseline/compressed 결과만 비교하며 신규 모델 호출 없음. Python 합성 단위시험 **19 PASS/0 FAIL**. 기존 메모리 내 합성 계약시험 26 PASS와 실제 업무 스킬 E2E는 구별.
+- **아직 수행하지 않은 것:** 후보를 활성 `l1-fix-workflow` / `work-ledger-kernel` / `code-analyzer` ZIP에 편입하거나 실제 Linux 설치본의 기존 함수와 연결하는 작업. 업무 전용 `l1-knowledge-updater`의 코드/SKILL.md를 GitHub로 제공할 필요 없음. 새로운 서브에이전트, 학습/압축 엔진, 유료 모델 호출, Knowledge write, REQUEST/READY/Job, Windows/업무 호스트 변경 모두 없음.
+- **배포 차단 사유:** GitHub PRIVATE의 관련 개발 ZIP은 `development_not_for_deployment`. 기존 업무용 Git/Knowledge writer의 raw Git·credential·동시성/충돌 방어, 전체 회귀, 신규 코드 독립 리뷰, 실제 설치/연결 계약 등이 통합 배포 PASS로 입증되지 않았음. 최신 활성 설치 버전을 확인하지 않고 낮은 공개 ZIP을 기반으로 새 버전을 만들면 과거 변경을 덮을 수 있음. 따라서 “단순 ZIP 재패키징 → L1Work 공개 → 업무 환경 자동 설치”를 실행하면 안 됨. 공개된 구버전 ZIP을 변경하지 않음.
+- **업무 GPT의 최소 후속:** 기존 §§9~10의 전체 재조사 대신, 실제 활성 **Workflow/Kernel/Analyzer 버전 또는 source hash(확인 가능한 항목만)**, 기존 Work 결정의 원문 순서/권한 검증 가능성, 기존 Evidence 발췌의 byte range 제공 여부, Knowledge Updater의 **지원 기능/제약/호스트 시험 등급에 대한 비민감 요약**만 읽기 전용으로 회신. 내부 코드·원문 로그·회사 자료·상세 MSC는 업무 환경에 유지. 접근/권한이 없으면 `NOT_VERIFIED`.
+- **다음 수행의 완료 기준:** 현재 버전과 호환되는 기존 스킬 경로에 필요한 순수 연결만 추가 → 기존 기능·보안·호환 전체 회귀 및 독립 코드 리뷰 → 필수 릴리스 게이트 PASS → 새 최종 스킬 ZIP을 L1Work/main **루트**에 게시해 바이트/SHA 원격 검증. 업무 환경의 설치/활성화·동작 시험은 그 후 별도 HOST 결과로 정산. 조건 미달이면 계속 `BLOCKED_NOT_POSTED`.
+
+**현재 분리 판정:** `DEV_SOURCE=POSTED_PRIVATE_READBACK_PASS`; `SYNTHETIC_UNIT_TESTS=19_PASS`; `SOURCE_SKILL_INTEGRATION=NOT_RUN`; `INDEPENDENT_CODE_REVIEW=NOT_RUN`; `PUBLIC_FINAL_ZIP=BLOCKED_NOT_POSTED`; `BUSINESS_HOST_INSTALL=NOT_RUN`; `DESIGN_REVIEW_R1=CLOSED`. 이 공개 문서는 **실제 ZIP 배포/자동 업데이트/업무 호스트 적용 신호가 아님**.
