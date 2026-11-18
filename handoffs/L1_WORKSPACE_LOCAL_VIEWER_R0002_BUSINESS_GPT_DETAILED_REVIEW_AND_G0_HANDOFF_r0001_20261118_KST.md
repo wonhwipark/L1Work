@@ -1,6 +1,6 @@
 # 업무 GPT 상세 검토·실행 게이트 인계 — L1 Workspace 전체 트리 로컬 웹 뷰어 r0002
 
-- 문서 개정: r0001 / 2026-11-18 KST
+- 문서 개정: r0001 + 개인 Linux PC 웹서비스 실행 인계 보강 / 2026-11-18 KST
 - 기존 협업 Work ID: `L1-WORKSPACE-RAG-20261111-001` (같은 Work 재개, 신규 Work 생성 금지)
 - 작업 정본: GitHub PRIVATE `wonhwipark/CoWork-Skill-Collab`, `main`, `collab/projects/L1-WORKSPACE-RAG-20261111-001/CURRENT.md`
 - 인계 위치: GitHub PUBLIC `wonhwipark/L1Work`, `main`, `handoffs/`
@@ -225,6 +225,92 @@ NEXT_ONE_ACTION: 정확히 1개
 - 기존 리뷰 요청 `REQ-L1-WORKSPACE-LOCAL-VIEWER-DESIGN-R1-20261118` 관련 REQUEST/READY/watchers/유료 실행을 생성·재큐잉하지 않음. 이전 예산 USD 1.50 승인을 이번 업무 GPT 단계의 유료 모델 실행/보안 설정 변경 승인으로 확대하지 않음.
 - 리뷰 생략 사실은 명시적으로 유지: `INDEPENDENT_REVIEW=NOT_RUN`. 이 문서에서의 GPT 검토는 독립 코드 리뷰·호스트 E3·보안 운영 인증을 대체하지 않는다.
 - **다음 한 동작:** 업무 GPT가 이 문서의 **r0002 정적 상세 검토 + 읽기 전용 G0 A~S**를 기존 설치 근거로 수행하고, 차단 항목·가장 작은 후속 시험/승인 범위를 한 번에 판정. Linux 서비스 기동·네트워크 공유·writer 전환·Group Knowledge 게시 등은 이후 별도 승인 전까지 수행하지 않는다.
+
+## 13. 개인 Linux PC 웹 서비스 실제 구현을 위한 업무 GPT → 업무 LLM 지시
+
+> **2026-11-18 추가 운영 인계 — 사용자의 목적을 명확화:** 업무 GPT가 개인 Linux PC의 기존 `l1-workspace` 업무 문서를 실제 웹 URL로 열람하도록 만드는 일을 **검토·계획·허용된 실행 Agent/업무 LLM에 위임하고 결과를 판정**하는 것이 최종 목표. 단순 G0 조사서로 종료하지 않는다. 이 절은 실무 실행의 **순서·구현 상세·증거·승인 경계**를 제공하며, 이번 GitHub 문서 변경이 곧 Linux 서비스 실행/설치 권한은 아니다.
+
+### 13.1 수행 주체·실제 연결 및 최종 산출
+
+- **업무 GPT(관리·판정):** 최신 인계서 검토→실제 Linux G0 회수→기존 서비스 활용 후보 결정→필요한 최소 코드/설정 수정 지시 작성→유효한 실행 승인 확인→Agent/업무 LLM으로 위임→시험 증거 취합/FAIL 보완→호스트 수락 판정. 자신이 Linux shell·서비스를 직접 제어할 수 있다고 가정하지 않음.
+- **업무 LLM + 기존 Linux Agent/MCP:** 실행 권한이 실제 확인된 기존 업무 도구만 사용하여 파일·설치본 조사, 검증된 구현·격리 시험, 승인된 호스트 변경·브라우저 시험 수행. 텍스트 전용 업무 GPT는 실행 자체가 아니라 명시적인 프롬프트/Job 인계 역할.
+- **기존 시스템:** Workflow/Kernel/Converter/Updater·Git·Kernel Ledger/Work ID는 데이터 소유권 유지. Viewer는 READ_ONLY. 새 Skill/DB/별도 정본·양방향 Sync를 선제 생성하지 않음.
+- **최종 기능 완료 조건:** 사용자 브라우저에서 개인 Linux PC가 제공하는 하나의 **승인된 URL**로 업무 Workspace 폴더 전체/신규 Work를 탐색하고, Markdown 즉시 렌더와 기존 B형 MSC HTML·SVG·PDF/텍스트를 문제없이 **읽기만** 할 수 있어야 함. 동료 접속은 별도 인증/망/서비스 승인이 확인된 이후의 G4이며 localhost 성공과 구별.
+- **최종 보고 필드:** `HOST_G0`, `WEB_SERVICE_SELECTED`, `SOURCE_REVISION`, `VIEWER_ORIGIN`, `URL_SCOPE=LOCALHOST|BUSINESS_NETWORK|NONE`, `AUTH/TLS`, `READ_ONLY_PROOF`, `TESTS`, `BACKUP/ROLLBACK`, `BLOCKERS`, `NEXT_ONE_ACTION`. 실제 URL·IP·호스트명·계정/경로/보안설정 원문은 Linux 업무 환경에만 보존.
+
+### 13.2 업무 GPT가 업무 LLM에 위임할 세부 작업 순서
+
+| 실행 순서 | 업무 GPT → 업무 LLM 구체 지시 | 끝난 뒤 확인할 증거 | 승인·STOP 조건 |
+|---|---|---|---|
+| **E0 환경 확인 (NOW)** | 기존 스킬 설치본/Workspace 실제 루트·디렉터리 수·파일 확장자·Work/Evidence 소유자, 현재 OpenCode Web 또는 기존 승인된 웹 서비스 프로세스/렌더러/포트·인증·TLS·격리 지원, Git writer·원본/백업/복구·동료 접속 정책을 **읽기 전용** 조회. A~S와 비교. | 설치본·지원 여부 `1/2/3/4`, 증거 종류, 미확인 사항. 파일 경로는 공개 보고에서 가림 | 현재 직접 요청 가능한 범위. 파일/설정 변경·웹기동·추가 Job/유료 호출 없음 |
+| **E1 최소안 설계 (NOW)** | 기존 웹 서비스의 디렉터리 트리·Markdown/HTML/MSC/PDF/이미지 핸들러·검색·권한을 확인. **A 기존 서비스의 안전한 read-only source/handler**, 미지원/경계 위험이면 **B 검증된 별도 READ_ONLY snapshot** 중 최저 변경안을 선정. 구현 파일/설정, 책임, 보안 필터, 서비스 기동·롤백 구체 계획 제시 | A/B 선택 이유, 지원/부족 기능표, 변경 예상 파일 목록·되돌리기 계획 | *계획은 허용*. 실제 설치/서비스 실행/쓰기 승인과 별개 |
+| **E2 합성 재현·개발 후보** | 허용된 격리 시험 범위에서만 synthetic Work 트리(한글 MD, MSC HTML/SVG 샘플, JSON/CSV/PDF/이미지, 민감 경로 반례)를 이용해 디렉터리 탐색/파일별 renderer/원본 SHA 불변/링크·HTML 보안 시험. 기존 렌더러 활용, gap 입증 시 최소 수정만 제안/개발 | 시험 PASS/FAIL/NOT_RUN, 소스 diff·합성 증거 ID, 위험/문제 목록 | 시험 환경/실행 권한 확인. 실제 Workspace에 export/migrate·쓰기 금지 |
+| **E3 개인 PC localhost 시범** | **Linux 호스트 실행·설정 승인 후** 기존 웹 서비스 또는 승인된 별도 viewer 계층을 사용해 **격리된 읽기 전용** 문서 루트와 제한된 서비스 identity 생성/연결. `/workspace/` 등 *설계상* 루트 URL에서 폴더 탐색, `/workspace/.../<file>` 파일별 렌더, 원문보기, 검색/최신화 기능을 검증. 실제 경로·포트는 현장 계약에 맞춰 결정 | 실제 로컬 브라우저 캡처/검사 ID, 접속 URL 범위, read-only 근거, 원본 해시 전후 비교, 이전 서비스 설정 복구 절차 | 설치/프로세스 실행·mount·서비스 계정/설정 변경은 사용자/호스트 승인 확인 전 **HOLD** |
+| **E4 동료용 업무망 읽기 전용 공개** | **별도 업무망 공유 승인·G2/G3 PASS 뒤** 기존 HTTPS reverse proxy/인증/방화벽을 재사용해 권한 있는 동료 계정 2개에서 같은 단일 URL·전체 업무 콘텐츠 tree 탐색·MD/MSC 검색/직접 링크 확인. Work별 개별 공개요청은 기본 필수 아님 | 인증·TLS/접속/403/404/쓰기 거부·비밀 차단·2계정 접속 시험 ID, PC offline·재접속 판정 | 기존 승인된 보안 정책·데이터 분류·망 설정에서 허용 불확실 시 **HOLD**; 익명/인터넷 공개 금지 |
+| **E5 수락·복구** | T01~T34 중 해당되는 테스트의 수행 범위·결과·회귀/부정시험·브라우저 기능 확인, 장애 시 viewer만 내리거나 snapshot을 이전 정상본으로 되돌리는 시험. 원본 writer/Git/Group Knowledge 불변 확인 | 호스트 실제 결과, 원본 SHA/Work ID/그룹 writer 무변경 증거, 장애 복구 영수증, 사용 가능 URL 범위 | FAIL이면 운영 확대 금지. G5 원본 authority 전환·G6 그룹 지식 게시 자동 착수 금지 |
+
+**실행 순서가 중단되지 않도록:** E0/E1 결과가 나왔을 때 업무 GPT는 확인된 기존 기능을 바탕으로 E2~E5의 **구체적인 변경안과 시험 명령을 현장 적합하게 작성**한다. 이미 확인한 항목을 반복 질문하지 않고, 같은 Work에서 구현/자체시험/수정/재시험을 이어간다. 다만 필요한 별도 실행 승인이 없으면 해당 E단계만 `HOLD/NOT_RUN`으로 표시하고 설계·비민감 합성 분석을 계속한다.
+
+### 13.3 뷰어 구현 시 실제 개발 요구와 보호 조건
+
+**구현 계약(실제 API 이름은 기존 설치본 조회 후 정함)**
+
+1. **파일 목록/라우팅:** G0에서 확인된 Workspace 업무 root를 읽기 전용으로 탐색. root의 폴더·Work ID와 상대 디렉터리 구조를 보존하고 새 파일 자동 감지. 서비스가 자체 파일 브라우저를 제공하면 그대로 활용. 검색이 없으면 확인된 기존 색인만 재사용 또는 최소 범위 후보 제안.
+2. **형식별 응답:** Markdown → 안전한 HTML 렌더/원문보기; MSC HTML+SVG → 별도 origin·sandbox/CSP가 허용하는 범위에서 인터랙션; JSON/CSV/TXT/YAML → escape된 구조/텍스트·테이블; PDF/이미지 → 승인된 handler; 기타 바이너리 → 안전한 다운로드/비지원 안내. 전량 MD를 HTML 정본으로 생성하거나 원본을 덮어쓰지 않음.
+3. **원본의 최신성:** 읽을 때 원본 revision/mtime/hash 또는 검증된 캐시 키로 갱신; 검색 색인/HTML cache·ETag·직접 URL에 이전 권한이나 제한 자료가 남지 않도록 보호. 변경 발견/캐시 만료 기준·동시 사용자 부하는 G0 성능 근거로 설정.
+4. **원본 분리:** Viewer service identity에 파일 쓰기/수정/삭제/rename/업로드 권한 없음. 읽기 전용 mount도 root/secret 필터를 우회할 수 있으면 사용 금지, B의 격리된 snapshot으로 전환. HTML/asset/원문/다운로드뿐 아니라 API·검색 결과도 동일한 필터.
+5. **보안 필수:** symlink/hardlink·경로 정규화·루트 이탈·숨김 파일·`.git`/키/토큰·`.env` 등 denylist, 비밀 내포 콘텐츠 검사, HTML JS isolation·CSP·비인증 인터넷 접근 차단. 기존 OpenCode Web 자체가 안전한 viewer인지 **실제 인증·권한/쓰기 API까지** 검증하기 전 업무 전체를 노출하지 않음.
+6. **서비스 운영:** 허용된 기존 인증/HTTPS, 재시작·PC 절전·IP/DNS 변경에 따른 URL 단절, 업그레이드/롤백/프로세스 중복 방지 확인. 신규 패키지·서비스·systemd unit·firewall 규칙 생성/변경 및 공개 포트 개방은 **현장 승인 이후**에만 지시.
+7. **기존 소비자 호환:** `MSC_VIEW.md`의 HTML 링크와 Converter 상세 MD의 상대 asset 링크를 별개로 검사. 라우팅 문제는 viewer 계층의 안전한 링크 매핑으로 우선 해결. 기존 Workflow의 `docs_sync/docs_push` Git 검증을 끄거나 `work_docs` role을 임의 변경하지 않음.
+8. **실제 출력 형식:** 설계(어떤 existing web service, A/B, root 범위, ACL, renderer), 정확한 *현장 검증된* 실행 명령과 변경 대상 설정의 diff, synthetic/브라우저 시험 계획 및 실행 결과, 단계별 승인 요구, 복원 명령/영수증. 확실하지 않은 CLI/API/서비스 스키마를 추정해 명령을 만들지 않음.
+
+### 13.4 업무 GPT에서 그대로 시작할 수 있는 지시문
+
+아래는 **업무 GPT에게 전달하는 요청문**이며, 이후 업무 GPT가 업무 LLM/허용된 Agent용 단계별 실제 프롬프트를 생성한다. PUBLIC 문서를 Linux에서 실행하는 스크립트처럼 취급하지 않는다.
+
+```text
+대상 Work: L1-WORKSPACE-RAG-20261111-001
+정본 설계: CoWork PRIVATE wonhwipark/CoWork-Skill-Collab / main
+현재 인계: L1Work PUBLIC wonhwipark/L1Work / main /
+  handoffs/L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md
+반드시 위 인계서의 r0002 우선 정책과 13절 실행 지시까지 읽고 진행해줘.
+
+최종 목적은 내가 사용하는 개인 Linux PC의 실제 l1-workspace 전체 업무 문서 폴더를
+하나의 승인된 웹 URL에서 읽기 전용으로 탐색·검색·표시하는 것.
+Markdown은 열 때 HTML로 렌더, B형 MSC HTML/SVG·PDF/JSON/이미지 등도 지원.
+Work별 별도 공유 목록은 기본 요구가 아니며, OS 비밀·제한 자료/인터넷 익명 공개는 금지.
+기존 Git/Kernel Work 정본과 그룹 Knowledge writer는 변경하지 마.
+
+우선 기존 Linux Agent/MCP에 허용된 도구를 이용하여 A~S G0 중 아직 미확인만
+읽기 전용으로 검증해줘. 기존 OpenCode Web/기타 승인 웹서비스,
+디렉터리 browse·Markdown 렌더·HTML 격리·인증/쓰기 API·HTTPS 지원을 실제 조회하고
+A(기존 서비스에 안전한 read-only 연결) 또는 B(격리 snapshot)를 선택해.
+미확인 API/포트/호스트 경로/CLI를 만들어 내지 말고 필요한 최소 구현·변경 파일,
+synthetic/보안/브라우저 시험, 원본 SHA 불변·rollback 계획까지 구체화해줘.
+
+G0 근거가 확인되면 업무 LLM/Agent용 실제 단계별 작업 지시를 작성하고
+기존 승인된 범위의 합성 시험까지 이어서 처리해줘.
+별도 Linux 설치·서비스 실행·로컬 설정/계정/권한 변경은 해당 호스트의
+현재 유효 승인/사전 위임이 확인된 경우에만 실행해.
+업무망 동료 공개는 네트워크 보안 승인과 localhost G2/G3 시험 PASS 후 별도 진행.
+승인 미확인/보안 차단이면 그 단계만 HOLD하고 독립 리뷰를 다시 요청하지 마.
+
+실제 실행은 업무 GPT 자신이 했다고 주장하지 말고 허용된 실행 LLM·Agent의
+입력 revision, 변경 파일, 자체시험, 현장 Evidence, 실패/복구, 남은 승인을 보고해줘.
+결과 보고는 PASS/FAIL/SKIP/NOT_RUN과 NEXT_ONE_ACTION으로 마무리.
+제한 코드·MSC/로그·호스트 주소·토큰/개인정보는 업무 Linux 내 보존하고
+PUBLIC 또는 CoWork PRIVATE에 복사하지 마.
+```
+
+### 13.5 현재 범위에서 **가능한 일**과 **승인 후 가능한 일**
+
+| 즉시 가능한 업무 GPT 주도 작업 | 별도 Gate 통과 후 실제 수행 |
+|---|---|
+| 인계서 전체 설계 검토, G0 A~S READ_ONLY 근거 조사, 기존 서비스 지원 여부·보안 GAP 확인, 후보 A/B 판정 및 작업 지시 세분화 | 기존 Linux 웹 서비스 설정/마운트/리버스프록시·systemd/프로세스 실행, 신규 패키지 설치·코드/파일 쓰기 |
+| 현재 승인된 합성·비민감 테스트 범위의 분석 및 최소 수정 제안, 기존 Work와 결과 연결 | 개인 localhost 접속 수락(E3), 동료 업무망 접속(E4) 및 네트워크/방화벽/인증·TLS 설정 |
+| 지원 불가 항목과 필요한 승인 종류를 구분해 한 번에 제시 | 업무 Git 원본 전환(G5), 그룹 Knowledge 쓰기(G6): **별도 목표/승인**, Viewer 성공으로 자동 실행 금지 |
+
+**인계 완료 기준:** 업무 GPT가 이 문서만으로 개인 Linux PC를 대상으로 G0 점검→웹 서비스 후보 결정→업무 LLM용 실제 구현 지시→증거 기반 호스트 검증까지 **전체 순서를 계획·관리할 수 있게 하는 것**. 이 문서만으로 Linux 웹 서비스가 이미 생성되었다거나 호스트 변경이 승인되었다는 뜻은 아니다.
 
 ## 12. 참고 정본 경로(접근 가능한 경우에만 조회; 이 문서 단독으로도 1차 검토 가능)
 
