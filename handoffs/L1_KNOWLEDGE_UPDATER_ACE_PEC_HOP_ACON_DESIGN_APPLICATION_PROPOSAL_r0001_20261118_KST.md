@@ -98,3 +98,120 @@ B. Workflow 기존 Work 지식화: 현재 Work ID/Evidence/source revision 사�
 검증 기준: 기존 근거/결정·Source Revision 무손실, 미승인 쓰기 0, 과거 사례를 현재 fact로 승격 0, 기존 Knowledge 원격 충돌·다른 담당자 변경 무손실, 업무 GPT 텍스트 전달시 근거 위치 소실 0. 설계 리뷰 PASS는 설치/실행/Knowledge 게시 PASS가 아님.
 
 **이번 요청은 검토·회신만입니다.** 실제 코드 변경/시험 실행/그룹 Knowledge 게시/운영 설치/Job/새 유료 모델 리뷰·승인/키·토큰 변경은 여기서 시작하지 마세요. 기존 업무 인계 r0002의 실제 G0 점검과 중복 조사하지 말고 확인된 항목은 근거를 재사용하세요.
+
+
+## 9. 2026-11-18 KST — ACE·PEC-HOP·SAFE 실제 Linux 설치본 G0 읽기 전용 원샷
+
+### 상태·책임 및 적용 경계
+
+- 최신 사용자 지시: ACE/PEC-HOP/SAFE 합성 설계시험과 CoWork PRIVATE 개발 후보의 실제 소스 정적 G0 이후, **업무 GPT/허용된 Linux Agent의 실제 설치본 G0**를 이어서 수행. 이 항목은 앞의 7~8절 G0에 추가되는 **한정된 확인 절차**이며 새 Work/스킬/Writer를 만들지 않는다.
+- 선행 증거: CoWork 기존 Work \`COWORK-SKILL-DISCOVERY-20261112-001\`의 \`GPT_ACE_PEC_SAFE_SOURCE_G0_INTERFACE_MAPPING_r0001_20261118_KST.md\`. 개발 후보 \`l1-fix-workflow 1.6.70\`, \`work-ledger-kernel 0.7.43\`, \`code-analyzer 0.15.3\`의 일부 소스는 GPT가 직접 열어 **SOURCE_CANDIDATE_G0=PASS_SCOPE_LIMITED** 확인. 이는 설치/활성 버전 확인이 아니며 실제 함수 실행 결과도 아니다.
+- CoWork 합성 계약 26/26 PASS는 **순수 함수 oracle**의 결과일 뿐 실제 업무 스킬 통합 시험 결과가 아니다. \`UPDATER_HOST_G0\`는 별도로 업무 GPT가 확인한다.
+- 이번 수행 허용 범위: 실제 설치 경로·버전·원본 파일 digest·함수 정의·기존 reader/검증기 권한·적합한 **이미 존재하는 승인된 비민감 synthetic fixture**의 무변경 여부를 읽기 전용으로 조사. 스킬/지식 수정, \`apply=True\`, 모듈 재설치, Git/P4 push, Group Knowledge 쓰기, 예약/Job/모델 실행, 서비스 개방, 신규 유료 리뷰, CoWork REQUEST/READY 생성 **금지**. 만약 기존 fixture/허용 registry가 없으면 실제 호출 시험을 강행하지 않고 \`NOT_RUN\`.
+- 여기의 \`python -B\`는 실제 설치 Python 모듈을 **import하지 않고 AST로 읽기만 하는 1차 점검용**. 이 문서의 게시나 GPT 응답 자체는 Linux Agent를 시작하지 않으며 실제 호스트 실행/인증은 업무 GPT가 기존 허용된 Linux MCP/Agent 경로로 수행해야 한다.
+
+### 9.1 업무 GPT가 먼저 수행할 설치본 READ_ONLY 원샷
+
+1. 실제 Linux 환경의 허용된 스킬 발견/설치 상태 조회 기능으로 \`l1-fix-workflow\`, \`work-ledger-kernel\`, \`code-analyzer\`, \`l1-knowledge-updater\`의 **활성 설치본** 디렉터리·SKILL.md 버전/원본 revision/설치 해시/호출 가능 provider를 확인. 공개 릴리스와 PRIVATE 개발 후보 번호를 현재 설치 버전으로 추정하지 않음. Agent에 업무 폴더 전체 검색이나 민감 파일 출력 요청 금지.
+2. 아래 probe의 \`WORKFLOW_ROOT\`, \`KERNEL_ROOT\`, \`ANALYZER_ROOT\`에는 **각 스킬의 실제 설치 root**(예: 하위 \`l1_fix_workflow/\`, \`work_ledger_kernel/\`, \`scripts/ca_core/\`가 존재하는 부모)만 입력. stdout에 절대 경로·회사 코드·Evidence 원문은 출력하지 말고 별칭/상대 경로·SHA만 회신. 설치본 경로 또는 스킬 이름을 확인할 수 없으면 \`NOT_VERIFIED\`로 보고하고 자동 설치/탐색 범위 확대 금지.
+3. 다음 코드는 stdlib AST와 SHA-256만 사용하고 **실제 설치 모듈을 import하거나 실행하지 않는다**. UTF-8 파일을 검사하는 동안 pycache 쓰기를 피하기 위해 \`-B\` 사용. 원본이 symlink/누락/파싱 불가면 FAIL_CLOSED/\`NOT_VERIFIED\`.
+
+\`\`\`bash
+# 실제 설치 root는 업무 GPT/허용된 Agent가 확인한 값으로만 지정
+: "\${WORKFLOW_ROOT:?verified workflow skill root required}"
+: "\${KERNEL_ROOT:?verified kernel skill root required}"
+: "\${ANALYZER_ROOT:?verified analyzer skill root required}"
+PYTHONDONTWRITEBYTECODE=1 python3 -B - "$WORKFLOW_ROOT" "$KERNEL_ROOT" "$ANALYZER_ROOT" <<'PY'
+import ast
+import hashlib
+import json
+import pathlib
+import sys
+
+CHECKS = {
+    "workflow": [
+        ("l1_fix_workflow/work_inspection.py", "inspect_work"),
+        ("l1_fix_workflow/feature_evidence.py", "attach_evidence"),
+        ("l1_fix_workflow/work_router.py", "DeterministicWorkRouter.handle"),
+    ],
+    "kernel": [
+        ("work_ledger_kernel/continuity.py", "TLContinuity.resume"),
+        ("work_ledger_kernel/work_refs.py", "WorkReferences.read"),
+        ("work_ledger_kernel/validation.py", "validate_evidence_meta"),
+        ("work_ledger_kernel/storage.py", "LedgerStorage.__init__"),
+    ],
+    "analyzer": [
+        ("scripts/ca_core/reuse_validator.py", "validate"),
+        ("scripts/ca_core/provenance_resolver.py", "resolve"),
+    ],
+}
+def symbols(tree):
+    found = {}
+    for item in tree.body:
+        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            found[item.name] = item
+        elif isinstance(item, ast.ClassDef):
+            for child in item.body:
+                if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    found[item.name + "." + child.name] = child
+    return found
+
+results = []
+for role, value in zip(CHECKS, sys.argv[1:]):
+    root = pathlib.Path(value).expanduser().resolve(strict=True)
+    if not root.is_dir():
+        raise SystemExit("HOLD: verified root is not a directory")
+    for relative, symbol in CHECKS[role]:
+        candidate = root / relative
+        row = {"role": role, "module": relative, "symbol": symbol}
+        if candidate.is_symlink() or not candidate.is_file():
+            row["status"] = "NOT_VERIFIED"
+        else:
+            try:
+                raw = candidate.read_bytes()
+                tree = ast.parse(raw, filename=relative)
+                found = symbols(tree)
+                row["sha256"] = hashlib.sha256(raw).hexdigest()
+                row["status"] = "PRESENT" if symbol in found else "NOT_VERIFIED"
+                if symbol == "LedgerStorage.__init__" and symbol in found:
+                    row["calls_mkdir"] = any(
+                        isinstance(n, ast.Call) and
+                        isinstance(n.func, ast.Attribute) and
+                        n.func.attr == "mkdir"
+                        for n in ast.walk(found[symbol])
+                    )
+            except (OSError, SyntaxError, UnicodeError):
+                row["status"] = "NOT_VERIFIED"
+        results.append(row)
+print(json.dumps(results, ensure_ascii=False, indent=2))
+if any(r["status"] != "PRESENT" for r in results):
+    raise SystemExit(2)
+PY
+\`\`\`
+
+**주의:** \`PRESENT\`는 함수 정의가 소스에 있다는 사실만 확인하며, 실제 runtime import/호출 가능 또는 권한/무변경 보증이 아니다. \`calls_mkdir=true\`면 이미 소스에서 확인된 Kernel 초기화 부수효과 위험을 보여준다. 결과에 출력되지 않는 writer/Agent 자동 작업이나 하위 호출까지 검증한 것으로 취급하지 않는다.
+
+### 9.2 실제 읽기 전용 fixture 시험 — 전제 통과 때만
+
+- 업무 GPT가 **이미 존재하며 사용이 승인된 비민감 synthetic Work/Evidence fixture**와 기존 provider registry/profile을 확인한 뒤, 실제 설치 모듈을 이용한 \`inspect_work\`, \`TLContinuity.resume\`, \`attach_evidence(..., apply=False)\`를 순서대로 실행할 수 있는지 판정. 미확인 API/빈 Work에 새로운 Work ID를 임의 생성하거나 실제 회사 Work를 fixture로 쓰지 않음.
+- 호출 전·후 **해당 fixture 전체**의 상대 파일/디렉터리 목록·파일 크기·SHA-256·mtime/ctime을 비교. 생성·수정·삭제가 하나라도 있으면 \`FAIL_SIDE_EFFECT\`, 비교/권한 불가면 \`NOT_RUN\`. atime은 읽기만 해도 파일시스템에 따라 변할 수 있으므로 무변경 판정의 유일한 기준으로 삼지 않음. 업무 Workspace 원본/시스템 설정에는 실행하지 않음.
+- \`LedgerStorage.__init__\`은 \`root.mkdir(parents=True, exist_ok=True)\` 가능성이 확인됐으므로, **기존 fixture root가 실제 존재할 때만** 시험. root 미존재로 인한 자동 디렉터리 생성은 읽기 전용 PASS가 아니다.
+- **ACE-02:** 원본 결정 append/revision·승인 범위·철회 이력이 실제 reader 출력/정본에서 보존되는지 비교. \`brief.decisions\`의 \`ref/date=None\` 요약값만 있으면 최신 결정 확정 불가 → \`HOLD\`.
+- **PEC-01/03:** 기존 Evidence \`sha256\`이 **전체 파일 digest**인지 확인한 뒤, 발췌의 \`byte_offset/length\`가 원본 provider 출력에 존재하는지 확인. 명확한 바이트 범위와 동일 revision이 있으면 원문 raw bytes와 발췌 raw bytes의 SHA-256을 fixture에서만 대조하고 1바이트 오염의 FAIL/HOLD를 확인. byte range/인코딩/원본 권한 불명확하면 \`NOT_VERIFIED/HOLD\`; 원본 속성을 새 Kernel 필드로 추가하지 않음.
+- **SAFE-01/03:** \`apply=True\` 금지, 검증 작업 중 파일/디렉터리 변경·Group write·Git/P4 publish·Watcher REQUEST/READY·모델 호출·Job/Agent 자동 시작 모두 0 확인. 기존 R1 완료 리뷰는 재큐잉하지 않음. 실행중 부수효과 감시 근거가 없으면 단순 파일 diff만으로 watcher/모델 호출 0을 보증했다고 주장 금지.
+- 위 중 하나라도 설치 경로·함수 존재·fixture·권한 경계가 미확인이면 **거기서 중단**하여 해당 항목만 \`NOT_RUN/BLOCKED\`로 기록. 이미 가능한 정적 G0 조사·비민감 회신은 계속.
+
+### 9.3 단일 비민감 회신(동일 기존 Work에 연결)
+
+업무 GPT는 기존 검토 7~8절과 중복 수행하지 말고 실제 이번에 확인된 델타만 다음 표로 한 번 회신:
+
+| 항목 | 요구 회신 |
+|---|---|
+| 설치본/활성 provider | 스킬 4종별 실제 버전·설치 경로 **별칭**·SKILL/기능 파일 SHA/실행 인터페이스; 코드·절대 경로 본문 금지 |
+| ACE-02 | \`SOURCE_STATIC/ACTUAL_FIXTURE=PASS/FAIL/NOT_RUN\`, 결정 원본 순서·승인 근거 보존, HOLD 반례 |
+| PEC-01/03 | preview\`(apply=False)\` 결과, 전체 파일 SHA vs byte-range SHA 경계, 1-byte 오염/누락 시 결과 |
+| SAFE-01/03 | fixture 사전/사후 트리 digest 동일성·측정 대상/확인 불가 항목; 신규 모델/Job/READY 발생 여부는 **실제 로그 확인 여부**와 함께 보고 |
+| Updater/그룹 | 실제 Knowledge Updater 설치/Writer 및 그룹 게시 계약 **읽기 전용 G0**; 최신 개인 Knowledge 관리 전담 결정(기존 15절) 유지 |
+| 판정 | 항목별 \`PASS/FAIL/SKIP/NOT_RUN\`, REUSE/CONNECT/입증된 gap만 EXTEND 후보, 잔여 차단·최소 다음 동작 |
+
+현재 이 문서 추가는 \`HANDOFF_UPDATED\`일 뿐 \`LINUX_HOST_G0=NOT_RUN\`. 업무 GPT 회신 전에는 실제 통합 기능의 PASS/배포 가능 판정을 내리지 않는다. 리뷰 R1은 **CLOSED_NO_AUTOMATIC_REREVIEW**, ACON 모델 3+3 시험은 별도 유효 권한·예산 확인 전 **NOT_RUN**.
