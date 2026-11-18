@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## ACE·PEC-HOP·ACON 신규 코드 후보·최종 ZIP 배포 게이트 (2026-11-19)
+
+- **[ACE·PEC-HOP·ACON 실제 적용 현황: 비민감 순수 후보 19건 PASS / 최종 스킬 ZIP 배포 차단 — 기존 인계서 최신 11절](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — PRIVATE 구현 후보·정적 근거는 원래 CoWork Work에 보존. `development_not_for_deployment`/실설치 소스 미확인·Writer 보호/전체 회귀·코드 독립 리뷰 미충족으로 `PUBLIC_SKILL_ZIP=BLOCKED_NOT_POSTED`. 업무 GPT가 필요한 설치 기능의 비민감 델타만 READ_ONLY 회신, Gate 완료 후 신규 ZIP만 L1Work/main 루트로 전달. 문서 게시 자체는 설치나 Job 실행이 아님.
+
 ## L1 Workspace 최신 책임 변경·가독성 개선 논의 (2026-11-18)
 
 - **[개인 Knowledge 관리 및 그룹 Knowledge 연계: 업무 GPT 현장 설계 / Knowledge Updater 전담, 웹 뷰어 UX 문제 OPEN — 최신 15절](L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md#15-최신-사용자-결정--knowledge-updater-전담업무-gpt-현장-설계-및-viewer-ux-별도-논의-2026-11-18)**. 기존 13·14절 유지. 메타정보·실제 스킬/G0는 업무 GPT가 조사, UI 화면 변경은 사용자 논의 후. 인계 문서 게시만 수행; Linux 운영·Knowledge WRITE 미실행.
