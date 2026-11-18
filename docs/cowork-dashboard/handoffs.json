@@ -7,14 +7,14 @@
       "published_on": "2026-11-18"
     },
     {
-      "filename": "L1_MSC_DUAL_ENTRY_WRITER_G0_READONLY_HANDOFF_r0001_20261118_KST.md",
-      "title": "L1 MSC 두 진입 — 업무 GPT / Linux Agent writer G0 읽기 전용 확인",
+      "filename": "L1_WORKSPACE_LOCAL_VIEWER_SAFE_STOP_HANDOFF_r0001_20261118_KST.md",
+      "title": "L1 Workspace 전체 URL 웹 뷰어 — 안전 중지·재개 인계 r0001",
       "published_on": "2026-11-18"
     },
     {
-      "filename": "L1_KNOWLEDGE_UPDATER_R1_G0_DETAILED_HANDOFF_r0002_20261117_KST.md",
-      "title": "업무 GPT 인계 — L1 Knowledge Updater ↔ Workflow ↔ 개인/그룹 Knowledge 동기화·충돌 처리 상세 설계 및 G0 실측 요청",
-      "published_on": "2026-11-17"
+      "filename": "L1_MSC_DUAL_ENTRY_WRITER_G0_READONLY_HANDOFF_r0001_20261118_KST.md",
+      "title": "L1 MSC 두 진입 — 업무 GPT / Linux Agent writer G0 읽기 전용 확인",
+      "published_on": "2026-11-18"
     }
   ]
 }
