@@ -12,7 +12,7 @@
     "works": 10
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-17T23:14:36Z",
+  "generated_at": "2026-11-18T01:39:21Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -57,8 +57,8 @@
       "category": "skill-discovery",
       "next_action": "추가 확인이 필요한 스킬 근거 검토",
       "owner": "GPT",
-      "phase_index": 4,
-      "phase_label": "판정·보완 신고",
+      "phase_index": 0,
+      "phase_label": "단계 미확인",
       "review_label": "독립 리뷰 증거 미검증",
       "test_label": "자체시험 기록 · 별도 검증",
       "title": "스킬 발견·재사용"
