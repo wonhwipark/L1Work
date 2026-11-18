@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## L1 Workspace r0002 업무 GPT 직접 상세 검토 인계 (2026-11-18)
+
+- **[전체 Workspace 트리·형식별 렌더링·보안/기존 스킬/G0 A~S/수락시험 T01~T34 상세 검토·작업 지시서](L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md)** — **최신 사용자 결정: Claude 독립 리뷰 생략, 업무 GPT 직접 검토.** 기존 r0002 설계의 요구·리스크·근거·19개 현장 질문과 단계별 Gate를 단독 검토 가능한 수준으로 수록. `INDEPENDENT_REVIEW=NOT_RUN`, Linux G0·서비스/원본 전환·그룹 Knowledge 게시 `NOT_RUN`. 지금은 허용된 읽기 전용 G0·설계 검토에 한정; Linux 운영 변경은 별도 승인.
+
 ## L1 Workspace 웹 뷰어 안전 중지 인계 (2026-11-18)
 
 - **[Linux Workspace 전체 URL 뷰어 — 중지 시점·재개 조건 인계](L1_WORKSPACE_LOCAL_VIEWER_SAFE_STOP_HANDOFF_r0001_20261118_KST.md)** — 전체 업무 폴더 열람 및 Markdown 즉시 렌더 설계 r0002, Claude 리뷰 입력·$1.50 단일 승인·미등록 REQUEST/READY, 운영 설정 미변경, 안전 중지 상태와 추후 재개 경계를 정리. **읽기 전용 상태 공유이며 실행 트리거가 아님.**
