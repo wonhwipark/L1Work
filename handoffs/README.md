@@ -2,7 +2,7 @@
 
 ## L1 Workspace r0002 업무 GPT 직접 상세 검토 인계 (2026-11-18)
 
-- **[전체 Workspace 트리·형식별 렌더링·보안/기존 스킬/G0 A~S/수락시험 T01~T34 상세 검토·작업 지시서](L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md)** — **최신 사용자 결정: Claude 독립 리뷰 생략, 업무 GPT 직접 검토.** 기존 r0002 설계의 요구·리스크·근거·19개 현장 질문과 단계별 Gate를 단독 검토 가능한 수준으로 수록. `INDEPENDENT_REVIEW=NOT_RUN`, Linux G0·서비스/원본 전환·그룹 Knowledge 게시 `NOT_RUN`. 지금은 허용된 읽기 전용 G0·설계 검토에 한정; Linux 운영 변경은 별도 승인.
+- **[전체 Workspace 트리·형식별 렌더링·보안/기존 스킬/G0 A~S/수락시험 T01~T34 상세 검토·작업 지시서](L1_WORKSPACE_LOCAL_VIEWER_R0002_BUSINESS_GPT_DETAILED_REVIEW_AND_G0_HANDOFF_r0001_20261118_KST.md)** — **최신 사용자 결정: Claude 독립 리뷰 생략, 업무 GPT 직접 검토.** 기존 r0002 설계의 요구·리스크·근거·19개 현장 질문과 단계별 Gate를 단독 검토 가능한 수준으로 수록. **13절 추가: 개인 Linux PC의 실제 웹 서비스 구축을 위한 업무 GPT→업무 LLM/Agent E0~E5 단계별 구현·시험·승인·롤백 지시문 포함.** `INDEPENDENT_REVIEW=NOT_RUN`, Linux G0·서비스/원본 전환·그룹 Knowledge 게시 `NOT_RUN`. 지금은 허용된 읽기 전용 G0·설계 검토에 한정; Linux 운영 변경은 별도 승인.
 
 ## L1 Workspace 웹 뷰어 안전 중지 인계 (2026-11-18)
 
