@@ -22,7 +22,7 @@
 
 ## ACE·PEC-HOP·ACON 지식 Updater 설계 적용 제안 (2026-11-18)
 
-- **[업무 GPT 검토용 설계 적용 제안서 r0001](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — 최신 접근 가능한 스킬 원문·기존 Work/Evidence 재사용 기준을 바탕으로 Updater에 ACE 맥락 유지, PEC-HOP 근거 보존, ACON 실패 기반 압축 개선을 적용할 수 있는지 **실제 업무 설치본 READ_ONLY G0 리뷰** 요청. 스킬 수정·설치·Knowledge 게시·Job/유료 실행 승인 아님. 기존 11-17 Knowledge 동기화 R1 리뷰와 구분.
+- **[업무 GPT 검토용 설계 적용 제안서 r0001 + 실제 Linux 설치본 READ_ONLY G0 원샷(9절)](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md#9-2026-11-18-kst--acepec-hopsafe-실제-linux-설치본-g0-읽기-전용-원샷)** — ACE 최신 Work 결정·PEC-HOP Evidence 원문 바이트·SAFE 무변경을 **실제 설치본에서 읽기 전용**으로 확인하기 위한 AST/SHA-256 점검 스니펫·synthetic fixture 경계·단일 비민감 결과 양식 포함. 업무 GPT/허용된 Linux Agent가 실행하는 절차이며 현재 **호스트 미실행**. 스킬 수정·설치·Knowledge 게시·Job·유료 호출 승인 아님. 기존 11-17 Knowledge 동기화 R1 리뷰와 구분.
 
 ## CL·Jira 기반 이슈 시나리오·복구 지점 분석 (2026-11-17)
 
