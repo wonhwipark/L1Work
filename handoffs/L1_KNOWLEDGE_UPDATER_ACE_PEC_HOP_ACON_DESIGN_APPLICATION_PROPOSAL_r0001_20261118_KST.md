@@ -229,3 +229,50 @@ PY
 **점검 스니펫 자체 QA(업무 호스트가 아닌 격리 합성 환경):** GitHub 본문 내 Python 코드 3,027 B, SHA-256 `9fc117c5754b096f01f98d9130461aa0d92bd469b46b98ae280c63cda2fd024b`; 동일 실제 바이트를 대상으로 구문 파싱/정상 9개 함수/`mkdir` 탐지/모듈 누락/루트 누락 시 경로 비노출/인수 누락/symlink 거부를 실행해 **PASS**. 실제 업무 설치본 함수 실행·권한·부수효과 검증은 **NOT_RUN**.
 
 현재 이 문서 추가는 `HANDOFF_UPDATED`일 뿐 `LINUX_HOST_G0=NOT_RUN`. 업무 GPT 회신 전에는 실제 통합 기능의 PASS/배포 가능 판정을 내리지 않는다. 리뷰 R1은 **CLOSED_NO_AUTOMATIC_REREVIEW**, ACON 모델 3+3 시험은 별도 유효 권한·예산 확인 전 **NOT_RUN**.
+
+## 10. 2026-11-19 KST — 실제 업무 사용·업무 전용 Updater·모바일 수정 요청 협업 경계
+
+### 10.1 사용자 최신 운영 사실과 검증 등급
+
+- **사용자 확인(2026-11-19):** 스킬 패키지는 업무 환경으로 전달되어 실제 업무에 사용되고 있음. 문제 발생 시 사용자는 **모바일에서 수정 요청**하여 기존 협업으로 후속 보완하는 운용 방식을 사용.
+- 이는 **USER_CONFIRMED_IN_USE**이며, 개별 스킬별 실제 설치/활성 버전·SHA-256·적용 날짜·호스트 영수증이 자동으로 입증됐다는 뜻은 아님(`ACTIVE_REVISION=NOT_VERIFIED`). GitHub PUBLIC ZIP, CoWork PRIVATE 개발 후보 ZIP, Linux 호스트 설치본을 계속 구별. 스킬이 실제 사용 중이라는 이유로 전체 기능/E2E PASS를 선언하지 않음.
+- **`l1-knowledge-updater`는 업무 환경 전용 스킬.** 구현 코드·SKILL.md·업무 Knowledge·로그·경로·회사 소스 원문을 CoWork PRIVATE 또는 L1Work PUBLIC에 옮기지 않음. 원본을 GPT에 제공하는 것을 G0/설계 수락의 필수 조건으로 삼지 않음.
+- 업무 GPT와 허용된 Linux Agent/MCP가 현재 환경에서 내부 원본·설치 계약·실제 실행 근거를 확인할 수 있음. GPT는 **업무 GPT의 비민감 결과 요약을 HOST_REPORTED로 수용**해 REUSE/CONNECT/검증된 최소 EXTEND 여부를 판정할 수 있으나, 원본을 직접 검증했다고 소급 보고하지 않음.
+- 기존 7~9절의 실제 설치본 G0 요청은 **필요한 미확인 부분만** 수행. 업무 전용 Updater의 raw package/SKILL.md/코드 제출은 요구하지 않음. 이미 실행 중인 정상 스킬을 조사 때문에 재설치하거나 기존 Job을 재실행하지 않음. 확인 불가 항목은 BLOCKED/NOT_VERIFIED로 유지하되 나머지 설계·후속 처리는 진행.
+
+### 10.2 업무 GPT의 최소 회신 — 원본 반출 없이 충분한 범위
+
+| 항목 | 비민감 회신만 허용 | 실제 검증 경계 |
+|---|---|---|
+| 스킬 사용 | 관련 스킬명, 실제 사용 중 여부(USER_CONFIRMED/HOST_VERIFIED 구분), 버전·SHA는 **알려진 경우만** | 설치본 추정 금지. 외부 GPT가 이미 확인한 PUBLIC/PRIVATE 스냅샷과 호스트 활성본은 별개 |
+| Knowledge Updater | Work 직접 분석/기존 Work 지식화, 후보·Preview, 개인/그룹 지식 연결 등 **지원/미지원/미확인**과 책임 스킬 | 구현/스킬 원문·회사 자료·상세 코드/로그/절대 경로 반출 불필요 |
+| ACE | 최신 유효 Work 결정/이력·다음 액션을 기존 reader에서 찾을 수 있는지, HOLD 반례 | 사용자 결정/승인 범위와 원본 기록에 대한 **호스트 자체 판정 요약** |
+| PEC-HOP | Source Revision·Evidence ID·전체 파일 SHA·근거 발췌 검증의 지원 범위 및 누락 | 실제 파일/함수/IPC/원문 bytes를 CoWork로 반출하지 않음 |
+| ACON | 기존 실패·수정 피드백 기록과 baseline 비교 가능성, 모델 호출 없이 수행 가능한 부분 | 유료 모델 반복 시험이나 신규 모델 호출 자동 시작 금지 |
+| 안전·수정 | `REUSE / CONNECT / GAP_VERIFIED / BLOCKED`, 증상·원인·수정 소유자, 사전/사후 시험 등급 | 로컬 실제 시험 상세는 업무 환경에 보존, 공유본에는 요약만 |
+
+**실제 버전이나 내부 함수 시그니처 확보가 불가능해도** 사용 기능의 관측·입출력·제약·실패 조건을 확인한 범위에서 설계 검토 가능. 단 내부 구현의 미확인 항목은 확정 구현이나 코드 검증 PASS로 승격하지 않음.
+
+### 10.3 사용 중 문제 발생 시 모바일 수정 요청 경로
+
+```text
+업무 Linux 스킬 사용 중 문제 확인
+  → 모바일 Agent에서 문제·기대 결과·재현 조건의 비민감 요약을 전달
+  → 기존 CoWork Work/기존 스킬 책임과 중복 확인
+  → GPT가 원인/범위와 REUSE·CONNECT·필요한 최소 수정 판정
+  → (GitHub 관리 스킬) 허용된 개발·시험 → 필요한 독립 리뷰 → 배포 Gate 충족 시 최종 L1Work ZIP
+  → (업무 전용 Updater) 업무 GPT/허용된 업무 Agent에서 원본 보존·허용된 수정·시험, 비민감 결과만 회신
+  → 기존 유효 승인·skill-updater/전달 계약에 따라 업무 Linux 적용
+  → 실제 설치 해시·시험/영수증·오류 해결 여부를 확인하고 동일 Work 정산
+```
+
+- 모바일 수정 요청은 **이슈 접수**이며 자동 설치·호스트 시작·유료 리뷰·원격 게시·REQUEST/READY 트리거가 아님. 해당 행위는 그때의 유효한 승인·권한·비용·배포 게이트를 별도 확인.
+- 모바일 회신에 필요한 최소 내용: **대상 스킬/Work ID(알 때만), 관측 증상, 기대 동작, 문제가 발생한 단계, 비민감 재현 조건, 활성 버전(확인된 경우), 오류 분류·Evidence 식별자(공유 가능한 경우)**. 민감 코드/로그/토큰/고객정보 복사 금지.
+- 동일 목적의 기존 Work를 우선 재개. 수정된 ZIP이 기존 공개본보다 높거나 후보 이름이 같아도 설치됐다고 보고하지 않음. 새로운 최종 ZIP은 기존 ZIP 보존·SHA/CRC·보안·호환/시험·필요 리뷰 게이트 후 허용된 PUBLIC 배송을 수행. 업무 환경 설치/사용 결과는 **별도 HOST_VERIFIED**.
+- 운영 문제를 접수했다고 ACE/PEC-HOP/ACON의 새로운 서브에이전트·상시 watcher·압축 엔진·지식 원장까지 신설하지 않음.
+
+### 10.4 현재 판정·다음 한 행동
+
+`DESIGN_R1=ACCEPT_WITH_CHANGE/CLOSED` (기존 완료 리뷰 재사용), `SYNTHETIC_CONTRACT=26_PASS`, `USER_CONFIRMED_SKILLS_IN_USE=YES`, `ACTIVE_INSTALLED_REVISIONS=NOT_VERIFIED`, `UPDATER_SOURCE_EXPORT=NOT_REQUIRED`, `UPDATER_RUNTIME_CONTRACT=HOST_REPORTED_OR_PENDING`, `NEW_HOST_TEST/MODEL_CALL/INSTALL/KNOWLEDGE_WRITE=NOT_RUN_BY_THIS_DOC`.
+
+**NEXT_ONE_ACTION:** ACE·PEC-HOP·ACON을 실제 업무에 연결할 때 또는 모바일 오류 수정 요청이 들어올 때, 업무 GPT가 **문제와 관련된 미확인 기능만** 읽기 전용으로 확인하여 10.2 표의 비민감 결과를 회신. GPT는 기존 Work/공개 스킬 근거와 대조해 최소 변경·검증·배송 여부를 판정. 현재 정상 사용 중인 스킬에 대한 일괄 재설치·전체 기능 재조사 요구 없음.
