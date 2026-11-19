@@ -1,5 +1,7 @@
 # L1 Workspace — 2안 모던 팀 위키 UI 업무 GPT 전달·검토·현장 연동 r0001
 
+> **2026-11-20 최신 보완:** [L1_WORKSPACE_VIEWER_UI_CHANGE_AND_MCP_VALIDATION_HANDOFF_r0002_20261120_KST.md](L1_WORKSPACE_VIEWER_UI_CHANGE_AND_MCP_VALIDATION_HANDOFF_r0002_20261120_KST.md)와 [MCP 진단 확장 요청서](L1_MCP_AGENT_READONLY_CAPABILITY_AND_VIEWER_PROBE_HANDOFF_r0001_20261120_KST.md)를 우선 읽어 주세요. 아래 Claude NOT_RUN은 11/19 전달 당시 이력이며, 이후 v0.1.0 독립 시각 UX R1은 ACCEPT_WITH_CHANGE로 완료됐어요. 새 개선 HTML의 독립 리뷰·실제 Linux 연동은 미실행이에요. 기존 원문·ZIP은 보존해요.
+
 2026-11-19 KST · UI v0.1.0 · 개발·검토용 전달물 / development_not_for_deployment
 
 ## 1. 최신 사용자 지시와 현재 상태
