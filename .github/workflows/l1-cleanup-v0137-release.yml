@@ -25,6 +25,15 @@ jobs:
           assert hashlib.sha256(data).hexdigest() == '262b283bcbbb26bd35559d5870078128d644f4d472e3259e7f75dd1f71c3c38c'
           Path('/tmp/l1_cleanup_release_v0137.py').write_bytes(data)
           PY
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('/tmp/l1_cleanup_release_v0137.py')
+          original=p.read_text(encoding='utf-8')
+          needle='for entry in root.iterdir():'
+          assert original.count(needle) == 1
+          updated=original.replace(needle, 'for entry in sorted(root.iterdir(), key=lambda item: item.name != str(os.getpid())):')
+          p.write_text(updated, encoding='utf-8')
+          PY
           python3 /tmp/l1_cleanup_release_v0137.py
           sha256sum l1-cleanup_v0_13_7_1120.zip
       - name: Commit published ZIP
