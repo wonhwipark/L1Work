@@ -1,5 +1,13 @@
 # 업무용 GPT 인계 문서
 
+## Agent/MCP 상태 확인 확장 + Viewer UI 변경 인계 (2026-11-20 최신)
+
+- **[MCP 읽기 전용 진단 확장 요청서](L1_MCP_AGENT_READONLY_CAPABILITY_AND_VIEWER_PROBE_HANDOFF_r0001_20261120_KST.md)** — 실제 대상 호스트·설치/로드·Viewer API·기존 문서/MSC·현재성·권한을 한 번에 조회하고 모바일 Agent가 짧은 판정을 전달하도록 기존 기능 재사용/최소 확장. MCP 실제 구현·설치·활성은 아직 NOT_RUN.
+- **[Viewer UI 변경·연동 인계 r0002](L1_WORKSPACE_VIEWER_UI_CHANGE_AND_MCP_VALIDATION_HANDOFF_r0002_20261120_KST.md)** — P1 두 건·사용성 개선, 실제 연동 전 I-01~I-07, B1~B3/E3~E4·복구·업무 GPT 복사 지시문. 기존 v0.1.0 UX 독립 리뷰는 이후 ACCEPT_WITH_CHANGE로 완료; 아래 과거 NOT_RUN 표기는 당시 기록.
+- **[개선 HTML 시안](L1_Workspace_Wiki_Usability_Preview_20261120_KST.html)** / [기존 구현 ZIP](../l1-workspace-wiki-ui_v0_1_0_1119.zip) — 개선 시안은 별도 합성 자료이며 ZIP에 미포함. PUBLIC 자료 전달과 실제 업무 서비스 설치/동작 검증을 구분.
+
+---
+
 ## PEC·ACE 두 스킬 최종 ZIP 실제 배포 완료 (2026-11-19)
 
 - **[최신 업무 GPT 인계 §15](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — `code-analyzer v0.15.4` PEC-HOP [최종 ZIP](../code-analyzer_v0_15_4_1119.zip) · `l1-fix-workflow v1.6.74` ACE [최종 ZIP](../l1-fix-workflow_v1_6_74_1119.zip). **L1Work/main 실제 배송·원격 SHA256 PASS**, 자체 패키지 12+10 PASS; 독립 코드 리뷰는 **사용자 명시 생략**으로 PASS 아님. 업무 Linux 설치/활성·효용 시험은 업무 환경 자체 책임, 외부 전송 요구 없음. 아래 “최종 ZIP 미게시”는 당시에만 유효한 과거 기록.
