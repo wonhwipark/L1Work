@@ -373,3 +373,21 @@ PY
 **배포 상태:** 두 개발 ZIP 모두 `development_not_for_deployment`, 최신 신규 코드 **독립 리뷰·최종 릴리스 게이트 미충족**으로 `L1WORK_FINAL_SKILL_ZIPS=BLOCKED_NOT_POSTED`. 기존 L1Work 공개 ZIP을 덮지 않았으며 인계서 공개 자체는 설치 신호가 아님. CoWork PRIVATE 해당 Work의 `GPT_PEC_ACE_TWO_SKILLS_DEV_BUILD_AND_RELEASE_GATE_r0001_20261119_KST.md`에 코드·시험·미확인, `PEC_ACE_TWO_SKILL_CODE_REVIEW_AND_RELEASE_ONESHOT_r0001_20261119_KST.md`에 Windows 독립 코드 리뷰 및 조건부 최종 배송 원샷을 게시.
 
 **다음 한 동작:** Windows Claude Code 독립 리뷰 운영 계약상 실제 LIVE 승인/비용/중복 gate가 PASS인 범위에서 두 수정 ZIP의 신규 코드 독립 리뷰를 진행→차단 지적 최소 보완·전체 회귀 및 공개 정보등급/릴리스 채널 검증→ **그때 새 최종 스킬 ZIP 두 개를 `wonhwipark/L1Work/main` 루트에 게시·원격 SHA256 확인**. 업무 Linux 실사용 수락은 별도 업무 GPT/Agent가 내부에만 보존.
+
+## 15. 2026-11-19 KST — PEC·ACE 두 최종 스킬 L1Work PUBLIC 실제 배포 완료
+
+**이 절이 앞선 §13·§14의 “최종 ZIP 미게시/리뷰 대기”보다 최신 상태입니다.**
+
+사용자 지시 “리뷰스킵하고 스킬 업데이트후패키지 l1work 에 올려줘”에 따라, **이번 두 스킬 한정 독립 코드 리뷰만 명시적으로 생략**했습니다. 리뷰 결과를 PASS로 주장하지 않으며 `INDEPENDENT_CODE_REVIEW=SKIPPED_BY_USER_REQUEST`로 기록합니다. 기존 Windows 정책 불일치로 정식 리뷰 REQUEST/READY/유료 호출은 없었습니다.
+
+| 최종 스킬·기능 | L1Work `main` 루트 실제 공개 ZIP | 크기 | 공개 raw bytes SHA-256 |
+|---|---|---:|---|
+| `code-analyzer` PEC-HOP v0.15.4 | [`code-analyzer_v0_15_4_1119.zip`](../code-analyzer_v0_15_4_1119.zip) | 515581 B | `11e1da15ee12e750c3652190c348a7fc8e31aa1741876e3c06bc0af3413b16af` |
+| `l1-fix-workflow` ACE v1.6.74 | [`l1-fix-workflow_v1_6_74_1119.zip`](../l1-fix-workflow_v1_6_74_1119.zip) | 760324 B | `b810ce0cf072609431737c58b0ef2b7a0a8ec0701a0746e6a94283c374224989` |
+
+- **실제 PUBLIC commit:** `b27d7ccaf7d3d827e493e0b61db9ff083817daaf`. 기존 공개 ZIP 두 버전은 무변경. GitHub API로 배송 후 **L1Work `main`의 실제 바이너리 전체 바이트를 재조회해 원본과 직접 대조했고 SHA-256 재계산까지 두 건 PASS**.
+- **릴리스 시험:** CoWork PRIVATE [CI run 44512854513](https://github.com/wonhwipark/CoWork-Skill-Collab/actions/runs/44512854513) SUCCESS. 실제 두 스킬 패키지 합성 12+10 PASS, 원본 파일 보존·CRC·manifest 전파일 SHA·Python 컴파일·보안 패턴/중첩 아카이브 검사 및 **최종 ZIP 두 번 빌드 바이트 일치 PASS**. 이번 최종 ZIP은 개발 후보에서 메타데이터/문구를 재정리하고 재해싱해 `channel=public_release`가 된 **별도 최종 바이트**입니다.
+- **실제 연결:** Code Analyzer는 기존 `reuse_validator.validate(...,pec_claims=...)`의 선택적 PEC raw byte/revision 검증, Workflow는 기존 `work_inspection.inspect_work(... request)`에 `ace_scope/ace_subject` 지정 시 유효 결정 후보/HOLD. 기본 호출/작업 원장은 무변경, 승인·쓰기 권한 자동 부여 없음.
+- **업무 적용은 별도:** PUBLIC 업로드는 완료됐으나 업무 Linux `skill-updater`의 실제 설치·활성 revision·Work/Evidence 실제 source 권한·실제 PEC/ACE 파일럿 검증은 **GPT가 직접 실행/관측하지 않았음**. 업무 GPT와 허용된 Linux Agent가 기존 §§13–14의 비반출 현장 G0→대표 1사례 baseline 평가 기준으로 처리해야 합니다. 업무 자료/설치결과/비민감 요약도 외부 반출 요청 없음. `ACON=DEFER`, Kernel/Knowledge Updater/skill-updater 변경 0.
+
+`PUBLIC_2_ZIPS=POSTED_REMOTE_SHA256_VERIFIED` / `NON_REVIEW_GATES=PASS` / `INDEPENDENT_REVIEW=USER_SKIPPED` / `BUSINESS_HOST_INSTALL=NOT_VERIFIED` / `NO_EXPORT=MAINTAINED`.
