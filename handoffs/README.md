@@ -1,5 +1,10 @@
 # 업무용 GPT 인계 문서
 
+## L1 Workspace 모던 팀 위키 UI — 업무 GPT 검토·현장 연동 (2026-11-19 최신)
+
+- **[화면 구성·가독성·스타일·시인성 검토 및 Linux Viewer 최소 연동 인계](L1_WORKSPACE_WIKI_UI_BUSINESS_GPT_REVIEW_AND_INTEGRATION_HANDOFF_r0001_20261119_KST.md)** — 사용자 요청에 따라 Claude 토큰 만료 보고 후 업무 GPT로 전달. 이번 구현물의 독립 시각·코드 리뷰는 NOT_RUN. 과거 리뷰 대기보다 이 최신 전달 지시 우선.
+- **[UI 코드·설계·시험·캡처·INTEGRATION 전체 ZIP](../l1-workspace-wiki-ui_v0_1_0_1119.zip)** / [단일 HTML](L1_Workspace_Wiki_UI_v0_1_0_20261119_KST.html). 합성 UI v0.1.0, 브라우저 자체시험 56/56·정적 19/19·CRC/해시 PASS. **개발·검토용 전달물이며 정식 설치 배포 아님**, 실제 API·B1~B3·E3/E4 미검증.
+
 ## Recovery 포인트 분석 — 업무 GPT 상세 설계·구현 인계 (2026-11-19)
 
 - **[필수 근거 9항목·단계별 입출력·후보 판정·최소 구현·검증을 포함한 상세 인계 r0001](L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0001_20261119_KST.md)** — CL→Jira/merged PR의 Problem/Cause/Solution과 실제 source revision을 대조하고, 정상/실패 시나리오·최초 불일치·검출부·런타임 자원 소유자의 복구 경계를 구분. 기존 스킬 재사용, G01~G10 기능 대조, S0~S6 분석 계약, E0~E5 적용·최소 구현·회수, T01~T20 연결 시험과 R01~R08 제품 효과 검증 계획 포함.
