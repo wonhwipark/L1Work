@@ -2,6 +2,12 @@
 
 L1 업무용 스킬 패키지 및 별도 승인된 공개 자료를 제공하는 GitHub PUBLIC 저장소입니다.
 
+## 최신 스킬 ZIP 배포 (2026-11-19)
+
+- **PEC-HOP** — [`code-analyzer_v0_15_4_1119.zip`](code-analyzer_v0_15_4_1119.zip), SHA-256 `11e1da15ee12e750c3652190c348a7fc8e31aa1741876e3c06bc0af3413b16af`
+- **ACE** — [`l1-fix-workflow_v1_6_74_1119.zip`](l1-fix-workflow_v1_6_74_1119.zip), SHA-256 `b810ce0cf072609431737c58b0ef2b7a0a8ec0701a0746e6a94283c374224989`
+- 두 ZIP 모두 **PUBLIC 게시·원격 바이트 검증 완료**. 코드 독립 리뷰는 이번 두 스킬에 한해 **사용자 요청으로 생략**했으며 자체/패키지 시험 22건 PASS. 실제 업무 Linux `skill-updater` 설치·호스트 기능 검증은 별도. 자세한 인계: [업무 GPT 적용·검증 §15](handoffs/L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md).
+
 ## 바로가기
 
 - **[분석 문서 → HTML → MSC 열람 샘플](https://wonhwipark.github.io/L1Work/sample/msc-workspace/)** — [GitHub sample 폴더](sample/README.md). 가상 Work의 분석 문서·MSC 미리보기·확대/단계 이동 뷰어를 연결한 공개 예시예요.
