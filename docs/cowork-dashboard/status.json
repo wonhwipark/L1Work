@@ -6,13 +6,13 @@
   },
   "counts": {
     "projects": 10,
-    "receipts": 11,
+    "receipts": 12,
     "requests": 17,
-    "reviews": 11,
+    "reviews": 12,
     "works": 10
   },
   "cutover": "정식 전환 전",
-  "generated_at": "2026-11-19T16:46:53Z",
+  "generated_at": "2026-11-19T16:53:14Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
