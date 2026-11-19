@@ -40,6 +40,13 @@ jobs:
           new_import="    import importlib.util\n    module_path = Path(__file__).resolve().parent / 'process_guard.py'\n    spec = importlib.util.spec_from_file_location('_l1_process_guard', module_path)\n    if spec is None or spec.loader is None:\n        return True, 'UNKNOWN:PROCESS_GUARD_MODULE_UNAVAILABLE'\n    module = importlib.util.module_from_spec(spec)\n    spec.loader.exec_module(module)\n    state, why = module.inspect_process_use(path)"
           assert updated.count(old_import) == 1
           updated=updated.replace(old_import,new_import)
+          guard_old="def _mole_guard(path):\n    # Windows keeps"
+          guard_new="def _mole_guard(path):\n    if os.environ.get('L1_CLEANUP_PROCESS_GUARD_STRICT') != '1':\n        return False, 'STRICT_GUARD_NOT_ENABLED'\n    # Windows keeps"
+          assert updated.count(guard_old) == 1
+          updated=updated.replace(guard_old,guard_new)
+          doc_old="P0 Linux `process_guard.py`: same-user"
+          doc_new="P0 Linux `process_guard.py`: opt-in `L1_CLEANUP_PROCESS_GUARD_STRICT=1`; same-user"
+          updated=updated.replace(doc_old,doc_new)
           p.write_text(updated, encoding='utf-8')
           PY
           python3 -m pip install --disable-pip-version-check -q pytest
