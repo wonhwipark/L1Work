@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## PEC-HOP 우선·ACE 최소 적용: 반출 없는 현장 평가 (2026-11-19)
+
+- **[최신 범위 및 현장 평가 §13](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — **PEC-HOP P1 / ACE P2만 최소 적용·ACON 보류**. 업무 Linux 설치·코드/Evidence·시험 결과는 업무 환경 내부에서 보존하며 **반출 승인 없는 “비민감 결과 회신”도 요구하지 않음**. 현장 자체 G0→대표 사례 1건 기존/개선 비교→확대 판단. 현재 최종 ZIP 배송·현장 시험은 완료 아님.
+
 ## 수정 CL 기반 미커버 유사 결함 탐색·검사·Recovery 판단 — 최신 r0002 (2026-11-19)
 
 - **[이전 recovery 상황·배경 논리·Seed 패턴·현재 보호 커버·조치 선별을 포함한 업무 GPT 인계 r0002](L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0002_20261119_KST.md)** — 기존 11-17 분석 프롬프트와 11-19 r0001 설계·진행 기록을 조회한 뒤 개정. 수정 CL을 Seed로 원인 구조·Fix 효과를 배우고 현재 관련 경로의 미커버 유사 문제를 탐색. Seed가 이미 수정됐어도 다른 후보 탐색을 계속하며, 정적 유사 결함 발견·런타임 검출·안전한 복귀를 각각 판단.
