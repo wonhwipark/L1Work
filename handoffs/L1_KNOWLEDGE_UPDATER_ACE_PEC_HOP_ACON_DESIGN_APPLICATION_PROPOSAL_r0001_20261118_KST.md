@@ -300,3 +300,59 @@ PY
 - **최종 다음 행동:** 관련 업무 G0와 독립 코드 리뷰/릴리스 Gate PASS 후, 검증된 신규 최종 채널 패키지만 `wonhwipark/L1Work/main` 루트에 게시하여 실제 바이트 SHA-256 readback. 공개 ZIP 전달과 `skill-updater` Linux 설치·실업무 결과는 각각 별도 판정.
 
 `HOST_INSTALL=NOT_RUN`; `WORKFLOW_V1673_DEV_CI=PASS`; `INDEPENDENT_CODE_REVIEW=NOT_RUN`; `PUBLIC_SKILL_ZIP=BLOCKED_NOT_POSTED`; `BUSINESS_UPDATER_SOURCE_EXPORT=NOT_REQUIRED`.
+
+## 13. 2026-11-19 KST — 최종 범위 축소: PEC-HOP 우선·ACE 최소, ACON 보류 / 업무 환경 내부 완결형 실증
+
+**가장 최근 적용 판단(앞선 §§1~12의 G0 회수·ACON 배포 계획보다 우선):** 사용자 확인에 따라 *업무 환경에서 생성된 코드·분석/Evidence/로그·실험 및 설치 결과는 외부 GitHub/개발 GPT로 반출하지 않음*. “비민감 G0 요약 회신”도 **별도 명시적 반출 승인 없이는 요구하지 않음**. 기존 문서의 회신 문장은 현장 내부 확인·보존으로 대체.
+
+### 13.1 실제 실행 구조
+
+```text
+개발 GPT / Windows Claude Code
+  비민감 스킬 코드·합성 시험·독립 코드 리뷰·릴리스 심사
+  → 승인된 새 최종 ZIP만 L1Work/main 루트
+  → 기존 skill-updater가 허용된 업무 Linux에서 설치/검증
+     └─ 업무 GPT / Linux Agent / MCP
+          ├─ PEC-HOP(P1): 원본 source revision·Evidence/raw bytes 대조
+          ├─ ACE(P2): 기존 Workflow/Kernel의 결정·미해결·중단 Work 재개
+          ├─ ACON: DEFER
+          └─ 현장 전용 baseline 비교/시험 결과/영수증 보존
+                  X 회사 자료·실행 판정 외부 회신
+```
+
+실제 업무 데이터와 함수/IPC/MSC/Work ID/로그, 호스트 버전·경로·평가 결과는 모두 승인된 업무 환경에만 보존. 기능을 현장에서 사용하기 위해 외부 GPT가 이 정보를 읽을 필요는 없음. 하지만 외부 GPT는 현장 PASS를 직접 확인할 수 없으므로 `HOST_VERIFIED_EXTERNAL=NOT_OBSERVABLE`로 유지.
+
+### 13.2 스킬 연결 범위
+
+| 우선 | 담당 | 필요한 최소 기능 | 금지/미확인 |
+|---|---|---|---|
+| P1 PEC-HOP | Code Analyzer의 근거·Workflow/Kernel 기존 reader | 실제 고정 source revision·해당 byte-range와 발췌 일치 검증, stale/missing/1-byte 변조 시 FAIL/HOLD | 기존 원본·근거를 L1Work로 내보내지 않음; raw range 미지원이면 임의 PASS 금지 |
+| P2 ACE | Workflow/Kernel 기존 Work/decision | 같은 scope/유효 출처·권한/append 결정 중 최신 선택, 불명확 시 HOLD, Work 재개 시 미해결·다음 행동 보존 | 새 Work/DB/Agent/재실행/자동 승인 없음 |
+| 보류 ACON | 기존 코드 후보는 보존 | **실제 현장 효과가 확인된 후에만** 별도 재평가 | 3+3 유료 모델 시험·새 압축 엔진·자동 프롬프트 수정·이번 ZIP 범위에 자동 포함 금지 |
+| 변경 제외 Knowledge Updater | 업무 GPT/허용 Agent | 기존 관리·승인/게시 기능과 권한 유지 | 업무 전용 스킬 SKILL.md/구현 제공 불필요, writer 변경 없음 |
+
+기존 `l1-fix-workflow_v1_6_73_1119.zip`의 **20 PASS는 과거 합성 개발시험**일 뿐 현장 기능·신규 범위 PASS 아님. 패키지는 `development_not_for_deployment`이고 **최종 ZIP은 아직 L1Work에 미게시**. 과거 개발 바이트와 리뷰 영수증은 무손실 보존; 향후 P1/P2만 포함할 최종 패키지는 실제 소스·호환성을 먼저 고정해 새 고유 버전으로 검증/게시.
+
+### 13.3 업무 환경 내부에서만 수행하는 소규모 평가
+
+업무 GPT는 실제 설치본의 read-only G0(Workflow·Kernel·Code Analyzer·Updater 역할/권한/원본 조회 가능 여부)를 **현장에서 자체 확인**. 데이터 쓰기·호스트 재설치 없이 합성 fixture부터 확인하고 허용된 경우 대표 사례 1개(예: NR L1 Tx Recovery 업무)를 선택. 기존 결과 baseline과 개선 결과를 같은 입력·설정·판정 기준으로 비교. 효과가 보이면 3~5개 사례로 확대. **현장 결과의 외부 회신은 요구하지 않음**.
+
+| ID | 합격 기준(기본 상태 전부 NOT_RUN) |
+|---|---|
+| PEC-P1 | 원본 권한/source revision/raw byte-range/digest 실제 일치만 PASS; 원본 미접근·위치 미확인 HOLD |
+| PEC-P2 | **합성** 1-byte 변조, stale revision, 누락 범위 입력이 하나도 잘못 PASS되지 않을 것 |
+| PEC-P3 | 선택 사례의 핵심 IPC/상태/조건/근거 누락·변형 0, 근거 없는 원인 확정 0 |
+| ACE-P1 | 유효 최신 결정/철회 처리 정확, 승인 범위·순서 모호 시 HOLD, 권한 잘못 적용 0 |
+| ACE-P2 | 중단 Work 재개 시 원 Work/결정/미해결/다음 행동 보존; 중복 Work·중복 Job 0 |
+| SAFE-P1 | 무단 업무/Git/Knowledge/운영 WRITE·모델 호출·외부 데이터 전송 0 |
+| VALUE-P1 | baseline 대비 근거 오류·재개 누락·수동 확인 횟수·경과 시간을 **내부에서 실측**해 실제 개선 여부 판단. 향상이 없으면 `BENEFIT_NOT_DEMONSTRATED` |
+
+안전·정확성 결함 하나라도 있으면 해당 사례 FAIL. 제한된 표본의 통과는 `LOCAL_PILOT_PASS_SCOPE_LIMITED`로 표시하고 다른 모듈·업무 환경 전체 PASS로 확대하지 않음. 현장 호스트의 실제 영수증은 업무 환경에서만 정산.
+
+### 13.4 책임과 다음 한 행동
+
+- **외부 개발 담당:** PEC·ACE에 필요한 공개 가능한 공통 코드·합성 테스트·독립 코드 리뷰·패키지 RELEASE 품질·PUBLIC GitHub 게시까지만 판단. 실제 업무 원본이 없으면 기능 연결 G0를 추정하거나 현장 검증 PASS로 보고하지 않음.
+- **업무 GPT/허용 Linux Agent:** 실제 설치본 read-only 기능을 확인하고, 기존 Work/Evidence로 파일럿 1건의 baseline과 P1/P2 개선판을 **현장 내부에서만** 비교·기록·판정. 설치·운영 변경은 실제 기존 승인/호스트 계약 하에서만.
+- **본 인계서의 게시**는 스킬 설치/호스트 실행/자동 모델 호출/Knowledge writer/외부 피드백 승인이 아님. 내부 검증 결과가 외부에서 관찰되지 않더라도 기존 개발·PUBLIC ZIP 무결성 검증은 독립적으로 계속 가능.
+
+`LATEST_SCOPE=PEC_P1_ACE_P2_ACON_DEFER`, `NO_EXPORT=DEFAULT`, `WORKFLOW_V1673_DEV=20_SYNTHETIC_PASS`, `CURRENT_PILOT=NOT_RUN`, `PUBLIC_FINAL_ZIP=BLOCKED_NOT_POSTED`, `EXTERNAL_HOST_E2E=NOT_OBSERVABLE`.
