@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## PEC·ACE 두 스킬 최종 ZIP 실제 배포 완료 (2026-11-19)
+
+- **[최신 업무 GPT 인계 §15](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — `code-analyzer v0.15.4` PEC-HOP [최종 ZIP](../code-analyzer_v0_15_4_1119.zip) · `l1-fix-workflow v1.6.74` ACE [최종 ZIP](../l1-fix-workflow_v1_6_74_1119.zip). **L1Work/main 실제 배송·원격 SHA256 PASS**, 자체 패키지 12+10 PASS; 독립 코드 리뷰는 **사용자 명시 생략**으로 PASS 아님. 업무 Linux 설치/활성·효용 시험은 업무 환경 자체 책임, 외부 전송 요구 없음. 아래 “최종 ZIP 미게시”는 당시에만 유효한 과거 기록.
+
 ## PEC-HOP·ACE 상위 2개 스킬만 수정 — 22건 실패 없는 개발 CI (2026-11-19)
 
 - **[업무 GPT 2스킬 수정 결과·최종 배송 상태 — 기존 인계서 §14](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)**: `code-analyzer v0.15.4` PEC-HOP (12 PASS), `l1-fix-workflow v1.6.74` ACE (10 PASS) 개발 ZIP 생성·source 보존/CRC/2회 빌드 동일. ACON 제외. 이 ZIP들은 PRIVATE CI artifact의 `development_not_for_deployment`이며 **L1Work/main 루트 최종 ZIP은 아직 미게시**. Windows 신규 코드 독립 리뷰/배포 게이트 충족 후만 공개·설치 가능; 현장 결과는 외부 반출 없음.
