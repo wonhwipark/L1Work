@@ -32,8 +32,13 @@ jobs:
           needle='for entry in root.iterdir():'
           assert original.count(needle) == 1
           updated=original.replace(needle, 'for entry in sorted(root.iterdir(), key=lambda item: item.name != str(os.getpid())):')
+          old="process = subprocess.run([sys.executable, '-m', 'unittest', 'discover', '-s', 'tests', '-p', file, '-v'],"
+          new="process = subprocess.run([sys.executable, '-m', 'pytest', '-q', 'tests/' + file],"
+          assert updated.count(old) == 1
+          updated=updated.replace(old,new)
           p.write_text(updated, encoding='utf-8')
           PY
+          python3 -m pip install --disable-pip-version-check -q pytest
           python3 /tmp/l1_cleanup_release_v0137.py
           sha256sum l1-cleanup_v0_13_7_1120.zip
       - name: Commit published ZIP
