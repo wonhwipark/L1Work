@@ -36,6 +36,10 @@ jobs:
           new="process = subprocess.run([sys.executable, '-m', 'pytest', '-q', 'tests/' + file],"
           assert updated.count(old) == 1
           updated=updated.replace(old,new)
+          old_import="    from process_guard import inspect_process_use\n    state, why = inspect_process_use(path)"
+          new_import="    import importlib.util\n    module_path = Path(__file__).resolve().parent / 'process_guard.py'\n    spec = importlib.util.spec_from_file_location('_l1_process_guard', module_path)\n    if spec is None or spec.loader is None:\n        return True, 'UNKNOWN:PROCESS_GUARD_MODULE_UNAVAILABLE'\n    module = importlib.util.module_from_spec(spec)\n    spec.loader.exec_module(module)\n    state, why = module.inspect_process_use(path)"
+          assert updated.count(old_import) == 1
+          updated=updated.replace(old_import,new_import)
           p.write_text(updated, encoding='utf-8')
           PY
           python3 -m pip install --disable-pip-version-check -q pytest
