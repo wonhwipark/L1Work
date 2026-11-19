@@ -1,5 +1,12 @@
 # L1Work
 
+## l1-cleanup v0.13.7 릴리스 (2026-11-20 KST)
+
+- **[최종 패키지 l1-cleanup_v0_13_7_1120.zip](l1-cleanup_v0_13_7_1120.zip)** — SHA-256 `a1a2daf42bb079bd7531ce73376f014dff9a2b4218bbd73c99a64be50d90f2f2` (216,672 bytes), GitHub Actions 원격 게시 확인.
+- 기존 v0.13.6 기반 최소 개선: P0 Linux 프로세스 FD/maps/cwd 보호 검사(기존 운영 동작 유지를 위해 **`L1_CLEANUP_PROCESS_GUARD_STRICT=1` 명시 설정 시 강화 검사 적용**; `UNKNOWN`이면 차단), P1 기존 HTML 보고서의 폴더·소스별 크기 탐색, P2 읽기 전용 `system-health` 진단.
+- **검증:** 신규 2건 + OS 안전 19건 + 기존 안전 82건 + 산출물 6건 = 109건 PASS, ZIP CRC/manifest 전 파일 SHA-256/크기·PACKAGE_CONTENTS 정합성 PASS. Windows 실환경 및 업무 Linux 설치/운영 E2E는 별도 확인 필요. 스킬 설치·LIVE 정책 변경은 수행하지 않음.
+- [CI 릴리스 검증 기록](https://github.com/wonhwipark/L1Work/actions/runs/44578645761) · 기존 버전과 정책은 보존.
+
 L1 업무용 스킬 패키지 및 별도 승인된 공개 자료를 제공하는 GitHub PUBLIC 저장소입니다.
 
 ## 최신 스킬 ZIP 배포 (2026-11-19)
