@@ -47,6 +47,14 @@ jobs:
           doc_old="P0 Linux `process_guard.py`: same-user"
           doc_new="P0 Linux `process_guard.py`: opt-in `L1_CLEANUP_PROCESS_GUARD_STRICT=1`; same-user"
           updated=updated.replace(doc_old,doc_new)
+          package_marker="        # Populate SHA file (one checksum per regular file relative to package root)."
+          package_patch="        # Remove test runner metadata before packaging; no pytest cache belongs in a skill.\n        for cache in root.rglob('.pytest_cache'):\n            if cache.is_dir():\n                shutil.rmtree(cache)\n        # Reconcile manifest file hashes and sizes with the actually modified files.\n        manifest = json.loads(manifest_file.read_text(encoding='utf-8'))\n        old_file_rows = {row['path']: row for row in manifest.get('files', [])\n                         if isinstance(row, dict) and isinstance(row.get('path'), str)}\n        entries = []\n        for file in sorted(root.rglob('*')):\n            if not file.is_file() or file in (manifest_file, root / 'PACKAGE_CONTENTS.sha256') or '__pycache__' in file.parts or '.pytest_cache' in file.parts:\n                continue\n            rel = file.relative_to(root).as_posix()\n            row = dict(old_file_rows.get(rel, {}))\n            row.update(path=rel, sha256=hashlib.sha256(file.read_bytes()).hexdigest(), bytes=file.stat().st_size)\n            entries.append(row)\n        manifest['files'] = entries\n        manifest_file.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + '\\n', encoding='utf-8')\n        # Populate SHA file (one checksum per regular file relative to package root)."
+          assert updated.count(package_marker) == 1
+          updated=updated.replace(package_marker,package_patch)
+          digest_marker="    digest = hashlib.sha256(NEW.read_bytes()).hexdigest()"
+          digest_patch="        manifest = json.loads(src.read('l1-cleanup_v0_13_7/PACKAGE_MANIFEST.json'))\n        for row in manifest['files']:\n            actual = src.read('l1-cleanup_v0_13_7/' + row['path'])\n            assert hashlib.sha256(actual).hexdigest() == row['sha256'], 'Manifest hash mismatch: ' + row['path']\n            assert len(actual) == row['bytes'], 'Manifest size mismatch: ' + row['path']\n        for line in src.read('l1-cleanup_v0_13_7/PACKAGE_CONTENTS.sha256').decode('utf-8').splitlines():\n            expected, path = line.split('  ', 1)\n            assert hashlib.sha256(src.read('l1-cleanup_v0_13_7/' + path)).hexdigest() == expected, 'Contents hash mismatch: ' + path\n    digest = hashlib.sha256(NEW.read_bytes()).hexdigest()"
+          assert updated.count(digest_marker) == 1
+          updated=updated.replace(digest_marker,digest_patch)
           p.write_text(updated, encoding='utf-8')
           PY
           python3 -m pip install --disable-pip-version-check -q pytest
