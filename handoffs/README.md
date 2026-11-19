@@ -1,5 +1,10 @@
 # 업무용 GPT 인계 문서
 
+## Recovery 포인트 분석 — 업무 GPT 상세 설계·구현 인계 (2026-11-19)
+
+- **[필수 근거 9항목·단계별 입출력·후보 판정·최소 구현·검증을 포함한 상세 인계 r0001](L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0001_20261119_KST.md)** — CL→Jira/merged PR의 Problem/Cause/Solution과 실제 source revision을 대조하고, 정상/실패 시나리오·최초 불일치·검출부·런타임 자원 소유자의 복구 경계를 구분. 기존 스킬 재사용, G01~G10 기능 대조, S0~S6 분석 계약, E0~E5 적용·최소 구현·회수, T01~T20 연결 시험과 R01~R08 제품 효과 검증 계획 포함.
+- **CNF 미수신 timeout·기존 recovery 커버 범위 제외**, 저사양 모델 순차 처리·기존 Work/Evidence 보존·미확인 API/스키마 가정 금지 유지. 분석 흐름 구현과 실제 제품 recovery 코드 변경을 구분. 업무 GPT의 현장 대조·구현에 사용할 설계 인계이며, 게시 자체는 호스트 실행·제품 코드 변경·설치·운영 전환 승인이 아님. 기존 [사례 분석 프롬프트](L1_CL_JIRA_RECOVERY_ANALYSIS_PROMPT_r0001_20261117_KST.md) 보존.
+
 ## ACE·PEC-HOP·ACON — Workflow v1.6.73 개발 ZIP CI 검증 결과 (2026-11-19)
 
 - **[ACE·PEC-HOP·ACON Workflow 통합 개발 ZIP 실제 CI 20 PASS / 최종 ZIP은 릴리스 게이트 미충족 — 기존 인계서 최신 12절](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — PRIVATE Actions에서 기존 MSC 계보를 보존한 `l1-fix-workflow v1.6.73` 개발 ZIP 실제 빌드·전파일 해시/CRC·재현성 PASS. 미완료 코드 독립 리뷰/실호스트 G0·Writer 권한을 건너뛴 자동 배포 금지; 배포 승인된 최종 ZIP만 L1Work 루트에 게시 가능. 업무 전용 Updater 원본 반출 없이 업무 GPT의 비민감 기능 판정 회수.
