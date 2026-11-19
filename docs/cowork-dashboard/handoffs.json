@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_MCP_AGENT_READONLY_CAPABILITY_AND_VIEWER_PROBE_HANDOFF_r0001_20261120_KST.md",
+      "title": "업무 GPT 요청 — Agent에서 확인 가능한 Linux MCP 읽기 전용 진단 확장",
+      "published_on": "2026-11-20"
+    },
+    {
       "filename": "L1_WORKSPACE_WIKI_UI_BUSINESS_GPT_REVIEW_AND_INTEGRATION_HANDOFF_r0001_20261119_KST.md",
       "title": "L1 Workspace — 2안 모던 팀 위키 UI 업무 GPT 전달·검토·현장 연동 r0001",
       "published_on": "2026-11-19"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0002_20261119_KST.md",
       "title": "수정 CL 기반 미커버 유사 결함 탐색과 검사·Recovery 판단 — 업무 GPT 인계",
-      "published_on": "2026-11-19"
-    },
-    {
-      "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0001_20261119_KST.md",
-      "title": "Recovery 포인트 분석 — 업무 GPT 상세 설계·구현 인계",
       "published_on": "2026-11-19"
     }
   ]
