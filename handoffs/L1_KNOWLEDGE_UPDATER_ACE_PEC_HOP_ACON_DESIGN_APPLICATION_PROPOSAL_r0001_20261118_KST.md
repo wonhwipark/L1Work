@@ -356,3 +356,20 @@ PY
 - **본 인계서의 게시**는 스킬 설치/호스트 실행/자동 모델 호출/Knowledge writer/외부 피드백 승인이 아님. 내부 검증 결과가 외부에서 관찰되지 않더라도 기존 개발·PUBLIC ZIP 무결성 검증은 독립적으로 계속 가능.
 
 `LATEST_SCOPE=PEC_P1_ACE_P2_ACON_DEFER`, `NO_EXPORT=DEFAULT`, `WORKFLOW_V1673_DEV=20_SYNTHETIC_PASS`, `CURRENT_PILOT=NOT_RUN`, `PUBLIC_FINAL_ZIP=BLOCKED_NOT_POSTED`, `EXTERNAL_HOST_E2E=NOT_OBSERVABLE`.
+
+## 14. 2026-11-19 KST — PEC-HOP Code Analyzer + ACE Workflow 두 스킬 실제 수정·개발 ZIP 검증
+
+사용자 최신 지시: **상위 두 스킬만 코드 수정 후 L1Work 최종 ZIP 배포**. 기존 §13의 P1/PEC, P2/ACE·ACON 보류/업무 데이터 `NO_EXPORT`를 유지. **아래는 PRIVATE CI에서 실제 생성한 개발 ZIP으로, 아직 PUBLIC 최종 ZIP이 아님.**
+
+| 스킬 | 개발 패키지(기한부 PRIVATE CI artifact) | 실제 패키지 시험 | 개발 ZIP 고정 SHA256 |
+|---|---|---|---|
+| `code-analyzer` PEC-HOP | `code-analyzer_v0_15_4_1119.zip` / 515271 B | 12 PASS; 원본 파일 보존/CRC/manifest PASS | `ca1e4cd2d89afd5bf35ce49cab4d2034e93650ffb50a3e713db28eb65b758d21` |
+| `l1-fix-workflow` ACE | `l1-fix-workflow_v1_6_74_1119.zip` / 760040 B | 10 PASS; MSC 기존 기능/원본 파일 보존/CRC/manifest PASS | `546936c3856ef19e212ecea3076446d7c75d89db6fcb5ff34df77981024edcd6` |
+
+[검증된 PRIVATE GitHub Actions CI run 44453442652](https://github.com/wonhwipark/CoWork-Skill-Collab/actions/runs/44453442652): 2회 재빌드 바이트 동일/새 범위만 수정·의도 밖 기존 파일 손실 0 확인. 아티팩트 `pec-ace-two-skill-development-1119` (ID `14496641478`, 2026-11-26 UTC 만료). ACON·Kernel·Knowledge Updater·skill-updater 수정 0.
+
+**중요한 실제 사용 경계:** Code Analyzer는 기존 `reuse_validator.validate(..., pec_claims=...)`에 명시적인 opt-in 호출로 원본 raw byte range/기대 SHA를 대조. Workflow는 기존 `work_inspection.inspect_work`에 `ace_scope`/`ace_subject`가 제공될 때만 최신 결정 선택 **후보**를 제시하고 출처/권한/append 순서가 미확인되면 HOLD. 이 함수의 실 업무 Agent 호출 연결과 설치·효용 비교는 현장에서만 확인. 업무 코드/실제 Evidence/설치버전/현장 PASS·비민감 요약을 외부로 돌려보내지 않음.
+
+**배포 상태:** 두 개발 ZIP 모두 `development_not_for_deployment`, 최신 신규 코드 **독립 리뷰·최종 릴리스 게이트 미충족**으로 `L1WORK_FINAL_SKILL_ZIPS=BLOCKED_NOT_POSTED`. 기존 L1Work 공개 ZIP을 덮지 않았으며 인계서 공개 자체는 설치 신호가 아님. CoWork PRIVATE 해당 Work의 `GPT_PEC_ACE_TWO_SKILLS_DEV_BUILD_AND_RELEASE_GATE_r0001_20261119_KST.md`에 코드·시험·미확인, `PEC_ACE_TWO_SKILL_CODE_REVIEW_AND_RELEASE_ONESHOT_r0001_20261119_KST.md`에 Windows 독립 코드 리뷰 및 조건부 최종 배송 원샷을 게시.
+
+**다음 한 동작:** Windows Claude Code 독립 리뷰 운영 계약상 실제 LIVE 승인/비용/중복 gate가 PASS인 범위에서 두 수정 ZIP의 신규 코드 독립 리뷰를 진행→차단 지적 최소 보완·전체 회귀 및 공개 정보등급/릴리스 채널 검증→ **그때 새 최종 스킬 ZIP 두 개를 `wonhwipark/L1Work/main` 루트에 게시·원격 SHA256 확인**. 업무 Linux 실사용 수락은 별도 업무 GPT/Agent가 내부에만 보존.
