@@ -1,5 +1,9 @@
 # 업무용 GPT 인계 문서
 
+## PEC-HOP·ACE 상위 2개 스킬만 수정 — 22건 실패 없는 개발 CI (2026-11-19)
+
+- **[업무 GPT 2스킬 수정 결과·최종 배송 상태 — 기존 인계서 §14](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)**: `code-analyzer v0.15.4` PEC-HOP (12 PASS), `l1-fix-workflow v1.6.74` ACE (10 PASS) 개발 ZIP 생성·source 보존/CRC/2회 빌드 동일. ACON 제외. 이 ZIP들은 PRIVATE CI artifact의 `development_not_for_deployment`이며 **L1Work/main 루트 최종 ZIP은 아직 미게시**. Windows 신규 코드 독립 리뷰/배포 게이트 충족 후만 공개·설치 가능; 현장 결과는 외부 반출 없음.
+
 ## PEC-HOP 우선·ACE 최소 적용: 반출 없는 현장 평가 (2026-11-19)
 
 - **[최신 범위 및 현장 평가 §13](L1_KNOWLEDGE_UPDATER_ACE_PEC_HOP_ACON_DESIGN_APPLICATION_PROPOSAL_r0001_20261118_KST.md)** — **PEC-HOP P1 / ACE P2만 최소 적용·ACON 보류**. 업무 Linux 설치·코드/Evidence·시험 결과는 업무 환경 내부에서 보존하며 **반출 승인 없는 “비민감 결과 회신”도 요구하지 않음**. 현장 자체 G0→대표 사례 1건 기존/개선 비교→확대 판단. 현재 최종 ZIP 배송·현장 시험은 완료 아님.
