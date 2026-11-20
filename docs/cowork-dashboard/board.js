@@ -131,7 +131,7 @@
    "detail": "그룹 게시 → readback → 역링크 → 재사용"
   }
  ];
- let cards=[], pub=null, mode='board', filter='', focused=null, latestHistory=[];
+ let cards=[], pub=null, mode='timeline', filter='', focused=null, latestHistory=[];
  const $=id=>document.getElementById(id);
  const el=(type,cls,content)=>{const n=document.createElement(type); if(cls)n.className=cls; if(content!==undefined)n.textContent=String(content);return n};
  const str=(s,max=165)=>typeof s==='string'&&s.length<=max&&!/[<>]/.test(s);
@@ -163,7 +163,54 @@
  function txtBlock(c){let p=el('p','',c.next_action||'다음 행동 확인 필요');return p}
  function card(c){let b=el('button','item');b.type='button';b.dataset.category=c.category;b.append(el('strong','',c.title),el('span','mini',c.phase_label),txtBlock(c));b.addEventListener('click',()=>open(c));return b}
  function match(c){const a=(c.title+' '+c.owner+' '+c.phase_label+' '+c.next_action).toLowerCase();return a.includes(filter.toLowerCase())}
- function renderWork(){const visible=cards.filter(match),v=$('workview');v.replaceChildren(); if(mode==='board'){
+ const TL_GROUPS=[
+  {name:'진행 스킬·운영',cats:['review-watcher','skill-discovery','job-list']},
+  {name:'설계·대시보드',cats:['dashboard','knowledge-design']}
+ ];
+ const TL_STAGES=['설계','개발·시험','리뷰 요청','독립 리뷰','게시·운영'];
+ function timelinePosition(c){
+   const n=phase(c);
+   // phase_index is a self-reported document position, never evidence that other gates passed.
+   return n===1?0:n===2?1:n===3?2:n===5?4:-1;
+ }
+ function renderTimeline(visible){
+   const root=el('div','tl-groups');
+   for(const group of TL_GROUPS){
+     const list=visible.filter(c=>group.cats.includes(c.category));
+     if(!list.length)continue;
+     const sec=el('section','tl-group'),head=el('div','tl-group-title');
+     head.append(el('strong','',group.name),el('span','',list.length+'건'));
+     const sc=el('div','tl-scroll');sc.setAttribute('role','region');
+     sc.setAttribute('aria-label',group.name+' 가로 진행 단계. 모바일에서는 가로 스크롤');
+     sc.tabIndex=0;
+     const header=el('div','tl-header');
+     ['진행 항목',...TL_STAGES,'현재 기록 · 다음 조치'].forEach(label=>header.append(el('span','',label)));
+     sc.append(header);
+     for(const c of list){
+       const row=el('div','tl-row');
+       const name=el('button','tl-name');name.type='button';
+       name.append(el('strong','',c.title),el('small','',c.owner));
+       name.addEventListener('click',()=>open(c));row.append(name);
+       const at=timelinePosition(c);
+       TL_STAGES.forEach((label,i)=>{
+         const b=el('button','tl-step');b.type='button';
+         b.dataset.first=String(i===0);b.dataset.current=String(i===at);
+         b.setAttribute('aria-label',c.title+' · '+label+' · '+(i===at?'기록상 위치':'완료 증거 미표시')+' · 상세 보기');
+         b.append(el('span','tl-dot'),el('small','',i===at?'위치 신고':'—'));
+         b.addEventListener('click',()=>open(c));row.append(b);
+       });
+       const next=el('button','tl-next');next.type='button';
+       next.append(el('strong','',c.phase_label),el('small','',c.next_action));
+       next.addEventListener('click',()=>open(c));row.append(next);
+       sc.append(row);
+     }
+     sec.append(head,sc);root.append(sec);
+   }
+   $('workview').append(root);
+   if(!visible.length)$('workview').append(el('p','note','조건에 해당하는 공개 업무 없음'));
+   else $('workview').append(el('p','tl-note','● 현재 기록상 위치(신고) · ○ 또는 — 다른 단계의 완료 여부 미확인. 단계 선택 시 자체시험·독립 리뷰 기록 확인. 모바일에서는 그룹별 표를 좌우로 이동.'));
+ }
+ function renderWork(){const visible=cards.filter(match),v=$('workview');v.replaceChildren(); if(mode==='timeline'){renderTimeline(visible);return} if(mode==='board'){
    const b=el('div','board');for(const lane of LANES){const list=visible.filter(c=>lane.match(phase(c)));const g=el('section','lane');const head=el('h3','',lane.name);head.append(el('em','',list.length));g.append(head);list.forEach(c=>g.append(card(c)));b.append(g)}v.append(b);
  }else{const w=el('div','tablewrap'),t=el('table'),th=el('tr');['업무','기록된 단계','담당','다음 행동'].forEach(s=>th.append(el('th','',s)));t.append(el('thead',''));t.tHead.append(th);const body=el('tbody');for(const c of visible){const tr=el('tr');for(const a of [c.title,c.phase_label,c.owner,c.next_action]){const td=el('td','');if(a===c.title){let b=el('button','',a);b.style.cssText='background:none;border:0;color:#285cb6;text-align:left;padding:0;font-weight:750';b.addEventListener('click',()=>open(c));td.append(b)}else td.textContent=a;tr.append(td)}body.append(tr)}t.append(body);w.append(t);v.append(w)}if(!visible.length)v.append(el('p','note','조건에 해당하는 공개 업무 없음'))}
  function renderTodo(){const p=$('todolist');p.replaceChildren();cards.forEach(c=>{const b=card(c);b.classList.add('todoitem');p.append(b)});if(!cards.length)p.append(el('p','note','허용된 최신 업무 정보 없음'))}
