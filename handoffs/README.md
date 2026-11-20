@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## Linux MCP 업무 스킬 접근 — Viewer 진단과 분리 (2026-11-20)
+
+- **[최신 업무 GPT 인계: 기존 L1 스킬 기능의 MCP 연결·호출 계약·P0 실호출 검증](L1_MCP_AGENT_SKILL_ACCESS_AND_CAPABILITY_HANDOFF_r0002_20261120_KST.md)** — 사용자 결정: Viewer는 브라우저용 별도 UI이며 MCP의 상시 업무 접근 경로가 아님. 모바일 Agent → Linux MCP → 기존 Workflow/Kernel/Analyzer/Knowledge Updater/Job의 실제 허용 인터페이스를 G0 조회하고 REUSE/CONNECT/최소 EXTEND. 조회와 분석·게시·설치·실행 승인을 구분하며 업무 GPT가 현장 실호출 근거로 판정.
+- 기존 [Viewer 중심 MCP r0001](L1_MCP_AGENT_READONLY_CAPABILITY_AND_VIEWER_PROBE_HANDOFF_r0001_20261120_KST.md)은 당시 진단 요청 이력으로 보존. [Viewer UI 인계 r0002](L1_WORKSPACE_VIEWER_UI_CHANGE_AND_MCP_VALIDATION_HANDOFF_r0002_20261120_KST.md)는 별도 작업으로 계속 유효. **이 게시만으로 MCP 설치/개발·Job 실행·지식 게시가 시작되지 않음.**
+
+---
+
 ## Recovery 분석 설계 보완 + Workspace 연결 — 최신 추가 인계 r0002 (2026-11-20)
 
 - **[업무 GPT 최종 HO: 차용 판단·원인 규칙·추적/판정 근거·평가 계획·저장/조회 계약](L1_RECOVERY_WORKSPACE_IMPLEMENTED_CONTRACT_HANDOFF_r0002_20261120_KST.md)** — 기존 11/19 기준 분석 r0002를 유지하며 사용자가 제공한 확장 설계 요청에서 필요한 네 항목만 보완. CodeQL 설치 없이 기존 분석 재사용, 후보별 순차 대조·반대 근거·근거 부족 보류, **CNF 미수신 timeout 및 이미 구현된 해당 recovery 제외** 유지.
