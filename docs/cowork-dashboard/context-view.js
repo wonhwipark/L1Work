@@ -11,7 +11,7 @@
   {id:'knowledge-design',title:'L1 지식',hint:'지식 후보와 그룹 게시·활용은 별도 단계'}
  ]);
  const NAMES=Object.freeze({'review-watcher':'협업 운송 전환','dashboard':'CoWork 대시보드','skill-discovery':'스킬 발견·재사용','job-list':'업무 자동화 후보','knowledge-design':'지식 구조 설계'});
- const STALE_AFTER_MS=30*60*1000; // public snapshot freshness, not host verification
+ const STALE_AFTER_MS=6*60*60*1000; // public snapshot freshness, not host verification
  const $=id=>document.getElementById(id);
  const text=(tag,cls,v)=>{const n=document.createElement(tag);if(cls)n.className=cls;n.textContent=v;return n};
  const safe=s=>typeof s==='string'&&s.length<=180&&!/[<>]/.test(s);
@@ -46,14 +46,14 @@
      const c=map[field.id];
      const box=text('article','cx-card','');
      box.append(text('h3','',field.title));
-     box.append(text('p','cx-state',outdated?'최신 상태 미확인 · 공개 자료 갱신 지연':c?c.phase_label:'공개 기록 미확인'));
+     box.append(text('p','cx-state',outdated?'공개 상태 6시간 경과 · 마지막 게시 기록':c?c.phase_label:'공개 기록 미확인'));
      box.append(text('p','cx-next',c?(outdated?'마지막 공개 기록(현재 상태 아님): '+c.phase_label+' / '+c.next_action:'다음 확인: '+c.next_action):'공개 근거가 없어 판단 보류'));
      box.append(text('p','cx-hint',field.hint));
      const btn=text('button','cx-link','관련 공개 업무 보기');
      btn.type='button';btn.disabled=!c;btn.addEventListener('click',()=>openArea(field.id));box.append(btn);
      target.append(box);
    }
-   $('contextStamp').textContent=(outdated?'공개 자료 30분 이상 갱신 지연 — ':'공개 자료 마지막 변경: ')+new Date(j.generated_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})+' · 호스트 최신 실측 시각 아님';
+   $('contextStamp').textContent=(outdated?'최근 6시간 내 신규 공개 게시 없음 — ':'공개 자료 마지막 변경: ')+new Date(j.generated_at).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'})+' · 호스트 최신 실측 시각 아님';
  }
  function links(j){
    const box=$('contextRelations');if(!box)return;box.replaceChildren();
@@ -62,11 +62,11 @@
    if(!flow.length){box.append(text('p','cx-hint','공개 연결 자료 없음'));return}
    const row=text('div','cx-flow','');
    flow.forEach((f,i)=>{if(i)row.append(text('span','cx-arrow','→'));row.append(text('span','cx-node',f.title))});
-   box.append(row,text('p','cx-hint',(stale(j)?'공개 자료가 지연 중이며 아래 연결은 과거 공개 자료의 개념적 관계입니다. ':'')+'책임·인계 관점의 개념 연결이며 실제 자동 호출·승인·설치·분석 성공을 뜻하지 않습니다. Work ID·리뷰 ID·영수증 상세는 PRIVATE 근거에서만 확인합니다.'));
+   box.append(row,text('p','cx-hint',(stale(j)?'새 공개 게시가 없는 동안 아래 연결은 마지막 공개 자료의 개념적 관계입니다. ':'')+'책임·인계 관점의 개념 연결이며 실제 자동 호출·승인·설치·분석 성공을 뜻하지 않습니다. Work ID·리뷰 ID·영수증 상세는 PRIVATE 근거에서만 확인합니다.'));
  }
  function deltas(now,j){
    const box=$('contextDelta');if(!box)return;box.replaceChildren();
-   if(stale(j)){previous=null;box.append(text('p','cx-hint','공개 상태가 30분 이상 지연되어 변경분 비교를 보류합니다. 과거 상태를 최신 관측으로 표시하지 않습니다.'));return}
+   if(stale(j)){previous=null;box.append(text('p','cx-hint','최근 6시간 내 신규 공개 상태 게시가 없어 변경분 비교를 보류합니다. 현재 운영 실패를 의미하지 않습니다.'));return}
    if(previous===null){box.append(text('p','cx-hint','이번 페이지 열람 중 이전에 비교할 공개 스냅샷이 없습니다. 과거 변경 이력을 추정하지 않습니다.'));previous=now;return}
    const changed=Object.keys(NAMES).filter(k=>previous[k]!==now[k] && (Object.hasOwn(previous,k)||Object.hasOwn(now,k)));
    if(changed.length===0){box.append(text('p','cx-hint','이번 페이지 열람 중 확인한 공개 상태 필드의 변화 없음 · 최신 실측을 의미하지 않습니다.'));}
@@ -96,5 +96,5 @@
  refresh();
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh()});
  window.addEventListener('focus',refresh);
- setInterval(refresh,120000);
+ setInterval(refresh,6*60*60*1000);
 })();

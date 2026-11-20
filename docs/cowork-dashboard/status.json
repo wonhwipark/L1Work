@@ -1,18 +1,18 @@
 {
   "checks": {
-    "active_provider": "기록 미확인",
+    "active_provider": "GitHub 리뷰 운송 LIVE (호스트 보고 수용)",
     "independent_review": "기록 미관측",
     "windows_stage1": "기록 미관측"
   },
   "counts": {
     "projects": 10,
-    "receipts": 13,
-    "requests": 18,
-    "reviews": 13,
+    "receipts": 14,
+    "requests": 19,
+    "reviews": 14,
     "works": 10
   },
-  "cutover": "정식 전환 전",
-  "generated_at": "2026-11-20T09:23:06Z",
+  "cutover": "GitHub LIVE (호스트 보고 수용)",
+  "generated_at": "2026-11-20T23:05:57Z",
   "handoffs": [
     {
       "id": "msc-b-viewer",
@@ -26,14 +26,14 @@
     }
   ],
   "schema": "COWORK_PUBLIC_STATUS_V1",
-  "snapshot_date": "2026-11-20",
+  "snapshot_date": "2026-11-21",
   "source": "APPROVED_AGGREGATE_ONLY",
-  "sync_mode": "AUTOMATED_ALLOWLIST",
+  "sync_mode": "MANUAL_ALLOWLIST",
   "work_cards": [
     {
       "action_kind": "OTHER",
       "category": "review-watcher",
-      "next_action": "LIVE 전환 선행 조건에 대한 사용자 결정·검증 근거 확인",
+      "next_action": "첫 신규 유효 요청의 실제 리뷰·영수증, 알림 수신 및 지속 가동 검증",
       "owner": "협업 관리·업무 실행",
       "phase_index": 5,
       "phase_label": "완료 신고 · 증빙 별도",
@@ -44,7 +44,7 @@
     {
       "action_kind": "OTHER",
       "category": "dashboard",
-      "next_action": "HTML 화면 및 자동 갱신 상태 검증",
+      "next_action": "6시간 화면 갱신 기준·수동 상태 게시 확인",
       "owner": "GPT",
       "phase_index": 5,
       "phase_label": "완료 신고 · 증빙 별도",
