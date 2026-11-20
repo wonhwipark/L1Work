@@ -7,13 +7,13 @@
       "published_on": "2026-11-21"
     },
     {
-      "filename": "NR_L1TX_UL_TX_SWITCHING_KNOWLEDGE_AGENT_MCP_ONE_SHOT_HANDOFF_r0001_20261120_KST.md",
-      "title": "업무 GPT 실행 인계 — NR L1 Tx UL Tx Switching Knowledge 실사용 1건",
-      "published_on": "2026-11-20"
+      "filename": "L1_KNOWLEDGE_UPDATER_LOW_RESOURCE_LLM_MSC_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md",
+      "title": "업무 GPT 인계 — NR L1 Tx UL Tx Switching 저사양 분석·MSC 검증 G0",
+      "published_on": "2026-11-21"
     },
     {
-      "filename": "L1_WORKSPACE_VIEWER_UI_CHANGE_AND_MCP_VALIDATION_HANDOFF_r0002_20261120_KST.md",
-      "title": "업무 GPT 요청 — 위키 Viewer UI 변경 및 MCP 확인 연계",
+      "filename": "NR_L1TX_UL_TX_SWITCHING_KNOWLEDGE_AGENT_MCP_ONE_SHOT_HANDOFF_r0001_20261120_KST.md",
+      "title": "업무 GPT 실행 인계 — NR L1 Tx UL Tx Switching Knowledge 실사용 1건",
       "published_on": "2026-11-20"
     }
   ]
