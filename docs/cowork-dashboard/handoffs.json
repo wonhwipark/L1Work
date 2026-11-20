@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "NR_L1TX_UL_TX_SWITCHING_KNOWLEDGE_AGENT_MCP_ONE_SHOT_HANDOFF_r0001_20261120_KST.md",
+      "title": "업무 GPT 실행 인계 — NR L1 Tx UL Tx Switching Knowledge 실사용 1건",
+      "published_on": "2026-11-20"
+    },
+    {
       "filename": "L1_WORKSPACE_VIEWER_UI_CHANGE_AND_MCP_VALIDATION_HANDOFF_r0002_20261120_KST.md",
       "title": "업무 GPT 요청 — 위키 Viewer UI 변경 및 MCP 확인 연계",
       "published_on": "2026-11-20"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_RECOVERY_WORKSPACE_IMPLEMENTED_CONTRACT_HANDOFF_r0002_20261120_KST.md",
       "title": "업무 GPT 인계 — CL/PR Recovery 분석 보완과 Workspace 저장·조회 연결",
-      "published_on": "2026-11-20"
-    },
-    {
-      "filename": "L1_MCP_AGENT_SKILL_ACCESS_AND_CAPABILITY_HANDOFF_r0002_20261120_KST.md",
-      "title": "업무 GPT 인계 — 모바일 Agent의 기존 L1 업무 스킬 접근을 위한 Linux MCP 기능 연결",
       "published_on": "2026-11-20"
     }
   ]
