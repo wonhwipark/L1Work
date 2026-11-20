@@ -1,5 +1,11 @@
 # 업무용 GPT 인계 문서
 
+## NR L1 Tx UL Tx Switching — 업무 GPT Updater 실제 수정 요구 (2026-11-21)
+
+- **[최신 구현 요청 R1~R8: 설치 Updater 확인 → 기존 Analyzer/Converter 재사용 → 부족분 수정·시험 → 협업 독립 리뷰 → 승인된 ZIP 배포](L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0001_20261121_KST.md)** — G0 보고에서 종료하지 말고 허용된 변경·회귀시험까지 연속 진행. 실제 업무 GPT 수신·호스트 실행·리뷰·최종 ZIP 배송은 아직 `NOT_VERIFIED/NOT_RUN`.
+
+---
+
 
 ## NR L1 Tx UL Tx Switching — 저사양 LLM·라이선스·MSC 검증 인계 (2026-11-21)
 
