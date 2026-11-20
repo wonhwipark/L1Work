@@ -1,5 +1,11 @@
 # 업무용 GPT 인계 문서
 
+## Viewer 2단계 개선 — 업무 GPT 원샷 구현 인계 (2026-11-20)
+
+- **[최신 Viewer 통합 인계: 이슈번호 SOC-xxx 선두·Work 제목 통일 → 수정 버튼 전용 인증·이슈/MSC 편집](L1_WORKSPACE_VIEWER_TWO_PHASE_IMPLEMENTATION_ONESHOT_HANDOFF_r0001_20261120_KST.md)** — 기존 PUBLIC `l1-workspace-wiki-ui_v0_1_0_1119.zip`과 앞선 Viewer UI 변경서 r0002를 재사용. 동료 무로그인 Read Only 유지, Work ID/폴더/근거 불변, canonical MSC/Writer 보안 게이트와 Linux G0 확인을 분리. **인계서 PUBLIC 게시 완료 / 실제 업무 GPT 수신·Linux 구현·호스트 배포 NOT_VERIFIED/NOT_RUN**.
+
+---
+
 ## NR L1 Tx UL Tx Switching — Agent MCP 지식 검토→개인 Workspace 갱신 1건 (2026-11-20)
 
 - **[실행 인계: l1-knowledge-updater 실제 분석 → l1-workspace 동일 Work 저장 → readback → 사용자 결과 표시](NR_L1TX_UL_TX_SWITCHING_KNOWLEDGE_AGENT_MCP_ONE_SHOT_HANDOFF_r0001_20261120_KST.md)** — 범용 MCP 기능 연결의 대표 실사용 시나리오. 제품 코드/그룹 Knowledge 변경은 제외. **문서 전달만 완료**, 실제 Linux MCP 호출·분석·개인 Workspace 저장/재조회는 아직 `NOT_RUN`.
