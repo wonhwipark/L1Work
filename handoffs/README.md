@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## NR L1 Tx UL Tx Switching — Agent MCP 지식 검토→개인 Workspace 갱신 1건 (2026-11-20)
+
+- **[실행 인계: l1-knowledge-updater 실제 분석 → l1-workspace 동일 Work 저장 → readback → 사용자 결과 표시](NR_L1TX_UL_TX_SWITCHING_KNOWLEDGE_AGENT_MCP_ONE_SHOT_HANDOFF_r0001_20261120_KST.md)** — 범용 MCP 기능 연결의 대표 실사용 시나리오. 제품 코드/그룹 Knowledge 변경은 제외. **문서 전달만 완료**, 실제 Linux MCP 호출·분석·개인 Workspace 저장/재조회는 아직 `NOT_RUN`.
+
+---
+
+
 ## Linux MCP 업무 스킬 접근 — Viewer 진단과 분리 (2026-11-20)
 
 - **[최신 업무 GPT 인계: 기존 L1 스킬 기능의 MCP 연결·호출 계약·P0 실호출 검증](L1_MCP_AGENT_SKILL_ACCESS_AND_CAPABILITY_HANDOFF_r0002_20261120_KST.md)** — 사용자 결정: Viewer는 브라우저용 별도 UI이며 MCP의 상시 업무 접근 경로가 아님. 모바일 Agent → Linux MCP → 기존 Workflow/Kernel/Analyzer/Knowledge Updater/Job의 실제 허용 인터페이스를 G0 조회하고 REUSE/CONNECT/최소 EXTEND. 조회와 분석·게시·설치·실행 승인을 구분하며 업무 GPT가 현장 실호출 근거로 판정.
