@@ -1,5 +1,8 @@
 # 업무 GPT 수정 요청 — l1-knowledge-updater Module→Feature→Scenario 및 코드 기반 MSC 개선
 
+> **2026-11-21 최신 사용자 결정 — 실행 보류(HOLD), 순서 정정.** 이전 이 문서 r0001의 “업무 GPT가 먼저 실제 Updater를 확인·수정” 순서는 철회. **설계 GPT가 저사양 LLM 분석 보조 패키지 구현·자체시험 → Windows Claude Code 독립 리뷰 → GPT 판정 → 승인된 최종 ZIP을 `L1Work/main` 루트에 배포하고 원격 SHA 확인 → 그 배포된 패키지의 정확한 버전·인터페이스를 포함한 신규 r0002 핸드오프 발행 → 마지막에 업무 GPT가 `l1-knowledge-updater` 최소 통합 구현/실사용 시험** 순서로만 진행. 지금은 PRIVATE 고정 후보 `knowledge_analysis_preflight v0.2.0` (16,138 B, SHA-256 `90a0d55842138d4c813f0dbc3a5c8e4625e84a110afe68035348297ffedad1f3`, 38 synthetic tests PASS)의 정식 독립 리뷰 `REQ-L1-KNOWLEDGE-PREFLIGHT-V020-R1-20261121`이 제출된 상태이며 PUBLIC 최종 ZIP 미게시. **이 문서만으로 업무 GPT 수정·설치·실행 시작하지 말 것.** 기존 요구 R1~R8은 후속 Updater 통합의 참고 규격으로만 보존.
+
+
 - r0001 / 2026-11-21 KST
 - **전달 정본:** GitHub PUBLIC `wonhwipark/L1Work` / `main` / `handoffs/L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0001_20261121_KST.md`
 - **기존 CoWork Work:** `L1-WORKSPACE-RAG-20261111-001` (동일 목적의 기존 분석·설계·개발 흐름을 재개)
