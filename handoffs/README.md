@@ -1,5 +1,14 @@
 # 업무용 GPT 인계 문서
 
+## Viewer Write — Workflow v1.6.75 / Kernel v0.7.43 전체 스킬 개발 패키지 (2026-11-21)
+
+- **[업무 GPT 우선 실행 인계 r0003](L1_WORKSPACE_VIEWER_WRITE_WORKFLOW_KERNEL_FULL_SKILLS_HANDOFF_r0003_20261121_KST.md)** — 기존 [r0002 통합 연동 HO](L1_WORKSPACE_VIEWER_WRITE_V020_WORKFLOW_KERNEL_E2E_ONESHOT_HANDOFF_r0002_20261121_KST.md) 보완. 최신 두 스킬의 **수정된 전체 ZIP**과 원본 ZIP SHA·단위/모의시험·기존 전체 회귀/실제 Linux Write E2E 미검증 경계 명시. **실제 호스트 사용은 별도 G0·보안/운영 승인 게이트**.
+- **[l1-fix-workflow v1.6.75 전체 ZIP](../l1-fix-workflow_v1_6_75_1121.zip)** — **832,039 B**, SHA-256 `fd337ee31e09c9f694146c9d159799ca7182af052c93121e73888a9ee367a0a1`, 315 entries; Viewer Write canonical Work ID/document/revision routing, SDK/README/release/manifest/단위시험 포함.
+- **[work-ledger-kernel v0.7.43 전체 ZIP](../work-ledger-kernel_v0_7_43_1121.zip)** — **379,642 B**, SHA-256 `9866ff7164884b0fb346bd31d37dbdf2013b5e5910e5857f8e35075624cf92f1`, 166 entries; 기존 잠금 CAS writer 위임·세션/ACL/원본 재검사·영수증/readback helper, 단위시험·manifest 포함.
+- **판정:** GitHub 원격 바이트·전체 ZIP CRC/manifest PASS, 기존 모듈 시험 Workflow 8/8+Kernel 13/13+교차 4/4+staging 5/5 PASS. **전체 기존 스킬 suite/실 Linux G0·B1~B3·E3/E4·운영 WRITE ON=NOT_RUN**. 신규 버전은 `development_not_for_deployment`, 승인된 최종 배포/운영 설치본 아님. 기존 v1.6.74/v0.7.42 불변 보존.
+
+---
+
 ## Viewer Write v0.2.0 × Workflow/Kernel — 업무 GPT E2E 인계 r0002 (2026-11-21)
 
 - **[업무 GPT 우선 실행 HO: Write v0.2.0 + l1-fix-workflow + work-ledger-kernel 통합](L1_WORKSPACE_VIEWER_WRITE_V020_WORKFLOW_KERNEL_E2E_ONESHOT_HANDOFF_r0002_20261121_KST.md)** — 실제 업무 Linux 설치본 G0 확인 후 기존 Work 선택·Workflow/Kernel/CAS·writer 연동→초안·Diff·저장·Evidence/revision readback→Viewer 반영을 원샷으로 실행. Workflow/Kernel은 필수 연결, **수정은 입증된 gap에만 최소 범위**. 설정 v0.3.0 공존/Read Only·보안/MSC 별도 게이트. **HO 게시만으로 업무 GPT 수신·호스트 E2E/운영 설치 완료 아님**.
