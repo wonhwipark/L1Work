@@ -1,5 +1,11 @@
 # 업무용 GPT 인계 문서
 
+## Viewer 2차 Write 기능 — 개발 후보·업무 GPT 연결 (2026-11-21)
+
+- **[Viewer v0.2.0 편집 UI 연결 및 실제 Linux G0 인계](L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md)** — 기존 동료 무로그인 Read Only 유지, [수정] 전용 인증·이슈 본문/MSC 변경 요청·Diff/Preview·초안/저장 흐름의 프런트엔드 개발 후보와 서버 보안·원본 writer 재사용 게이트를 정리. **UI 개발 자체시험 30+8 PASS**이나 실제 Linux 인증·CSRF·ACL·Writer·B1~B3/E3/E4 및 운영 Write는 NOT_RUN. v0.2.0 개발 ZIP은 **현재 GPT 대화 첨부에만 존재하고 L1Work에 바이너리 배송되지 않음**. 기존 1차 v0.1.2 ZIP/운영 보존.
+
+---
+
 ## L1 Workspace Viewer 1차 v0.1.2 배송 (2026-11-21)
 
 - **[Viewer v0.1.2 ZIP](../l1-workspace-viewer-ui_v0_1_2_1121.zip)** — 74,940 B / SHA-256 `9be14c4c34c2a7d923d8b11c01fb0249d41e820861721f275001f0f7d499d9e3`. 이슈번호 선두·Work ID 보조 표시, 블루그레이 색감·MSC 방향 안내. **사용자 최신 지시로 독립 스타일 리뷰 생략 후 PUBLIC 전달 완료**. 합성 정적 UI 포함, Linux 현장 적용·보안·실동료 시험은 미실행.
