@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## Viewer 환경설정 v0.3.0 개발용 전달 (2026-11-21)
+
+- **[환경설정 v0.3.0 소스·패치·시험 ZIP](../l1-workspace-viewer-preferences_v0_3_0_1121.zip)** — 20,661 B / SHA-256 `228c60bada8a92591f7ae855dfabe206e018d9e59970cf2d1b773d4d00072812`. 기존 Viewer v0.1.2/Write v0.2.0 유지, 사용자별(익명은 브라우저별) 표시·숨김/문서 유형 필터/화면 설정/로컬 저장·초기화 추가. Node 16/16 + Python 14/14 PASS, ZIP CRC PASS, **실 Linux DOM/CSP/브라우저·운영 설치 NOT_RUN**, `development_not_for_deployment`.
+- **[환경설정 Linux G0 연동·조건부 적용 인계](L1_WORKSPACE_VIEWER_PREFERENCES_V030_G0_INTEGRATION_HANDOFF_r0001_20261121_KST.md)** — 화면 매핑/사용자 식별·저장 정책/기존 Write 공존과 원본 무변경 확인, 재현 시험·안전 배포 조건.
+
+---
+
 ## Viewer 2차 Write 기능 — 개발 후보·업무 GPT 연결 (2026-11-21)
 
 - **[Viewer Write UI v0.2.0 개발 ZIP](../l1-workspace-viewer-write-ui_v0_2_0_1121.zip)** — L1Work/main 루트 21,171 B, SHA-256 `9f2df44348478eb44615bddef8f211645fa1c07ed71d43580b4fb324e376b6f9`, 10-file CRC PASS, 원격 bytes PASS. **개발용 전달 예외**, Linux Write 활성화·운영 배포 NOT_RUN.
