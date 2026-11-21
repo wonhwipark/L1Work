@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## Viewer Write v0.2.0 × Workflow/Kernel — 업무 GPT E2E 인계 r0002 (2026-11-21)
+
+- **[업무 GPT 우선 실행 HO: Write v0.2.0 + l1-fix-workflow + work-ledger-kernel 통합](L1_WORKSPACE_VIEWER_WRITE_V020_WORKFLOW_KERNEL_E2E_ONESHOT_HANDOFF_r0002_20261121_KST.md)** — 실제 업무 Linux 설치본 G0 확인 후 기존 Work 선택·Workflow/Kernel/CAS·writer 연동→초안·Diff·저장·Evidence/revision readback→Viewer 반영을 원샷으로 실행. Workflow/Kernel은 필수 연결, **수정은 입증된 gap에만 최소 범위**. 설정 v0.3.0 공존/Read Only·보안/MSC 별도 게이트. **HO 게시만으로 업무 GPT 수신·호스트 E2E/운영 설치 완료 아님**.
+- 실행 입력: [Viewer Write UI v0.2.0 개발 ZIP](../l1-workspace-viewer-write-ui_v0_2_0_1121.zip), [Viewer v0.1.2 UI ZIP](../l1-workspace-viewer-ui_v0_1_2_1121.zip), [환경설정 v0.3.0 ZIP](../l1-workspace-viewer-preferences_v0_3_0_1121.zip). 기존 [Write HO r0001](L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md)은 이력으로 유지.
+
+---
+
 ## Viewer 환경설정 v0.3.0 개발용 전달 (2026-11-21)
 
 - **[환경설정 v0.3.0 소스·패치·시험 ZIP](../l1-workspace-viewer-preferences_v0_3_0_1121.zip)** — 20,661 B / SHA-256 `228c60bada8a92591f7ae855dfabe206e018d9e59970cf2d1b773d4d00072812`. 기존 Viewer v0.1.2/Write v0.2.0 유지, 사용자별(익명은 브라우저별) 표시·숨김/문서 유형 필터/화면 설정/로컬 저장·초기화 추가. Node 16/16 + Python 14/14 PASS, ZIP CRC PASS, **실 Linux DOM/CSP/브라우저·운영 설치 NOT_RUN**, `development_not_for_deployment`.
