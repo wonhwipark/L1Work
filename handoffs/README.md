@@ -2,7 +2,8 @@
 
 ## Viewer 2차 Write 기능 — 개발 후보·업무 GPT 연결 (2026-11-21)
 
-- **[Viewer v0.2.0 편집 UI 연결 및 실제 Linux G0 인계](L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md)** — 기존 동료 무로그인 Read Only 유지, [수정] 전용 인증·이슈 본문/MSC 변경 요청·Diff/Preview·초안/저장 흐름의 프런트엔드 개발 후보와 서버 보안·원본 writer 재사용 게이트를 정리. **UI 개발 자체시험 30+8 PASS**이나 실제 Linux 인증·CSRF·ACL·Writer·B1~B3/E3/E4 및 운영 Write는 NOT_RUN. v0.2.0 개발 ZIP은 **현재 GPT 대화 첨부에만 존재하고 L1Work에 바이너리 배송되지 않음**. 기존 1차 v0.1.2 ZIP/운영 보존.
+- **[Viewer Write UI v0.2.0 개발 ZIP](../l1-workspace-viewer-write-ui_v0_2_0_1121.zip)** — L1Work/main 루트 21,171 B, SHA-256 `9f2df44348478eb44615bddef8f211645fa1c07ed71d43580b4fb324e376b6f9`, 10-file CRC PASS, 원격 bytes PASS. **개발용 전달 예외**, Linux Write 활성화·운영 배포 NOT_RUN.
+- **[Viewer v0.2.0 편집 UI 연결 및 실제 Linux G0 인계](L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md)** — 기존 동료 무로그인 Read Only 유지, [수정] 전용 인증·이슈 본문/MSC 변경 요청·Diff/Preview·초안/저장 흐름의 프런트엔드 개발 후보와 서버 보안·원본 writer 재사용 게이트를 정리. **UI 개발 자체시험 30+8 PASS**이나 실제 Linux 인증·CSRF·ACL·Writer·B1~B3/E3/E4 및 운영 Write는 NOT_RUN. v0.2.0 개발 ZIP은 **L1Work/main 루트에 PUBLIC 배송·SHA 검증 PASS**. 기존 1차 v0.1.2 ZIP/운영 보존.
 
 ---
 
