@@ -36,3 +36,27 @@
 - CoWork PUBLIC `main`: `collab/projects/L1-WORKSPACE-RAG-20261111-001/CURRENT.md` (리뷰 R1/R2 원본 이력 보존)
 
 **업무 GPT 전달 시 반드시 명시할 것:** 이 문서 및 ZIP은 '전달 완료'만 의미. 업무 Linux 실행·Updater 연동·C++ 사실 검증·MSC 문서 생성·Workspace 반영·MCP 실제 호출 완료는 각각 별도 영수증으로 보고.
+
+## E. 업무 GPT 원샷 실제 구현·시험 지시
+
+**이 인계서가 업무 GPT에 실제 전달되면, G0 결과만 회신하고 종료하지 말고 같은 연속 작업에서 가능한 최소 통합·시험까지 수행.** GitHub 문서 게시 자체는 업무 GPT의 자동 수신이나 Linux Agent/Job 실행 트리거가 아님.
+
+### 실행 입력
+
+- 정확한 저장소/브랜치: `wonhwipark/L1Work` / `main`
+- 요청 인계 파일: `handoffs/L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0002_20261121_KST.md`
+- 보조 ZIP: `knowledge_analysis_preflight_v0_2_0_1121.zip` (16,138 B; SHA-256 `90a0d55842138d4c813f0dbc3a5c8e4625e84a110afe68035348297ffedad1f3`)
+- **공개 doc-converter 최신 확인:** L1Work `main` 트리에서 `doc-converter_v0_2_26_1117.zip`이 게시된 가장 최신 버전 (169,204 B, Git blob `dcdb89205ec16ab07f04866bfc514954a02f8bc4`). 0.2.21·0.2.25도 존재. 이 정보는 **공개 트리 확인**이며 실제 업무 Linux 설치본·canonical IR·실호출 적합성 검증은 아님. 기존 Converter를 우선 재사용하며 검증된 gap 없으면 Converter 수정 금지.
+- 대표 사례: `NR L1 Tx → UL Tx Switching`, 기존 코드·Knowledge·Work에 고정된 **시나리오 하나**부터.
+
+### 원샷 명령 의도
+
+1. 실제 업무 Linux 스킬·writer 계약/버전과 권한을 확인. G0 결과만 보고 멈추지 말고 확인된 제공자부터 사용.
+2. `code-analyzer`의 실제 코드 사실→보조 컴포넌트 정규화 근거 매핑/범위 제한→Module·Feature·Scenario 후보/부정 검증까지 수행. 분석기/저사양 LLM 구현을 중복하지 않음.
+3. 확정된 source pin/실제 호출·분기·상태 근거를 확인한 시나리오만 기존 `doc-converter` native IR로 B형 HTML+SVG/PUML 변환·생성물 검증. **현재 개발용 ZIP의 `may_invoke_doc_converter=false`는 단독으로 해제하지 않음**. 연결 단계가 충족되지 않으면 MSC 부분만 `BLOCKED`.
+4. 권한 내에서 기존 개인 `l1-workspace` Work에 근거·분류 결과·MSC 링크/미확인 사항·변경분을 작성하고 **revision·원격/실제 본문 readback**. 그룹 Knowledge 게시 금지. Writer 권한 미확인 시 쓰기 부분만 보류.
+5. 허용된 코드 수정이 필요하면 실제 소스에 최소 변경, 관련 자체/회귀/부정 테스트까지 한 번에 진행. 실제 스킬/업무 코드·로그/고객자료는 공개 GitHub에 게시하지 않음. 운영 설치/서비스 재시작·새 유료 호출·Job 등록·자동 감시·공식 배포는 **유효한 기존 승인으로 덮이지 않으면 실행 금지**.
+
+### 최종 회신 계약
+
+`G0_REUSE_CONNECT_GAP` / `ANALYZER_FACTS` / `HELPER_INTEGRATION` / `MSC_HTML_SVG` / `PERSONAL_WORKSPACE_WRITE_READBACK` / `LOW_RESOURCE_LLM_TEST` / `REGRESSION` 각각 `PASS/FAIL/SKIP/NOT_RUN/BLOCKED`와 **실제 근거·source revision·실행 주체**를 명시. 공개 가능한 비민감 요약만 L1Work/CoWork에 전달; 실제 상세 근거는 원래 업무 Work에 저장. 실패한 부분만 차단하고 완료 항목 재실행 금지. **업무 GPT 수신·실제 실행 여부는 별도 결과/영수증 전까지 `NOT_VERIFIED`**.
