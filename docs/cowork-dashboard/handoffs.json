@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_WORKSPACE_VIEWER_WRITE_V020_WORKFLOW_KERNEL_E2E_ONESHOT_HANDOFF_r0002_20261121_KST.md",
+      "title": "업무 GPT 실행 인계 r0002 — Viewer Write v0.2.0 × l1-fix-workflow × work-ledger-kernel E2E",
+      "published_on": "2026-11-21"
+    },
+    {
       "filename": "L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md",
       "title": "업무 GPT 원샷 인계 — Linux Viewer 2차 Write 편집 연결 v0.2.0",
       "published_on": "2026-11-21"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_WORKSPACE_VIEWER_TWO_PHASE_IMPLEMENTATION_ONESHOT_HANDOFF_r0001_20261120_KST.md",
       "title": "업무 GPT 실행 인계 — 기존 L1 Workspace Viewer 2단계 기능 통합 원샷",
-      "published_on": "2026-11-21"
-    },
-    {
-      "filename": "L1_WORKSPACE_VIEWER_PREFERENCES_V030_G0_INTEGRATION_HANDOFF_r0001_20261121_KST.md",
-      "title": "Viewer 환경설정 v0.3.0 — 업무 GPT/Linux Agent G0·최소 연결·검증 인계",
       "published_on": "2026-11-21"
     }
   ]
