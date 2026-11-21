@@ -1,5 +1,14 @@
 # 업무용 GPT 인계 문서
 
+> **2026-11-21 전달 예외(사용자 최신 지시):** `knowledge_analysis_preflight_v0_2_0_1121.zip`가 L1Work/main 루트에 **개발용 분석 보조 ZIP**으로 공개 전달됨. 독립 리뷰 R2는 미실행(사용자 지시로 리뷰·별도 GPT 판정 생략). 실제 Updater 연동·C++/MSC/Workspace E2E 검증은 아직 안 됐으며 **자동 설치/운영 사용 승인 아님**. 후속 작업은 [업무 GPT Updater 통합 인계 r0002](L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0002_20261121_KST.md)를 우선 적용. 기존 r0001은 보존/HOLD.
+
+## NR L1 Tx UL Tx Switching — 분석 보조 ZIP 공개 전달 및 업무 GPT 통합 r0002 (2026-11-21)
+
+- **[분석 보조 ZIP: knowledge_analysis_preflight_v0_2_0_1121.zip](../knowledge_analysis_preflight_v0_2_0_1121.zip)** — 16,138B / SHA-256 `90a0d55842138d4c813f0dbc3a5c8e4625e84a110afe68035348297ffedad1f3`. 리뷰/별도 판정 사용자 생략에 따른 개발용 전달 예외, 호스트 설치용 검증본 아님.
+- **[업무 GPT 통합 구현 요구 r0002](L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0002_20261121_KST.md)** — 설치 Updater/Analyzer/Converter 실제 계약 대조 후 NR L1 Tx UL Tx Switching의 bounded evidence·MSC·개인 Workspace write/readback을 검증. 기존 r0001 HOLD.
+
+---
+
 > **2026-11-21 최신 우선순위 정정:** NR L1 Tx 지식 개선은 **설계 GPT의 분석 보조 구현·자체시험 → CoWork Claude 독립 리뷰 → GPT 판정 → L1Work 최종 ZIP 배포 → 그 후 업무 GPT Updater 연동 요구(r0002)** 순서다. 현재 [기존 Updater 우선 수정 요청 r0001](L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0001_20261121_KST.md)은 **HOLD/이력 보존**이며 업무 GPT의 수정 시작 트리거가 아니다. PRIVATE 리뷰 `REQ-L1-KNOWLEDGE-PREFLIGHT-V020-R1-20261121` 제출. ZIP은 아직 PUBLIC 배송되지 않았다.
 
 
