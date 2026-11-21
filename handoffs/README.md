@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## L1 Workspace Viewer 1차 v0.1.2 배송 (2026-11-21)
+
+- **[Viewer v0.1.2 ZIP](../l1-workspace-viewer-ui_v0_1_2_1121.zip)** — 74,940 B / SHA-256 `9be14c4c34c2a7d923d8b11c01fb0249d41e820861721f275001f0f7d499d9e3`. 이슈번호 선두·Work ID 보조 표시, 블루그레이 색감·MSC 방향 안내. **사용자 최신 지시로 독립 스타일 리뷰 생략 후 PUBLIC 전달 완료**. 합성 정적 UI 포함, Linux 현장 적용·보안·실동료 시험은 미실행.
+- **[업무 GPT 1차 Linux Viewer 이식·시험·조건부 배포 원샷](L1_WORKSPACE_VIEWER_FIRST_PHASE_V012_G0_DEPLOY_HANDOFF_r0001_20261121_KST.md)** — 기존 로그인 없는 Read Only, B1~B3·E3/E4·백업/rollback 필수. 실제 설치가 끝났다고 보고하지 않음.
+
+---
+
 > **2026-11-21 전달 예외(사용자 최신 지시):** `knowledge_analysis_preflight_v0_2_0_1121.zip`가 L1Work/main 루트에 **개발용 분석 보조 ZIP**으로 공개 전달됨. 독립 리뷰 R2는 미실행(사용자 지시로 리뷰·별도 GPT 판정 생략). 실제 Updater 연동·C++/MSC/Workspace E2E 검증은 아직 안 됐으며 **자동 설치/운영 사용 승인 아님**. 후속 작업은 [업무 GPT Updater 통합 인계 r0002](L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0002_20261121_KST.md)를 우선 적용. 기존 r0001은 보존/HOLD.
 
 ## NR L1 Tx UL Tx Switching — 분석 보조 ZIP 공개 전달 및 업무 GPT 통합 r0002 (2026-11-21)
