@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## Viewer 2안 Wiki 통합 UI v0.4.0 (2026-11-21)
+
+- **[업무 GPT 통합 Viewer v0.4.0 G0/E2E 인계](L1_WORKSPACE_VIEWER_WIKI_INTEGRATED_V040_G0_AND_E2E_HANDOFF_r0001_20261121_KST.md)** · [통합 20파일 ZIP](../l1-workspace-viewer-wiki-integrated_v0_4_0_1121.zip) · [단독 HTML 미리보기](L1_Workspace_Viewer_Wiki_Integrated_Preview_v0_4_0_20261121.html)
+- 팀 위키형 Blue Gray + Write UI v0.2.0 + 환경설정 v0.3.0 + 메뉴·폴더 숨김/탐색 복원 통합. **공개 개발 패키지 전달 PASS / 실제 Linux 브라우저·쓰기 E2E·운영 적용 NOT_RUN**. 기존 r0001~r0003, 이전 ZIP·리뷰·영수증 보존.
+
+---
+
 ## Viewer Write — Workflow v1.6.75 / Kernel v0.7.43 전체 스킬 개발 패키지 (2026-11-21)
 
 - **[업무 GPT 우선 실행 인계 r0003](L1_WORKSPACE_VIEWER_WRITE_WORKFLOW_KERNEL_FULL_SKILLS_HANDOFF_r0003_20261121_KST.md)** — 기존 [r0002 통합 연동 HO](L1_WORKSPACE_VIEWER_WRITE_V020_WORKFLOW_KERNEL_E2E_ONESHOT_HANDOFF_r0002_20261121_KST.md) 보완. 최신 두 스킬의 **수정된 전체 ZIP**과 원본 ZIP SHA·단위/모의시험·기존 전체 회귀/실제 Linux Write E2E 미검증 경계 명시. **실제 호스트 사용은 별도 G0·보안/운영 승인 게이트**.
