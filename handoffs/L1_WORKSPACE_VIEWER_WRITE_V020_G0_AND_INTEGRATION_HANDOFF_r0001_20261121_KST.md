@@ -1,10 +1,12 @@
 # 업무 GPT 원샷 인계 — Linux Viewer 2차 Write 편집 연결 v0.2.0
 
+> **2026-11-21 KST 배송 후 상태 갱신:** [Write UI v0.2.0 개발 ZIP](../l1-workspace-viewer-write-ui_v0_2_0_1121.zip)이 GitHub PUBLIC `wonhwipark/L1Work` **main 루트에 게시**되었음. **21,171 bytes / SHA-256 `9f2df44348478eb44615bddef8f211645fa1c07ed71d43580b4fb324e376b6f9`**, Git blob `aed05a83e70efbe32f28bf494b6bf7b984f3f09b`, commit `cf04dbf8d658ba4198c3cb9c691c07638711d97e`; 원본/원격 Base64 bytes readback **PASS**. 이제 업무 GPT는 PUBLIC 파일을 다운로드할 수 있음. **개발용 전달 완료 ≠ 실제 Linux Viewer 설치·편집 쓰기 승인**. 본문에 남아 있는 최초 작성 시점의 '미게시' 서술은 이 갱신으로 대체됨.
+
 - 작성: 2026-11-21 KST / Work: `L1-WORKSPACE-RAG-20261111-001`
 - 대상: **기존 Linux Viewer** (새 서비스 생성 금지); GitHub PUBLIC `wonhwipark/L1Work`, branch `main`
 - 인계 파일 상대 경로: **`handoffs/L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md`**
 - 기배송 1차 읽기 UI: [`l1-workspace-viewer-ui_v0_1_2_1121.zip`](../l1-workspace-viewer-ui_v0_1_2_1121.zip) / **74,940 bytes / SHA-256 `9be14c4c34c2a7d923d8b11c01fb0249d41e820861721f275001f0f7d499d9e3`**. 실제 Linux 설치는 이전 결과 기준 **NOT_RUN**.
-- **이번 GPT 선행 구현물:** `l1-workspace-viewer-write-ui_v0_2_0_1121.zip`, 21,171 bytes / SHA-256 **`9f2df44348478eb44615bddef8f211645fa1c07ed71d43580b4fb324e376b6f9`**, 10 files CRC PASS, Node 30/30 + Python 8/8 자체시험 PASS, JS syntax PASS. **현재 대화 파일로 제공된 개발 후보이며 아직 L1Work/CoWork에 ZIP 바이너리로 게시된 것은 아님.** 다른 세션/업무 GPT가 이 GitHub 인계서만으로 해당 ZIP을 자동 수신한다고 가정하지 말 것. 사용자가 승인된 파일 전달 경로로 ZIP을 공급할 때만 정확한 SHA를 확인해 적용.
+- **이번 GPT 선행 구현물:** `l1-workspace-viewer-write-ui_v0_2_0_1121.zip`, 21,171 bytes / SHA-256 **`9f2df44348478eb44615bddef8f211645fa1c07ed71d43580b4fb324e376b6f9`**, 10 files CRC PASS, Node 30/30 + Python 8/8 자체시험 PASS, JS syntax PASS. **2026-11-21 기준 GitHub L1Work/main 루트에 개발용 ZIP 게시·원격 무결성 확인 PASS.** 업무 GPT는 동일한 PUBLIC 파일을 고정 SHA로 다운로드·검증 후 사용. 이는 운영 설치/보안 게이트 통과 아님.
 - Code Gate: **development_not_for_deployment**, 현장 인증·writer·B1~B3·E3/E4 모두 미실행. GitHub 인계 게시 자체는 Linux 구현/배포·계정 발급·쓰기 활성화 승인 아님.
 
 ## 1. 사용자 확정 요구
@@ -31,7 +33,7 @@
 ## 3. 업무 GPT / Linux Agent 원샷 실행 순서
 
 1. **READ_ONLY G0**: 이미 있는 업무 Viewer 실제 source/branch/revision, v0.1.2 적용 여부, 읽기 URL/handler/MSC origin/CSP, 동료 무로그인 유지, 편집자 인증 제공자(기존 로컬 OS·reverse proxy/내장 등), 문서별 edit ACL·CSRF·session rotate/TTL/rate-limit/계정 보호, 기존 Workflow/Kernel/Knowledge Updater 원본 writer/CAS/readback, canonical anchor provider를 설치 코드에서 확인. 확인한 항목만 REUSE/CONNECT/GAP/UNKNOWN.
-2. **후보 패치와 격리시험**: 개발 ZIP이 사용자 대화 첨부에서 **실제로 전달된 경우에만** sha256 확인. 기배송 v0.1.2와 모두 준비됐으면 `python tools/apply_to_v012.py <v0.1.2 ZIP> <v0.2.0 candidate ZIP>`. 결과 manifest/CRC/소스 diff/Node/Python 시험. 제공되지 않았다면 `INPUT_ZIP=BLOCKED_NOT_TRANSFERRED`로만 보고하고 내용 추정·빈 파일 대체 금지.
+2. **후보 패치와 격리시험**: 이제 PUBLIC L1Work/main 루트의 [v0.2.0 ZIP](../l1-workspace-viewer-write-ui_v0_2_0_1121.zip)을 정확한 21,171 bytes 및 SHA-256으로 검증해 내려받을 수 있음. 기배송 v0.1.2와 모두 준비됐으면 `python tools/apply_to_v012.py <v0.1.2 ZIP> <v0.2.0 candidate ZIP>`. 결과 manifest/CRC/소스 diff/Node/Python 시험. 다운로드·무결성 검증이 실패한다면 `INPUT_ZIP=BLOCKED_NOT_VERIFIED`로만 보고하고 내용 추정·빈 파일 대체 금지.
 3. **실제 backend 연결**: 설치된 서버의 검증된 인증자/안전한 writer로만 `window.L1ViewerWriteHostAdapter`를 구현. 이 이름은 **frontend 합성 계약**이지 이미 존재하는 Linux API가 아님. 서버는 각 login/draft/preview/commit와 writer 호출 직전 session·CSRF·ACL·revision 재확인. 별도 계정 DB/새 문서 writer·그룹 지식 자동 게시 기본 개발 금지. 현장 owner가 인증/Writer 정책을 충족하지 못하면 서버 adapter **미등록** 상태로 읽기만 계속.
 4. **MSC**: canonical message/participant anchor의 서버 읽기 계약이 실제 있을 때만 selector 연결. 없으면 문서 단위 수정 요청 초안까지만. 실제 구조 수정/커맨드·LLM 자동 분석은 승인된 후속과 분리.
 5. **시험**: Read Only 무로그인/읽기용 동료·편집자 2역할, 잘못된 PW/타이밍/권한 회수/세션 만료/CSRF/rate-limit/세션 고정, 문서별 edit ACL, draft/Diff/COMMIT 세 시점, stale/conflict/UNCERTAIN/retry0, B1/B2/B3, E3/E4, 1440/720/390/320, MSC 6/12, 원본 SHA/readback, 백업·rollback. 미실행은 PASS로 승격하지 않음.
