@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## L1 Knowledge Updater — 야간 모듈·Procedure·MSC 분석 설계 (2026-11-23)
+
+- **[업무 GPT 실행 인계 r0001](L1_KNOWLEDGE_UPDATER_NIGHTLY_MODULE_PROCEDURE_MSC_HANDOFF_r0001_20261123_KST.md)** — 기존 Updater/Code Analyzer/Converter를 우선 재사용하고 NR UL Tx Switching 1건의 근거·MSC·개인 Work readback 검증 후 야간 예약 가능 여부 판정. **문서 게시 완료, Linux 실행·야간 예약·그룹 지식 게시 NOT_RUN**.
+- **Code Analyzer 판정:** 기존 공개 `code-analyzer v0.15.4`에 bounded probe/State·IPC·Callback/Procedure·MSC·revision 검증 기능이 있으므로 이 단계에서 **불필요한 코드 수정·신규 ZIP 발행 없음**. 현장 시나리오에서 재현된 실제 gap만 후속 최소 수정 검토.
+
+---
+
 ## Viewer v0.5.0 — 오늘의 업무·우측 업무 도우미 (2026-11-22)
 
 - **[업무 GPT 인계서](L1_WORKSPACE_VIEWER_V050_TODAY_ASSISTANT_HANDOFF_r0001_20261122_KST.md)** · [전체 개발 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_0_1122.zip) · [단독 HTML 미리보기](L1_Workspace_Viewer_v0_5_0_20261122_KST.html)
