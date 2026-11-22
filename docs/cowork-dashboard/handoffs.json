@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_WORKSPACE_VIEWER_V050_TODAY_ASSISTANT_HANDOFF_r0001_20261122_KST.md",
+      "title": "업무 GPT 인계 — Viewer v0.5.0 오늘의 업무·우측 업무 도우미",
+      "published_on": "2026-11-22"
+    },
+    {
       "filename": "L1_WORKSPACE_VIEWER_WRITE_WORKFLOW_KERNEL_FULL_SKILLS_HANDOFF_r0003_20261121_KST.md",
       "title": "업무 GPT 원샷 인계 r0003 — Viewer Write × 정식 형태의 Workflow/Kernel 전체 스킬 개발 패키지",
       "published_on": "2026-11-21"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_WORKSPACE_VIEWER_WRITE_V020_WORKFLOW_KERNEL_E2E_ONESHOT_HANDOFF_r0002_20261121_KST.md",
       "title": "업무 GPT 실행 인계 r0002 — Viewer Write v0.2.0 × l1-fix-workflow × work-ledger-kernel E2E",
-      "published_on": "2026-11-21"
-    },
-    {
-      "filename": "L1_WORKSPACE_VIEWER_WRITE_V020_G0_AND_INTEGRATION_HANDOFF_r0001_20261121_KST.md",
-      "title": "업무 GPT 원샷 인계 — Linux Viewer 2차 Write 편집 연결 v0.2.0",
       "published_on": "2026-11-21"
     }
   ]
