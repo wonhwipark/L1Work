@@ -1,5 +1,12 @@
 # 업무용 GPT 인계 문서
 
+## Viewer v0.5.1 — 2026-11-23 (단일 완결 인계)
+
+- [v0.5.1 신규 통합 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_1_1123.zip) — 349332 bytes / SHA-256 `0bc0240261e29c863c541e9650e9f99271b2b924ffd52be753598889f66cf290`, 기존 v0.5.0 불변
+- [업무 GPT 최종 인계서](./L1_WORKSPACE_VIEWER_V051_TODAY_ASSISTANT_HANDOFF_r0001_20261123_KST.md) — v0.5.0 계약 전체 포함, 이전 문서 별도 전달 불필요
+- [미리보기](./L1_Workspace_Viewer_v0_5_1_20261123_KST.html) · [개발 결과](./L1_WORKSPACE_VIEWER_V051_DEVELOPMENT_RESULT_20261123_KST.md) · [체크섬](./L1_WORKSPACE_VIEWER_V051_SHA256SUMS_20261123_KST.txt)
+
+
 ## L1 Knowledge Updater — 야간 모듈·Procedure·MSC 분석 설계 (2026-11-23)
 
 - **[업무 GPT 실행 인계 r0001](L1_KNOWLEDGE_UPDATER_NIGHTLY_MODULE_PROCEDURE_MSC_HANDOFF_r0001_20261123_KST.md)** — 기존 Updater/Code Analyzer/Converter를 우선 재사용하고 NR UL Tx Switching 1건의 근거·MSC·개인 Work readback 검증 후 야간 예약 가능 여부 판정. **문서 게시 완료, Linux 실행·야간 예약·그룹 지식 게시 NOT_RUN**.
