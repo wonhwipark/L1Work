@@ -1,5 +1,13 @@
 # 업무용 GPT 인계 문서
 
+## Viewer v0.5.0 — 오늘의 업무·우측 업무 도우미 (2026-11-22)
+
+- **[업무 GPT 인계서](L1_WORKSPACE_VIEWER_V050_TODAY_ASSISTANT_HANDOFF_r0001_20261122_KST.md)** · [전체 개발 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_0_1122.zip) · [단독 HTML 미리보기](L1_Workspace_Viewer_v0_5_0_20261122_KST.html)
+- v0.4.1의 제목·너비·필터 개선 포함. 우측 목차/도우미, 오늘 업무 탭, Work별 대화·상태·영수증·결과 연결. **기본 합성 예시, 실제 LLM/Agent 호출·운영 적용 없음.**
+- 자체시험 25 PASS / 실제 브라우저·호스트 검증은 사용자 지시대로 업무 환경에서 진행. development_not_for_deployment. [개발 결과](L1_WORKSPACE_VIEWER_V050_DEVELOPMENT_RESULT_20261122_KST.md) · [SHA-256](L1_WORKSPACE_VIEWER_V050_SHA256SUMS_20261122_KST.txt)
+
+---
+
 ## Viewer 2안 Wiki 통합 UI v0.4.0 (2026-11-21)
 
 - **[업무 GPT 통합 Viewer v0.4.0 G0/E2E 인계](L1_WORKSPACE_VIEWER_WIKI_INTEGRATED_V040_G0_AND_E2E_HANDOFF_r0001_20261121_KST.md)** · [통합 20파일 ZIP](../l1-workspace-viewer-wiki-integrated_v0_4_0_1121.zip) · [단독 HTML 미리보기](L1_Workspace_Viewer_Wiki_Integrated_Preview_v0_4_0_20261121.html)
