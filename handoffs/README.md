@@ -1,5 +1,14 @@
 # 업무용 GPT 인계 문서
 
+## Viewer 최신 통합 인계 — v0.5.2 + Updater/Converter MSC HTML 연결 (2026-11-24)
+
+- **[업무 GPT 최신 단일 인계 r0002](./L1_WORKSPACE_VIEWER_V052_MSC_UPDATER_CONVERTER_COMPLETE_HANDOFF_r0002_20261124_KST.md)** — 실제 Updater→doc-converter 호출·HTML/SVG 생성·Workspace artifact/Evidence 등록·Viewer 링크 표시를 단계별 조사. r0001의 전체 UI·Write·도우미 계약과 A01~A10/H01~H05, MSC T1~T8 보존. 최신 현장 회신 양식 포함.
+- **[Viewer v0.5.2 전체 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_2_1124.zip)** — 374,930 bytes / SHA-256 `15e83f136fa10ef680619602b55d74c4cd4c0c86a6cc470c1bec9cac250239ba`; **이번 Viewer 구현 입력은 r0002 + 이 ZIP 하나**. [기존 v0.5.2 가독성 완결 인계 r0001](./L1_WORKSPACE_VIEWER_V052_READABILITY_COMPLETE_HANDOFF_r0001_20261124_KST.md)은 r0002에 원문 보존.
+- **시험 상태 분리:** v0.5.1 게시본의 [후속 Node 재검증](https://github.com/wonhwipark/CoWork-Skill-Collab/blob/51c436e96821aa3d86fb4c8adf978f63b140773e/collab/projects/L1-WORKSPACE-RAG-20261111-001/VIEWER_V051_POST_UPLOAD_VERIFICATION_r0001_20261123_KST.md)은 **25 PASS(10+15)**. **v0.5.2 Node 3개·브라우저 E2E·실제 업무 Linux G0·MSC HTML 링크·Write/LLM/Agent/운영 적용은 NOT_RUN**; 과거 버전 PASS를 최신 버전에 대입하지 않음.
+- **운영 경계:** `development_not_for_deployment`. 인계/ZIP 공개 게시는 실제 설치·Converter 호출·현장 적용 완료가 아님. 실제 원본 코드·MSC·로그·인증정보는 업무 Work에만 보존. 기존 승인 범위에서 현장 G0→최소 연결·회귀시험→비민감 상태 회신.
+
+---
+
 ## Viewer v0.5.1 — 2026-11-23 (단일 완결 인계)
 
 - [v0.5.1 신규 통합 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_1_1123.zip) — 349332 bytes / SHA-256 `0bc0240261e29c863c541e9650e9f99271b2b924ffd52be753598889f66cf290`, 기존 v0.5.0 불변
