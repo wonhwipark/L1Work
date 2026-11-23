@@ -9,6 +9,17 @@
 - **기술 상태**: 위 현상은 사용자 관찰. 실제 `l1-knowledge-updater → doc-converter` 호출 여부, HTML/SVG 생성 여부, Work writer/Viewer 연결 여부 모두 **UNKNOWN / 업무 Linux G0 미검증**. ZIP 전달 자체는 호스트 적용 완료가 아님.
 - 실행 경계: `development_not_for_deployment`. 업무 제품 코드·로그·상세 MSC는 원래 업무 Work에만 저장. 이 공개 HO에 붙이지 않음. 설치/서비스 재시작/새 Job·자동 예약/새 유료 모델 호출/Write ON/그룹 지식 게시에는 기존 유효 승인 또는 별도 승인 필요.
 
+## 후속 시험 근거와 현장 적용 기준 — 2026-11-24 KST
+
+아래는 **버전별 다른 시험 근거**이며 최신 입력을 바꾸지 않는다. 업무 GPT는 이 r0002와 v0.5.2 ZIP만 이번 Viewer 구현 입력으로 사용하고, v0.5.1 ZIP을 별도 설치·전달하지 않는다. 이 문서의 후속 설명은 이전 인계 원문의 당시 시험 문구를 소급 변경하지 않는다.
+
+| 대상 | 확인된 시험·전달 상태 | 다음 현장 확인 |
+|---|---|---|
+| v0.5.1 원격 게시본 | Node `regression.cjs` 10 PASS + `assistant-client.cjs` 15 PASS = **25 PASS**, [CoWork 게시본 후속 재검증](https://github.com/wonhwipark/CoWork-Skill-Collab/blob/51c436e96821aa3d86fb4c8adf978f63b140773e/collab/projects/L1-WORKSPACE-RAG-20261111-001/VIEWER_V051_POST_UPLOAD_VERIFICATION_r0001_20261123_KST.md). 입력 ZIP SHA-256 `0bc0240261e29c863c541e9650e9f99271b2b924ffd52be753598889f66cf290` | 당시 브라우저 E2E·업무 Linux G0·실제 Writer/LLM/Agent·운영 설치는 `NOT_RUN`. 25 PASS를 v0.5.2의 성적으로 합산하지 않음 |
+| **v0.5.2 이번 단일 Viewer 입력** | ZIP SHA-256 `15e83f136fa10ef680619602b55d74c4cd4c0c86a6cc470c1bec9cac250239ba`, 공개 ZIP/manifest/CRC·기존 Write 3파일 원격 검증 PASS | `regression.cjs`, `assistant-client.cjs`, `readability.cjs`의 **v0.5.2 Node 실행, 브라우저 E2E, 업무 Linux G0·실제 read adapter·MSC 링크·Write/LLM 연동은 NOT_RUN** |
+
+**진입 순서:** 실제 활성 Viewer source revision/배포 상태와 원본 분석 Work·Run 영수증 확인 → 기존 HTML/SVG 파일·등록·링크 추적 → 확인된 gap만 최소 수정 → 버전별 시험/Work readback → 공개 가능한 짧은 회신. G0 확인 전에 합성 adapter를 실제 연결로 간주하지 않으며, 실제 운영 변경 승인과 격리 개발물 게시를 구분한다.
+
 ## 0. 가장 먼저 확인할 결손 — Converter 실제 호출 증거
 
 사용자가 Viewer에서 PlantUML 소스만 봤다는 이유로 Converter가 실행됐거나 실패했다고 **둘 다 단정하지 말 것**. 코드 Analyzer가 직접 PUML을 남겼을 수도 있고, Converter가 HTML을 만들었지만 저장 또는 링크가 누락됐을 수도 있음.
@@ -68,7 +79,33 @@ l1-knowledge-updater [직접 분석 진입, 또는 기존 Workflow 결과 재사
 | `VIEWER_HTML_LINK / BROWSER_E2E` | 링크 매핑/권한 검증·실제 화면 렌더 근거 |
 | `CODE_CHANGE / REGRESSION` | 변경한 정확한 파일·스킬 버전/ZIP SHA·시험 결과. 변경 없으면 NO_CHANGE |
 | `HOST_DEPLOY / INDEPENDENT_REVIEW` | 운영 설치·독립 리뷰 수행 사실(기본 NOT_RUN)과 승인·미검증 |
+| `VIEWER_ACTIVE_SOURCE / INPUT_PIN` | 실제 활성 Viewer 소스 저장소·branch·source revision·적용 여부와 이번 입력 v0.5.2 ZIP/SHA 차이. 미확인은 `UNKNOWN` |
+| `ANALYSIS_ENTRY / RESPONSIBLE_STAGE` | Updater 직접 분석 / Workflow 재사용 / 기타 진입을 구분. 원인으로 확인된 단계만 Updater·Converter·기존 writer/Kernel·실제 read adapter·운영 설치 중 담당 판정 |
+| `MSC_LINK_RESOLUTION` | 각 PUML/SVG/HTML의 실제 존재 여부와 Work artifact 링크/docId, 실제 Viewer 링크 노출/클릭 결과; `파일 미생성 / 미등록 / read 모델 미전달 / adapter 해석 실패 / CSP·권한 차단 / 정상 / UNKNOWN` 분리 |
+| `TEST_MATRIX` | v0.5.2 Node 3개 시험 각각 + T1~T8 + A01~A10/H01~H05의 수행 여부와 PASS/FAIL/SKIP/NOT_RUN/BLOCKED. 기록 없음과 미실행 혼동 금지 |
+| `FIELD_CHANGE_OWNER / REPRO_ID` | 업무 현장에서 실제 변경한 파일·source revision·기준 ZIP 대비 차이, 재현 가능한 T/A/H ID 또는 증상; 책임자/변경 없음/보류를 구분 |
 | `NEXT_ONE_ACTION` | 남은 가장 작은 연결 결손과 한 행동 |
+
+### 업무 GPT → 현재 GPT 최소 회신 (비민감)
+
+아래 양식은 위 필수 표의 **요약 회신**이다. 상세 로그·원문·경로·MSC·사내 계정/인증은 원래 업무 Work에 보존하고, 접근 가능한 근거 참조만 전달한다. 회신이 없어도 `UNKNOWN`을 `FAIL`로, 미실행을 `PASS`로 승격하지 않는다.
+
+```text
+기준 HO / Viewer ZIP SHA-256: r0002 / 15e83f136fa10ef680619602b55d74c4cd4c0c86a6cc470c1bec9cac250239ba
+활성 Viewer source revision / v0.5.2 반영 여부: [확인값 또는 UNKNOWN]
+원본 업무 Work ID / source revision / 기존 Run·영수증: [참조 ID 또는 UNKNOWN]
+진입: [Updater 직접 분석 / Workflow 재사용 / 기타 / UNKNOWN]
+doc-converter 실제 호출: [PASS/미호출/UNKNOWN/BLOCKED], 호출 근거 [영수증 참조 또는 없음]
+MSC 산출물: [PUML/SVG/HTML 각각 존재·등록·readback 상태], HTML 링크: [표시/미표시/차단/미시험]
+결손 단계 / 책임: [Updater / Converter / Writer·Kernel / Viewer adapter·UI / 운영 인증·설치 / 추가 확인]
+현장 판정: 읽기 [ ], 화면 [ ], MSC HTML 렌더 [ ], Write·재조회 [ ], 도우미·Agent [ ]
+회귀: v0.5.2 Node [regression/assistant-client/readability 각각], T1~T8 [ ], A01~A10·H01~H05 [ ]
+재현 시험 ID / 실제 변경 파일·revision / 패키지 차이: [비민감 식별자, 없으면 NO_CHANGE]
+근거: [업무 Work 내 허용된 결과·영수증 위치]
+다음 행동: [한 가지]
+```
+
+**책임 분리:** 공통 Viewer 코드에서 재현된 표시 결함은 기존 CoWork Viewer Work로 전달하여 Viewer 수정 후보를 검토한다. Updater·Converter 또는 원본 생성 스킬은 **실제 호출·출력 결손이 입증된 경우에만** 수정 대상으로 판정한다. 현장 인증/adapter/설치 문제는 업무 Work에서 보완한다. 기존 Work와 산출물 근거를 유지하고 새로운 이중 원장·임의 API를 도입하지 않는다. 현장에 Viewer 코드 수정이 있으면 기존 v0.5.2 ZIP 대비 변경 파일과 실제 적용 소스를 명시한다.
 
 상세 업무 코드·호스트 경로·MSC 내용은 업무 Work에만 보존. 공개 저장소에는 비민감 상태/패키지 식별자만 기록. **인계 파일 게시 자체는 실제 업무 GPT 수신·호스트 실행·진단 PASS를 뜻하지 않는다.**
 
