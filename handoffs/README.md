@@ -1,3 +1,11 @@
+## Qwen 기반 Knowledge Updater 분석 품질 개선 + Code Analyzer 개발 후보 (2026-11-25)
+
+- **[업무 GPT 구현 인계](./L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0001_20261125_KST.md)** — 실제 Analyzer·Converter 호출, 분석 준비/근거·커버리지·MSC/Work/Viewer 단계별 검증, 현장 최소 보완·회귀·회신 요구.
+- **[Code Analyzer v0.15.5 전체 개발 ZIP](../code-analyzer_v0_15_5_1125.zip)** — 594,930 bytes / SHA-256 `61099248ab0a4b2597ca8316e613f5987caaee671d735337eea1e0f70a6c2877`. callers/callees scope 제한 및 anchor/partial coverage 개선. v0.15.4 보존.
+- 상태: 격리 9 PASS, ZIP CRC/manifest PASS; 전체 suite·독립 코드 리뷰·실제 업무 Linux/LLM E2E NOT_RUN. development_not_for_deployment; 자동 설치 금지.
+
+---
+
 ## Recovery Viewer v0.5.3 + Kernel v0.7.47 — 신규 통합 인계 (2026-11-24)
 
 - **[업무 GPT 단일 통합 HO](L1_CHANNEL_RECOVERY_VIEWER_KERNEL_CONVERTER_COMPLETE_HANDOFF_r0001_20261124_KST.md)** — 업무 GPT의 Recovery Seed 전후/AS-IS·TO-BE doc-converter HTML/SVG 생성, 기존 Work/Evidence 등록·Kernel recovery/ 파생 탐색·Viewer MSC 연결. v0.5.2 기존 UI/Write/도우미 계약 전체 보존.

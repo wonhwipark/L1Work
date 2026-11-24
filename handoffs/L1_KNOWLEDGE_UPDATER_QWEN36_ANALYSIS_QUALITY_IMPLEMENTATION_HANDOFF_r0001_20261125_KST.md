@@ -83,3 +83,11 @@ Module→Feature→Scenario 정본 탐색과 Procedure 교차 연결 유지. 기
 - 기존 [저사양 분석 보조 연결](L1_KNOWLEDGE_UPDATER_NR_UL_TX_SWITCHING_MODIFICATION_REQUIREMENTS_r0002_20261121_KST.md), [Updater/Converter/Viewer 연결](L1_WORKSPACE_VIEWER_V052_MSC_UPDATER_CONVERTER_COMPLETE_HANDOFF_r0002_20261124_KST.md) 유지.
 - 공개 원본 [code-analyzer v0.15.4](../code-analyzer_v0_15_4_1119.zip), [doc-converter v0.2.26](../doc-converter_v0_2_26_1117.zip), [preflight v0.2.0 개발 보조](../knowledge_analysis_preflight_v0_2_0_1121.zip). 실제 업무 설치본/호환은 G0 확인. 신규 Analyzer 후보는 별도 게시·시험 결과 확인 후만 적용, 미게시 ZIP을 요구하지 않음.
 - 인계 자체는 업무 GPT 자동 수신·설치·실행·지식 업데이트 완료가 아님. 기존 파일/산출물 보존.
+
+## 9. 신규 Code Analyzer 개발 후보 — v0.15.5 (2026-11-25)
+
+- [code-analyzer_v0_15_5_1125.zip](../code-analyzer_v0_15_5_1125.zip) — 594,930 bytes / SHA-256 `61099248ab0a4b2597ca8316e613f5987caaee671d735337eea1e0f70a6c2877`; v0.15.4 원본 보존. `development_not_for_deployment`.
+- 실제 v0.15.4 `scripts/ca_core/probe_engine.py`에서 callers/callees가 선택 파일 budget을 우회하고 누락/불량 line anchor도 CONFIRMED로 반환하는 문제를 확인. 신규 버전은 선택 파일만 처리하고 source/structure 부재, invalid line/endpoint, budget 초과를 partial/UNCERTAIN 또는 NOT_ANALYZED로 표시. 기존 action/schema 및 구조 evidence 유지.
+- Updater는 `probe_meta.coverage_partial`, `structure_files_analyzed`, `missing_structure_count`, `missing_source_count`, `unanchored_edge_count`와 RN을 보존. 기존 schema의 선택적 meta이며 호환성 검증 전 필수 API로 강제하지 않음. 일부 anchored fact의 CONFIRMED는 전체 coverage/실행 reachability/source revision 확인이 아님. 별도 provenance 확인 후에만 승인된 문서에 반영.
+- 시험: 변경 함수 격리 harness 9 PASS(실제 전체 ZIP 시험 아님), ZIP CRC 220/220, manifest 219/219. 전체 기존 suite, 신규 코드 독립 리뷰, Linux 설치/호출, 실제 Qwen/MSC/Work E2E NOT_RUN.
+- 먼저 기존 활성 v0.15.4 및 이 후보의 격리 환경 회귀/호환을 확인. 후보는 운영 자동 설치 대상이 아니며 기존 운영 버전을 덮어쓰지 않음. 기존 승인 없는 설치/배포/Job/모델 호출 금지. Updater 인계 적용은 신규 후보 설치 여부와 별개로 가능한 연결·검증부터 수행.
