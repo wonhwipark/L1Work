@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md",
+      "title": "L1 Channel Recovery 통합 설계 가이드",
+      "published_on": "2026-11-25"
+    },
+    {
       "filename": "L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0001_20261125_KST.md",
       "title": "업무 GPT 실행 인계 — Qwen 기반 L1 Knowledge 분석 품질 개선 r0001",
       "published_on": "2026-11-25"
@@ -10,11 +15,6 @@
       "filename": "L1_CHANNEL_RECOVERY_WORKSPACE_VIEWER_NEW_CHAT_HANDOFF_r0002_20261124_KST.md",
       "title": "L1 Channel Recovery — Workspace·Kernel·Viewer 통합 인계서",
       "published_on": "2026-11-24"
-    },
-    {
-      "filename": "L1_KNOWLEDGE_UPDATER_NIGHTLY_MODULE_PROCEDURE_MSC_HANDOFF_r0001_20261123_KST.md",
-      "title": "업무 GPT 핸드오프 — L1 지식의 모듈·Procedure·MSC 야간 분석 설계 및 첫 사례 검증 r0001",
-      "published_on": "2026-11-23"
     }
   ]
 }
