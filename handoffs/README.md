@@ -1,3 +1,12 @@
+## Recovery Viewer v0.5.3 + Kernel v0.7.47 — 신규 통합 인계 (2026-11-24)
+
+- **[업무 GPT 단일 통합 HO](L1_CHANNEL_RECOVERY_VIEWER_KERNEL_CONVERTER_COMPLETE_HANDOFF_r0001_20261124_KST.md)** — 업무 GPT의 Recovery Seed 전후/AS-IS·TO-BE doc-converter HTML/SVG 생성, 기존 Work/Evidence 등록·Kernel recovery/ 파생 탐색·Viewer MSC 연결. v0.5.2 기존 UI/Write/도우미 계약 전체 보존.
+- **[Viewer 전체 ZIP v0.5.3](../l1-workspace-viewer-wiki-integrated_v0_5_3_1124.zip)** — 399,993 bytes / SHA-256 `9fe5d6cce9ac7064152099e183cdeee21421a0cefe9044ce48d39db686b67411`. 기존 v0.5.2 기능 보존, Recovery 읽기·상세·MSC artifact callback.
+- **[Kernel 전체 ZIP v0.7.47](../work-ledger-kernel_v0_7_47_1124.zip)** — 406,507 bytes / SHA-256 `5c1f73a09b2cd8c4ec93134f387ed7f80cec799b534f2d044978b66e6c38b20c`. Recovery v0.7.46 + Viewer Write guard v0.7.43 병합, 물리적 recovery/ 파생 보기.
+- 상태: 개발용 PUBLIC ZIP 배송과 업무 Linux 실제 설치·독립 리뷰·Browser/Converter E2E는 구분. 개발 패키지는 development_not_for_deployment.
+
+---
+
 # 업무용 GPT 인계 문서
 
 ## Viewer 최신 통합 인계 — v0.5.2 + Updater/Converter MSC HTML 연결 (2026-11-24)
