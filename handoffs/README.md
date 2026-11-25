@@ -1,6 +1,11 @@
-## L1 Channel Recovery 통합 설계 가이드 r0006 (2026-11-25)
+## L1 Channel Recovery 통합 설계·구현 인계 r0007 (2026-11-25)
 
-- **[업무 GPT 최신 단일 인계 r0006](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0006_20261125_KST.md)** — r0005 분석·MSC 의미 검증을 유지하고 Recovery, 기존 Work writer/Kernel, Viewer의 구현 책임·완료 판정을 분리해요. Viewer/Kernel 내부 수정·설치는 Recovery 구현 범위에서 제외하고, 기존 인터페이스 재사용과 실패 단계별 재개만 요구해요.
+- **[업무 GPT 최신 단일 인계 r0007](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0007_20261125_KST.md)**. V2는 수정 전·후·정상 반례, V3는 탐색 상한과 실제 조사량, V4는 첫 위반 전 보호와 종결 반대 근거를 대조해요. 현행 기준선과 보강한 단일 실행을 비교한 뒤 반복 오류가 남은 단계만 선택적으로 분리해요.
+- 원격 확인용 SHA-256 `12f3f1274a766c01ebac31007ab75a6c8e228fb9afbd433437685eca920f4e18`, 54,103 B. 업무 GPT에 전달할 요청문은 1절에 있어요. 신규 정식 독립 리뷰·업무 호스트 G0·Qwen 비교·실제 Work/Viewer 통합·제품 효과 시험은 `NOT_RUN`이에요.
+
+## L1 Channel Recovery 통합 설계 가이드 r0006 — 이전 버전 보존 (2026-11-25)
+
+- **[업무 GPT 이전 단일 인계 r0006](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0006_20261125_KST.md)** — r0005 분석·MSC 의미 검증을 유지하고 Recovery, 기존 Work writer/Kernel, Viewer의 구현 책임·완료 판정을 분리해요. Viewer/Kernel 내부 수정·설치는 Recovery 구현 범위에서 제외하고, 기존 인터페이스 재사용과 실패 단계별 재개만 요구해요.
 - 원격 확인용 SHA-256 `291c675185fe5ab7e0c6561f8ec823ac38586968b9fa42e7b1bdbf48857c4518`, 43,073 B. Analyzer v0.15.6은 별도 개발 후보로 전체 회귀·설치 자체검사 전 운영 설치 금지. r0006 독립 리뷰·업무 호스트·실제 분석/MSC/저장/Viewer 및 제품 시험은 NOT_RUN이에요.
 
 ## L1 Channel Recovery 통합 설계 가이드 r0005 — 이전 버전 보존 (2026-11-25)
