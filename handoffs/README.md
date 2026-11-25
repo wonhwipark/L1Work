@@ -1,3 +1,10 @@
+## Job-list PcellTxPathOnOff API 프로시저 MSC — 단일 실행 프롬프트 (2026-11-25)
+
+- **[업무 GPT 실행 프롬프트](JOBLIST_PCELL_TX_PATH_ON_OFF_PROCEDURE_MSC_PROMPT_r0001_20261125_KST.md)** — 실제 활성 `job-list`의 one-shot 경로에서 `code-analyzer`로 정확한 심볼의 caller/guard/callee/상태·비동기 흐름을 코드 근거로 분석하고 Procedure MSC 생성. 지원되는 경우 `doc-converter` PUML/SVG/HTML로 변환해 동일 Work/Evidence에 저장·재조회.
+- 공개 문서 업로드만 수행. 실제 제품 소스 접근·Job 등록·실행·모델 호출·MSC 생성·Linux MCP 검증·운영 설치 **NOT_RUN**. Analyzer v0.15.6 공개 ZIP은 개발 후보이며 강제 설치하지 않음.
+
+---
+
 ## L1 Channel Recovery 통합 설계·구현 인계 r0007 (2026-11-25)
 
 - **[업무 GPT 최신 단일 인계 r0007](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0007_20261125_KST.md)**. V2는 수정 전·후·정상 반례, V3는 탐색 상한과 실제 조사량, V4는 첫 위반 전 보호와 종결 반대 근거를 대조해요. 현행 기준선과 보강한 단일 실행을 비교한 뒤 반복 오류가 남은 단계만 선택적으로 분리해요.
