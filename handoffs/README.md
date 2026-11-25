@@ -1,3 +1,10 @@
+## Viewer v0.5.7 — Knowledge 표준 섹션 순서 (2026-11-26)
+
+- [업무 GPT 단일 인계](./L1_WORKSPACE_VIEWER_V057_KNOWLEDGE_SECTION_ORDER_COMPLETE_HANDOFF_r0001_20261126_KST.md) · [전체 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_7_1126.zip)
+- 검증된 동일 계층 섹션 순서 정렬·목차 동기화, 원문·MSC 링크·기존 스킬 유지. 457657 bytes / SHA-256 `4a7a7ce742106cebbb4192c250a716ec303ac223ad31fb9673dfe61cb8332ddd`. V8 대역 및 ZIP 검증 PASS; 실제 Node/브라우저/업무 호스트/독립 리뷰/운영 설치 NOT_RUN. development_not_for_deployment.
+
+---
+
 ## Viewer v0.5.6 — 기술 Knowledge·Work 가독성 통합 개발 인계 (2026-11-26)
 
 - [업무 GPT 단일 인계 r0001](./L1_WORKSPACE_VIEWER_V056_TECHNICAL_KNOWLEDGE_READABILITY_COMPLETE_HANDOFF_r0001_20261126_KST.md) · [Viewer v0.5.6 전체 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_6_1126.zip)
