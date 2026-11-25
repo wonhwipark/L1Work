@@ -1,8 +1,8 @@
-## L1 Channel Recovery 통합 설계 가이드 r0004 — 독립 리뷰 반영 (2026-11-25)
+## L1 Channel Recovery 통합 설계 가이드 r0005 (2026-11-25)
 
-- **[업무 GPT 최신 단일 인계](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0004_20261125_KST.md)** — r0003 독립 리뷰 M1/N1/N2/N3 모두 반영. 경로·revision 분기/질문 1회, MSC 의미 불일치 시 등록·링크 차단, 활성 Workflow 매핑 보류·재개, Edge 영향 범위별 미확정 처리 및 수락 시험.
-- 기존 [r0003 심사 원본](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md) 보존. r0004 SHA-256 `ab8b98c5a99a83011f76b1e9068e75a155c26873f4dbefdff63290eaf656661d`, 25,780 bytes.
-- 상태: 독립 정적 설계 리뷰 완료, GPT 수정 수용 및 인계 게시·검증. 실제 업무 호스트 G0·Qwen 구현/실행·제품/MSC/Viewer 시험은 NOT_RUN.
+- **[업무 GPT 최신 단일 인계 r0005](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0005_20261125_KST.md)**. 비-timeout Seed 1건에서 활성 Analyzer의 탐색 범위와 코드 근거를 대조해요. 호출·등록·보호 순서의 누락과 오탐을 측정하고, 검증된 MSC를 같은 Work에서 HTML/SVG로 열람해요.
+- 원격 확인용 SHA-256 `7564af19bcdba3aeaa25c951826b80e7cf179284aea2f37c99da4df931693ae8`, 37,084 B. 공개 Analyzer v0.15.5는 격리 설치 자체검사가 실패해 설치 보류예요. r0005 신규 독립 리뷰, 업무 호스트 G0·Qwen 실행·제품 및 MSC/Viewer 통합 시험은 `NOT_RUN`이에요.
+- [직전 단일 인계 r0004](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0004_20261125_KST.md)에는 [r0003 설계 심사 원본](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md)의 독립 리뷰 M1·N1·N2·N3가 반영됐어요. r0004는 25,780 B, SHA-256 `ab8b98c5a99a83011f76b1e9068e75a155c26873f4dbefdff63290eaf656661d`예요.
 
 ---
 
