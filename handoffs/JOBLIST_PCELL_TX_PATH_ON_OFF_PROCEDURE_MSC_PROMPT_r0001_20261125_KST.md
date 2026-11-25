@@ -34,7 +34,7 @@
 
 ### G3. 기존 Work/Evidence 보존과 MCP readback
 
-1. 유효한 기존 개인 `l1-workspace` Work를 검색·재개하고, 필요한 경우 기존 표준 Work 생성 계약/승인에 따라 진행합니다. Code Facts, Procedure 분석 MD, MCU가 아닌 **MSC** 원문/PUML/SVG/HTML, source pin, 범위·미확인, 실행 영수증을 기존 승인 writer/Kernel으로 같은 Work에 등록합니다.
+1. 유효한 기존 개인 `l1-workspace` Work를 검색·재개하고, 필요한 경우 기존 표준 Work 생성 계약/승인에 따라 진행합니다. Code Facts, Procedure 분석 MD, MSC 원문/PUML/SVG/HTML, source pin, 범위·미확인, 실행 영수증을 기존 승인 writer/Kernel으로 같은 Work에 등록합니다.
 2. 동일 Work의 Evidence/Artifact ID, 원본 SHA·revision, 실제 출력 경로를 **저장 후 재조회**. Viewer의 실제 read adapter가 HTML/SVG 연결을 지원하면 표시·클릭도 검사하되, 허용되지 않은 URL/HTML 직접 삽입이나 새 writer 구현은 금지합니다.
 3. Linux MCP에는 실제 노출된 `job_catalog_read`/`job_status_read`/`job_queue_read`/`job_result_read` **또는 현행 동등 도구**로 Job ID·실행 단계·Worker 시작/종료·artifact 실재를 각각 확인합니다. `DONE/SUCCESS`만으로 분석·MSC 완료를 선언하지 않습니다. `RESULT_UNSUPPORTED`면 기존 로컬 출력/영수증/Work readback으로 우회 조회하며 임의 allowlist/운영 MCP를 변경하지 않습니다.
 
