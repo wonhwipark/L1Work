@@ -1,6 +1,8 @@
-## L1 Channel Recovery 통합 설계 가이드 r0003 (2026-11-25)
+## L1 Channel Recovery 통합 설계 가이드 r0004 — 독립 리뷰 반영 (2026-11-25)
 
-[업무 GPT에 전달할 설계 가이드](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md)에 기존 Recovery 인계와 합성 C++ 평가를 통합했어요. 1절은 업무 GPT 전달 요청문, 2절은 제품 소스 폴더 확인, 4절은 미탐 사례별 조치와 수락 근거, 6절은 Qwen에서 수행할 시험을 담고 있어요.
+- **[업무 GPT 최신 단일 인계](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0004_20261125_KST.md)** — r0003 독립 리뷰 M1/N1/N2/N3 모두 반영. 경로·revision 분기/질문 1회, MSC 의미 불일치 시 등록·링크 차단, 활성 Workflow 매핑 보류·재개, Edge 영향 범위별 미확정 처리 및 수락 시험.
+- 기존 [r0003 심사 원본](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md) 보존. r0004 SHA-256 `ab8b98c5a99a83011f76b1e9068e75a155c26873f4dbefdff63290eaf656661d`, 25,780 bytes.
+- 상태: 독립 정적 설계 리뷰 완료, GPT 수정 수용 및 인계 게시·검증. 실제 업무 호스트 G0·Qwen 구현/실행·제품/MSC/Viewer 시험은 NOT_RUN.
 
 ---
 
