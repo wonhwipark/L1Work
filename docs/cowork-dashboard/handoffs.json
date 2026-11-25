@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_WORKSPACE_VIEWER_V057_KNOWLEDGE_SECTION_ORDER_COMPLETE_HANDOFF_r0001_20261126_KST.md",
+      "title": "Viewer v0.5.7 Knowledge 표준 섹션 순서 통합 인계 r0001",
+      "published_on": "2026-11-26"
+    },
+    {
       "filename": "L1_WORKSPACE_VIEWER_V056_TECHNICAL_KNOWLEDGE_READABILITY_COMPLETE_HANDOFF_r0001_20261126_KST.md",
       "title": "Viewer v0.5.6 기술 Knowledge·Work 가독성 통합 인계 r0001",
       "published_on": "2026-11-26"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0007_20261125_KST.md",
       "title": "L1 Channel Recovery 통합 설계·구현 인계서",
-      "published_on": "2026-11-25"
-    },
-    {
-      "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0006_20261125_KST.md",
-      "title": "L1 Channel Recovery 통합 설계 가이드",
       "published_on": "2026-11-25"
     }
   ]
