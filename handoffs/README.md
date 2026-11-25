@@ -1,3 +1,9 @@
+## L1 Channel Recovery 통합 설계 가이드 r0003 (2026-11-25)
+
+[업무 GPT에 전달할 설계 가이드](./L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md)에 기존 Recovery 인계와 합성 C++ 평가를 통합했어요. 1절은 업무 GPT 전달 요청문, 2절은 제품 소스 폴더 확인, 4절은 미탐 사례별 조치와 수락 근거, 6절은 Qwen에서 수행할 시험을 담고 있어요.
+
+---
+
 ## Qwen 기반 Knowledge Updater 분석 품질 개선 + Code Analyzer 개발 후보 (2026-11-25)
 
 - **[업무 GPT 구현 인계](./L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0001_20261125_KST.md)** — 실제 Analyzer·Converter 호출, 분석 준비/근거·커버리지·MSC/Work/Viewer 단계별 검증, 현장 최소 보완·회귀·회신 요구.
