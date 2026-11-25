@@ -11,9 +11,15 @@
 
 ---
 
-## Qwen 기반 Knowledge Updater 분석 품질 개선 + Code Analyzer 개발 후보 (2026-11-25)
+## Qwen 기반 Knowledge Updater 분석 품질 및 책임 경계 — 최신 r0002 (2026-11-25)
 
-- **[업무 GPT 구현 인계](./L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0001_20261125_KST.md)** — 실제 Analyzer·Converter 호출, 분석 준비/근거·커버리지·MSC/Work/Viewer 단계별 검증, 현장 최소 보완·회귀·회신 요구.
+- **[업무 GPT 최신 통합 인계 r0002](./L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0002_20261125_KST.md)** — 기존 Updater 분석·지식 관리 책임 유지, Kernel/Workflow/Viewer 내부 구현 제외. 원본 근거 검증·실제 탐색 상한·MSC 의미 대조·개인 Knowledge/그룹 Preview 및 게시 보호·단계별 검증·OpenCode 실행 환경을 통합. A1~D3 및 대표 수락 시험 18개 포함.
+- 원격 확인용 SHA-256 `365816fc1b502562fed353968f75471495fedc521531ede2955f755b092a2fbe`, 41,286 B. 기존 활성 Analyzer 유지, v0.15.6은 별도 개발 후보로 전체 회귀·설치 self-check 전 운영 설치 금지. 신규 독립 리뷰·업무 호스트·실제 Updater/MSC/Work/Knowledge/Viewer·그룹 게시/야간 실행 NOT_RUN.
+- 11/11 Workflow r0005와 11/17 동기화 R1의 READ_ONLY 조사·권한 보호는 유지. 이번 Updater 분석 품질 개선 범위만 r0002 우선이며 인계 자체는 설치·실행·write 승인이 아님.
+
+## Qwen 기반 Knowledge Updater 분석 품질 개선 + Code Analyzer 개발 후보 — 이전 r0001 보존 (2026-11-25)
+
+- **[업무 GPT 이전 구현 인계 r0001](./L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0001_20261125_KST.md)** — 실제 Analyzer·Converter 호출, 분석 준비/근거·커버리지·MSC/Work/Viewer 단계별 검증, 현장 최소 보완·회귀·회신 요구.
 - **[Code Analyzer v0.15.5 전체 개발 ZIP](../code-analyzer_v0_15_5_1125.zip)** — 594,930 bytes / SHA-256 `61099248ab0a4b2597ca8316e613f5987caaee671d735337eea1e0f70a6c2877`. callers/callees scope 제한 및 anchor/partial coverage 개선. v0.15.4 보존.
 - 상태: 격리 9 PASS, ZIP CRC/manifest PASS; 전체 suite·독립 코드 리뷰·실제 업무 Linux/LLM E2E NOT_RUN. development_not_for_deployment; 자동 설치 금지.
 
