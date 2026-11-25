@@ -1,3 +1,11 @@
+## Viewer v0.5.6 — 기술 Knowledge·Work 가독성 통합 개발 인계 (2026-11-26)
+
+- [업무 GPT 단일 인계 r0001](./L1_WORKSPACE_VIEWER_V056_TECHNICAL_KNOWLEDGE_READABILITY_COMPLETE_HANDOFF_r0001_20261126_KST.md) · [Viewer v0.5.6 전체 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_6_1126.zip)
+- 기술 레퍼런스 유형별 표현, Work 업무명·상단 상태 요약, 문서 내 MSC 링크 유지. 실제 업무 필드 매핑은 업무 GPT 담당. 원본·기존 스킬 변경 없음.
+- ZIP 446,659 bytes / SHA-256 `147c414777e6fd368520e7a7e7b9c8298c9fa047f2411d8525191e7b91c77343`. V8 대역 5개 시험 프로그램·제한 DOM 단언 7개·패키지 검증 PASS. 실제 Node/브라우저/업무 통합·독립 리뷰·운영 설치 NOT_RUN. development_not_for_deployment.
+
+---
+
 ## Job-list PcellTxPathOnOff API 프로시저 MSC — 단일 실행 프롬프트 (2026-11-25)
 
 - **[업무 GPT 실행 프롬프트](JOBLIST_PCELL_TX_PATH_ON_OFF_PROCEDURE_MSC_PROMPT_r0001_20261125_KST.md)** — 실제 활성 `job-list`의 one-shot 경로에서 `code-analyzer`로 정확한 심볼의 caller/guard/callee/상태·비동기 흐름을 코드 근거로 분석하고 Procedure MSC 생성. 지원되는 경우 `doc-converter` PUML/SVG/HTML로 변환해 동일 Work/Evidence에 저장·재조회.
