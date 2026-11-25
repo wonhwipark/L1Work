@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0005_20261125_KST.md",
+      "title": "L1 Channel Recovery 통합 설계 가이드",
+      "published_on": "2026-11-25"
+    },
+    {
       "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0004_20261125_KST.md",
       "title": "L1 Channel Recovery 통합 설계 가이드",
       "published_on": "2026-11-25"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_RECOVERY_POINT_ANALYSIS_DETAILED_DESIGN_AND_IMPLEMENTATION_HANDOFF_r0003_20261125_KST.md",
       "title": "L1 Channel Recovery 통합 설계 가이드",
-      "published_on": "2026-11-25"
-    },
-    {
-      "filename": "L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0001_20261125_KST.md",
-      "title": "업무 GPT 실행 인계 — Qwen 기반 L1 Knowledge 분석 품질 개선 r0001",
       "published_on": "2026-11-25"
     }
   ]
