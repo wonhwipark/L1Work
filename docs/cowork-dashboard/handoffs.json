@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_SOURCE_MAP_LLM_FIRST_G0_HANDOFF_r0001_20261127_KST.md",
+      "title": "업무 GPT 인계 — Source Map 공통 활용 G0",
+      "published_on": "2026-11-27"
+    },
+    {
       "filename": "L1_WORKSPACE_VIEWER_V057_KNOWLEDGE_SECTION_ORDER_COMPLETE_HANDOFF_r0001_20261126_KST.md",
       "title": "Viewer v0.5.7 Knowledge 표준 섹션 순서 통합 인계 r0001",
       "published_on": "2026-11-26"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_WORKSPACE_VIEWER_V056_TECHNICAL_KNOWLEDGE_READABILITY_COMPLETE_HANDOFF_r0001_20261126_KST.md",
       "title": "Viewer v0.5.6 기술 Knowledge·Work 가독성 통합 인계 r0001",
-      "published_on": "2026-11-26"
-    },
-    {
-      "filename": "L1_RECOVERY_V2_V3_PROCEDURE_KNOWLEDGE_DIAGNOSTIC_DESIGN_HANDOFF_r0001_20261126_KST.md",
-      "title": "L1 Channel Recovery V2/V3 원인 진단 및 Procedure Knowledge 활용 설계 인계",
       "published_on": "2026-11-26"
     }
   ]
