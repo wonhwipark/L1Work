@@ -1,3 +1,10 @@
+## Source Map LLM-first — 업무 GPT 읽기 전용 G0 (2026-11-27)
+
+- [G0 인계 r0001](L1_SOURCE_MAP_LLM_FIRST_G0_HANDOFF_r0001_20261127_KST.md) · [통합 상세 설계 r0002](https://github.com/wonhwipark/CoWork-Skill-Collab/blob/3ee216ff501172a164958e91106053c1ed6cd1f9/collab/projects/L1-WORKSPACE-RAG-20261111-001/L1_SOURCE_MAP_LLM_FIRST_INTEGRATED_DESIGN_r0002_20261127_KST.md)
+- 기존 Discovery 결과, 추출 신뢰도, G6 승인 범위, 저장/조회/Viewer/MCP 계약 및 모델 예산 확인. 사용자 지시로 추가 독립 리뷰 생략. 코드 수정·실행·설치·게시 승인 아님.
+
+---
+
 ## Viewer v0.5.7 — Knowledge 표준 섹션 순서 (2026-11-26)
 
 - [업무 GPT 단일 인계](./L1_WORKSPACE_VIEWER_V057_KNOWLEDGE_SECTION_ORDER_COMPLETE_HANDOFF_r0001_20261126_KST.md) · [전체 ZIP](../l1-workspace-viewer-wiki-integrated_v0_5_7_1126.zip)
