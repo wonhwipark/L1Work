@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0005_20261128_KST.md",
+      "title": "L1 Knowledge Updater · 업무 GPT 실행 인계 r0005",
+      "published_on": "2026-11-28"
+    },
+    {
       "filename": "L1_JOBLIST_KNOWLEDGE_UPDATER_RECOVERY_MCP_EXECUTION_RESULT_HANDOFF_r0001_20261128_KST.md",
       "title": "업무 GPT 통합 인계 — Job List 기반 Knowledge Updater / Channel Recovery 프롬프트 실행 및 Agent MCP 결과 조회 r0001",
       "published_on": "2026-11-28"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_SOURCE_MAP_LLM_FIRST_G0_HANDOFF_r0001_20261127_KST.md",
       "title": "업무 GPT 인계 — Source Map 공통 활용 G0",
-      "published_on": "2026-11-27"
-    },
-    {
-      "filename": "L1_SOURCE_MAP_KNOWLEDGE_UPDATER_VIEWER_SCOPE_HANDOFF_r0001_20261127_KST.md",
-      "title": "L1 Source Map 책임 경계와 수정 범위 · 업무 GPT 인계",
       "published_on": "2026-11-27"
     }
   ]
