@@ -1,6 +1,14 @@
+## LTE/NR L1 Source Map · 업무 GPT 통합 인계 (2026-11-27)
+
+[최신 통합 인계서 r0003](L1_SOURCE_MAP_1500_UPDATER_INTEGRATED_HANDOFF_r0003_20261127_KST.md) · Work `L1-WORKSPACE-RAG-20261111-001`
+
+업무 GPT는 1절 요청문으로 시작해 기존 Discovery 7건을 3절의 관계표와 대조하고, 8절 양식으로 회신해 주세요. 5절에는 합성 레코드와 변경·삭제 전후 예시가 있어요.
+
+---
+
 ## Source Map 책임 경계와 Viewer·관리 스킬 수정 범위 (2026-11-27)
 
-- [업무 GPT 최종 인계 r0001](L1_SOURCE_MAP_KNOWLEDGE_UPDATER_VIEWER_SCOPE_HANDOFF_r0001_20261127_KST.md) · 기존 Work `L1-WORKSPACE-RAG-20261111-001`. 기존 Knowledge·MSC 역할, Analyzer의 빌드 분기 반례, Viewer 최소 표시 범위와 자체 회귀·현장 수락 기준을 담았어요.
+- [기존 책임 경계 인계 r0001](L1_SOURCE_MAP_KNOWLEDGE_UPDATER_VIEWER_SCOPE_HANDOFF_r0001_20261127_KST.md) · 기존 Work `L1-WORKSPACE-RAG-20261111-001`. 기존 Knowledge·MSC 역할, Analyzer의 빌드 분기 반례, Viewer 최소 표시 범위와 자체 회귀·현장 수락 기준을 담았어요.
 - 다음은 업무 GPT의 활성 Updater·Discovery 7건·G6 범위 확인이에요. [기존 읽기 전용 G0 인계](L1_SOURCE_MAP_LLM_FIRST_G0_HANDOFF_r0001_20261127_KST.md)
 
 ---
