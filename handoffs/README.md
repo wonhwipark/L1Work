@@ -1,3 +1,11 @@
+## Knowledge Updater r0005 · 업무 GPT 실행 인계 (2026-11-28)
+
+[통합 인계서 r0005](L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0005_20261128_KST.md) · [Qwen 실행 참조서](L1_KNOWLEDGE_UPDATER_QWEN36_EXECUTION_REFERENCE_r0005_20261128_KST.md) · Work `L1-WORKSPACE-RAG-20261111-001`
+
+업무 GPT는 G0-1에서 실제 호출 진입점의 SHA-256을 먼저 확인하세요. Source Map, Procedure G-2, 기존 Knowledge 문서의 실행 순서와 확대·중단 기준은 통합 인계서 첫 페이지에서 확인할 수 있어요.
+
+---
+
 ## LTE/NR L1 Source Map · 업무 GPT 통합 인계 (2026-11-27)
 
 [최신 통합 인계서 r0003](L1_SOURCE_MAP_1500_UPDATER_INTEGRATED_HANDOFF_r0003_20261127_KST.md) · Work `L1-WORKSPACE-RAG-20261111-001`
