@@ -96,3 +96,12 @@ Viewer G0 G01~G09를 기존 승인된 Linux one-shot으로 한 번 수행. 정�
 읽기 조사, 기존 로그 조회, 비운영 후보 패치 및 무모델 격리 회귀는 기존 승인 범위 내 수행. 운영 설치/설정/서비스 변경, 키 교체, 추가 유료 호출, 소비 Job 재큐잉은 별도 유효 승인 없이는 금지. 승인된 운영 복구만 백업→최소 변경→검증→필요시 롤백. Viewer 자동 업데이트 자체 구현은 이번 범위 아님.
 ## 회신
 배송/설치/활성화/Worker/결과 저장/Catalog/MCP readback 각각 PASS/FAIL/BLOCKED/NOT_RUN; 실제 ID·버전·시각·근거·최초 실패·복구 diff·회귀·다음 한 행동. G01~G09 결과와 재사용 매트릭스 포함. 미발급 ID 생성 금지. 결과 조회 실패로 모델 재호출 금지. 기존 정상 Job 및 스킬 회귀 확인. 독립 리뷰 신규 요청 없음.
+
+
+## 2026-11-28 게시 확인 메모
+
+- **handoff r0002 GitHub 게시/재조회:** PASS.
+- **Job-list v0.4.39 ZIP GitHub 루트 게시:** `PUBLIC_NOT_POSTED` (현재 연결에서 로컬 바이너리 ZIP을 업로드하는 경로 미확인). GitHub에 ZIP이 있다고 가정하거나 자동 설치·실행을 기대하지 말 것.
+- 로컬 후보 ZIP: `job-list_v0_4_39_1128.zip`, 309,393 bytes, SHA-256 `fa81fc0ef06dfe91e4faea163f3df09506de40184e4500785f4e8ac59c620da1`.
+- **Linux Skill Updater 설치/Job 활성화/실행/MCP 조회:** 모두 `NOT_RUN`.
+- 배포 실행이 가능해지면 `L1Work/main` 루트 신규 ZIP → 원격 ZIP bytes/SHA-256 readback → 설치·활성화·실행 상태 분리 확인 순서로 진행. 중복 Job 실행 금지.
