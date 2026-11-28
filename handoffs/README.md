@@ -1,17 +1,17 @@
 <!-- BEGIN HANDOFF_CURRENT_INDEX: managed by scripts/build_handoff_current_index.py -->
 # 인계서 최신 정본 인덱스
 
-> 최신 정본은 명시적으로 검토·등록합니다. 새 인계서 게시와 업무 GPT 실제 적용·운영은 구분합니다.
+> 최신 정본은 명시적으로 검토·등록합니다. 새 인계서 게시와 업무 GPT 실제 적용·운영은 구분합니다. 업데이트 날짜는 등록된 정본·보완 문서의 마지막 Git 커밋 날짜 중 최신값(KST)입니다.
 
-| 관리 영역 | 최신 정본 및 보완 문서 | 현재 확인 상태 | 다음 조치 |
-|---|---|---|---|
-| Knowledge Updater | [r0005](L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0005_20261128_KST.md) · [실행 참조](L1_KNOWLEDGE_UPDATER_QWEN36_EXECUTION_REFERENCE_r0005_20261128_KST.md) | 인계 / G0 대기 | 실제 진입점·SHA 확인 |
-| Source Map | [통합 r0003](L1_SOURCE_MAP_1500_UPDATER_INTEGRATED_HANDOFF_r0003_20261127_KST.md) · [파일럿 r0001](L1_SOURCE_MAP_EXTRACTION_PILOT_HANDOFF_r0001_20261128_KST.md) | 인계 / 파일럿 대기 | 대표 모듈 근거 대조 |
-| Viewer · Code Analyzer | [Viewer v0.5.8 / Analyzer v0.15.7](L1_SOURCE_MAP_VIEWER_ANALYZER_DEVELOPMENT_DELIVERY_r0001_20261127_KST.md) | 개발 패키지 게시 / 운영 미확인 | 회귀·활성본 검증 |
-| Channel Recovery | [통합 r0008](L1_RECOVERY_POINT_ANALYSIS_INTEGRATED_IMPLEMENTATION_HANDOFF_r0008_20261127_KST.md) | 인계 / 실행 미확인 | Seed 1건 V2·V3 회귀 |
-| Viewer 자동 업데이트 · Job-list | [G0 조사](L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md) · [Job-list v0.4.39 배송 r0003](L1_VIEWER_AUTO_UPDATE_JOBLIST_DELIVERY_AND_RECOVERY_HANDOFF_r0003_20261128_KST.md) · [실패 복구 r0002](L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md) | 조사 / v0.4.39 ZIP 미게시 | ZIP 게시·SHA 확인 |
-| Job-list · Agent MCP | [통합 r0001](L1_JOBLIST_KNOWLEDGE_UPDATER_RECOVERY_MCP_EXECUTION_RESULT_HANDOFF_r0001_20261128_KST.md) | 인계 / 호스트 G0 대기 | 기존 Run·Result 조회 확인 |
-| Project Control Center | [구축 r0001](L1_PROJECT_CONTROL_CENTER_WORK_GPT_HANDOFF_r0001_20261128_KST.md) | 인계 / 업무 적용 미확인 | 권한·환경 G0 조사 |
+| 관리 영역 | 최신 정본 및 보완 문서 | 마지막 문서 업데이트 (KST) | 현재 확인 상태 | 다음 조치 |
+|---|---|---|---|---|
+| Knowledge Updater | [r0005](L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0005_20261128_KST.md) · [실행 참조](L1_KNOWLEDGE_UPDATER_QWEN36_EXECUTION_REFERENCE_r0005_20261128_KST.md) | 2026-11-28 | 인계 / G0 대기 | 실제 진입점·SHA 확인 |
+| Source Map | [통합 r0003](L1_SOURCE_MAP_1500_UPDATER_INTEGRATED_HANDOFF_r0003_20261127_KST.md) · [파일럿 r0001](L1_SOURCE_MAP_EXTRACTION_PILOT_HANDOFF_r0001_20261128_KST.md) | 2026-11-28 | 인계 / 파일럿 대기 | 대표 모듈 근거 대조 |
+| Viewer · Code Analyzer | [Viewer v0.5.8 / Analyzer v0.15.7](L1_SOURCE_MAP_VIEWER_ANALYZER_DEVELOPMENT_DELIVERY_r0001_20261127_KST.md) | 2026-11-27 | 개발 패키지 게시 / 운영 미확인 | 회귀·활성본 검증 |
+| Channel Recovery | [통합 r0008](L1_RECOVERY_POINT_ANALYSIS_INTEGRATED_IMPLEMENTATION_HANDOFF_r0008_20261127_KST.md) | 2026-11-27 | 인계 / 실행 미확인 | Seed 1건 V2·V3 회귀 |
+| Viewer 자동 업데이트 · Job-list | [G0 조사](L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md) · [Job-list v0.4.39 배송 r0003](L1_VIEWER_AUTO_UPDATE_JOBLIST_DELIVERY_AND_RECOVERY_HANDOFF_r0003_20261128_KST.md) · [실패 복구 r0002](L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md) | 2026-11-28 | 조사 / v0.4.39 ZIP 미게시 | ZIP 게시·SHA 확인 |
+| Job-list · Agent MCP | [통합 r0001](L1_JOBLIST_KNOWLEDGE_UPDATER_RECOVERY_MCP_EXECUTION_RESULT_HANDOFF_r0001_20261128_KST.md) | 2026-11-28 | 인계 / 호스트 G0 대기 | 기존 Run·Result 조회 확인 |
+| Project Control Center | [구축 r0001](L1_PROJECT_CONTROL_CENTER_WORK_GPT_HANDOFF_r0001_20261128_KST.md) | 2026-11-28 | 인계 / 업무 적용 미확인 | 권한·환경 G0 조사 |
 
 ## 신규·변경 인계서 (정본 미분류)
 
