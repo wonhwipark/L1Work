@@ -1,0 +1,87 @@
+name: One-time verified Job-list v0.4.39 clean ZIP publish
+on:
+  push:
+    branches: [main]
+    paths:
+      - automation/joblist_v0439_clean.delta.b64
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: joblist-v0439-clean-publish
+  cancel-in-progress: false
+jobs:
+  package:
+    if: github.repository == 'wonhwipark/L1Work' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Rebuild pinned source with verified G0-only delta, self-test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64,gzip,hashlib,json,pathlib,re,subprocess,sys,tempfile,zipfile
+          src=pathlib.Path('job-list_v0_4_38_1115.zip')
+          dst=pathlib.Path('job-list_v0_4_39_1128.zip')
+          pin='0cdda16fe214f86811d4df25cc04f3453ec93789ddc9bc2b0769e730bb9c16e0'
+          wanted='9d4fd7c31555080df50ce0b7fda728f81f37ad9ca26baf1fd52faf5c0ce03d84'
+          digest=lambda x:hashlib.sha256(x).hexdigest()
+          if digest(src.read_bytes())!=pin:raise SystemExit('SOURCE_PIN_MISMATCH')
+          d=json.loads(gzip.decompress(base64.b64decode(pathlib.Path('automation/joblist_v0439_clean.delta.b64').read_text())).decode())
+          retain=d['retain']
+          if len(retain)!=58 or len(set(retain))!=len(retain):raise SystemExit('FILE_COUNT_INVALID')
+          if any(not re.fullmatch(r'[A-Za-z0-9._/-]+',x) or '..' in x.split('/') or x.startswith(('data/state/','docs/')) or (x.startswith('output/') and x!='output/.gitkeep') for x in retain):raise SystemExit('FILE_POLICY_INVALID')
+          with tempfile.TemporaryDirectory() as tmp:
+              root=pathlib.Path(tmp)/'job-list_v0_4_39';root.mkdir()
+              with zipfile.ZipFile(src) as z:
+                  if z.testzip() is not None:raise SystemExit('SOURCE_CRC_FAILURE')
+                  files={}
+                  for i in z.infolist():
+                      if i.is_dir():continue
+                      if ((i.external_attr>>16)&0o170000)==0o120000:raise SystemExit('SYMLINK_SOURCE')
+                      k=i.filename.split('/',1)[1]
+                      if k in files:raise SystemExit('SOURCE_DUPLICATE')
+                      files[k]=i.filename
+                  for name in retain:
+                      if name not in files:continue
+                      f=root/name;f.parent.mkdir(parents=True,exist_ok=True);f.write_bytes(z.read(files[name]))
+              patch=pathlib.Path(tmp)/'joblist.patch';patch.write_text(d['patch'],encoding='utf8')
+              proc=subprocess.run(['patch','-s','-p0','-i',str(patch)],cwd=root,capture_output=True,text=True)
+              if proc.returncode:raise SystemExit('PATCH_FAILURE:'+proc.stdout[-200:]+proc.stderr[-200:])
+              seen={p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
+              if seen!=set(retain):raise SystemExit('FILE_INVENTORY_MISMATCH')
+              jobs=json.loads((root/'requests/one-shot-jobs.json').read_text())['jobs']
+              if len(jobs)!=1 or jobs[0]['job_id']!='JOB-20261128-VIEWER-AUTOUPDATE-G0-01' or jobs[0]['profile']!='viewer-autoupdate-g0-linux' or jobs[0]['platform']!='linux':raise SystemExit('ONE_SHOT_CONTRACT_FAIL')
+              if (root/'VERSION').read_text().strip()!='0.4.39' or json.loads((root/'lifecycle.json').read_text())['version']!='0.4.39' or json.loads((root/'.skill-release.json').read_text())['version']!='0.4.39':raise SystemExit('VERSION_MISMATCH')
+              man=''.join(digest((root/k).read_bytes())+'  '+k+'\n' for k in sorted(retain) if k!='PACKAGE_CONTENTS.sha256')
+              (root/'PACKAGE_CONTENTS.sha256').write_text(man)
+              proc=subprocess.run([sys.executable,str(root/'scripts/job_core.py'),'validate','--root',str(root)],capture_output=True,text=True)
+              if proc.returncode or '"status": "PASS"' not in proc.stdout:raise SystemExit('PROFILE_VALIDATE_FAIL:'+proc.stdout[-200:]+proc.stderr[-200:])
+              for p in root.rglob('*.py'):compile(p.read_bytes(),str(p),'exec')
+              with zipfile.ZipFile(dst,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as out:
+                  for rel in sorted(retain):
+                      zi=zipfile.ZipInfo('job-list_v0_4_39/'+rel,date_time=(2026,11,28,0,0,0));zi.compress_type=zipfile.ZIP_DEFLATED;zi.external_attr=0o644<<16
+                      out.writestr(zi,(root/rel).read_bytes(),compress_type=zipfile.ZIP_DEFLATED,compresslevel=9)
+          with zipfile.ZipFile(dst) as z:
+              if z.testzip() is not None or len(z.namelist())!=len(set(z.namelist())) or len(z.namelist())!=58:raise SystemExit('ZIP_INTEGRITY_FAIL')
+          if digest(dst.read_bytes())!=wanted or dst.stat().st_size!=314842:raise SystemExit('RELEASE_SHA_MISMATCH')
+          print('SELF_TEST_PASS; 27 PROFILES; 1 ACTIVE REQUEST; 0 HISTORICAL STATE; 58 FILES; 314842 BYTES; SHA256='+wanted)
+          PY
+      - name: Commit only the verified ZIP (never overwrite)
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          if git ls-tree -r --name-only origin/main | grep -Fxq 'job-list_v0_4_39_1128.zip'; then
+            echo 'ZIP_ALREADY_EXISTS_FAIL_CLOSED'
+            exit 1
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- job-list_v0_4_39_1128.zip
+          git commit -m 'release: job-list v0.4.39 clean Viewer G0 one-shot'
+          git push origin HEAD:main
