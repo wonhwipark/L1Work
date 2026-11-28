@@ -9,15 +9,13 @@
 | Source Map | [통합 r0003](L1_SOURCE_MAP_1500_UPDATER_INTEGRATED_HANDOFF_r0003_20261127_KST.md) · [파일럿 r0001](L1_SOURCE_MAP_EXTRACTION_PILOT_HANDOFF_r0001_20261128_KST.md) | 2026-11-28 12:20 | 인계 / 파일럿 대기 | 대표 모듈 근거 대조 |
 | Viewer · Code Analyzer | [Viewer v0.5.8 / Analyzer v0.15.7](L1_SOURCE_MAP_VIEWER_ANALYZER_DEVELOPMENT_DELIVERY_r0001_20261127_KST.md) | 2026-11-27 02:22 | 개발 패키지 게시 / 운영 미확인 | 회귀·활성본 검증 |
 | Channel Recovery | [통합 r0008](L1_RECOVERY_POINT_ANALYSIS_INTEGRATED_IMPLEMENTATION_HANDOFF_r0008_20261127_KST.md) | 2026-11-27 16:09 | 인계 / 실행 미확인 | Seed 1건 V2·V3 회귀 |
-| Viewer 자동 업데이트 · Job-list | [G0 조사](L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md) · [Job-list v0.4.39 배송 r0003](L1_VIEWER_AUTO_UPDATE_JOBLIST_DELIVERY_AND_RECOVERY_HANDOFF_r0003_20261128_KST.md) · [실패 복구 r0002](L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md) | 2026-11-28 10:01 | 조사 / v0.4.39 ZIP 미게시 | ZIP 게시·SHA 확인 |
+| Viewer 자동 업데이트 · Job-list | [검증된 ZIP 배포 r0004](L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md) · [G0 조사](L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md) · [장애 복구 r0002](L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md) | 2026-11-28 14:39 | 배포 완료 / Linux 설치·실행 미확인 | cron·Updater 영수증 및 G01~G09 결과 확인 |
 | Job-list · Agent MCP | [통합 r0001](L1_JOBLIST_KNOWLEDGE_UPDATER_RECOVERY_MCP_EXECUTION_RESULT_HANDOFF_r0001_20261128_KST.md) | 2026-11-28 01:51 | 인계 / 호스트 G0 대기 | 기존 Run·Result 조회 확인 |
 | Project Control Center | [구축 r0001](L1_PROJECT_CONTROL_CENTER_WORK_GPT_HANDOFF_r0001_20261128_KST.md) | 2026-11-28 10:39 | 인계 / 업무 적용 미확인 | 권한·환경 G0 조사 |
 
 ## 신규·변경 인계서 (정본 미분류)
 
-새로 게시되었지만 정본으로 승격되지 않았습니다. 대체·보완 관계를 검토한 뒤 handoffs/current-index.json에 등록하세요.
-
-- [L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md](L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md) — 정본 미분류 / 실제 적용 미확인
+현재 정본 인덱스 생성 기준 이후 신규·변경 미분류 문서는 없습니다. 새 문서는 정본 자동 승격 대신 이곳에 표시됩니다.
 
 기존 인계서와 검증 기록은 아래의 작성 당시 이력을 보존합니다.
 <!-- END HANDOFF_CURRENT_INDEX -->
