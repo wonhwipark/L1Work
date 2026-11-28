@@ -51,20 +51,20 @@
     {
       "id": "viewer-joblist",
       "title": "Viewer 자동 업데이트 · Job-list",
-      "primary": "L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md",
-      "primary_label": "G0 조사",
+      "primary": "L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md",
+      "primary_label": "검증된 ZIP 배포 r0004",
       "related": [
         {
-          "file": "L1_VIEWER_AUTO_UPDATE_JOBLIST_DELIVERY_AND_RECOVERY_HANDOFF_r0003_20261128_KST.md",
-          "label": "Job-list v0.4.39 배송 r0003"
+          "file": "L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md",
+          "label": "G0 조사"
         },
         {
           "file": "L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md",
-          "label": "실패 복구 r0002"
+          "label": "장애 복구 r0002"
         }
       ],
-      "status": "조사 / v0.4.39 ZIP 미게시",
-      "next_action": "ZIP 게시·SHA 확인"
+      "status": "배포 완료 / Linux 설치·실행 미확인",
+      "next_action": "cron·Updater 영수증 및 G01~G09 결과 확인"
     },
     {
       "id": "job-mcp",
