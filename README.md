@@ -1,5 +1,12 @@
 # L1Work
 
+## Job-list v0.4.39 경량 One-shot 공개 배포 (2026-11-28 KST)
+
+- **[검증된 최종 패키지](job-list_v0_4_39_1128.zip)** — 314,842 bytes / SHA-256 `9d4fd7c31555080df50ce0b7fda728f81f37ad9ca26baf1fd52faf5c0ce03d84`, GitHub 원격 바이트 재조회 PASS.
+- Viewer 자동 업데이트를 위한 **G0 읽기 전용 Linux 현장 조사 One-shot 1건**만 활성화. 과거 Job 결과·Queue·다른 스킬 ZIP 제외, 기존 실행 엔진과 persistent 이력 보존 계약 유지.
+- **[최신 업무 GPT 실행·실패 복구 인계 r0004](handoffs/L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md)** — 공개 게시 PASS, **Linux Skill Updater 설치·Job 실행·Viewer 자동 업데이트 적용은 미확인/미실행**. 확인은 기존 예약 실행 영수증으로 별도 진행.
+
+
 ## l1-cleanup v0.13.7 릴리스 (2026-11-20 KST)
 
 - **[최종 패키지 l1-cleanup_v0_13_7_1120.zip](l1-cleanup_v0_13_7_1120.zip)** — SHA-256 `a1a2daf42bb079bd7531ce73376f014dff9a2b4218bbd73c99a64be50d90f2f2` (216,672 bytes), GitHub Actions 원격 게시 확인.
