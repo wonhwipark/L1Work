@@ -2,6 +2,11 @@
   "schema": "L1WORK_HANDOFF_HISTORY_V1",
   "entries": [
     {
+      "filename": "L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md",
+      "title": "Viewer 자동 업데이트 G0 — Job-list v0.4.39 경량 패키지·실패 복구 인계 r0002",
+      "published_on": "2026-11-28"
+    },
+    {
       "filename": "L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0001_20261128_KST.md",
       "title": "Viewer 자동 업데이트 G0 — Job-list 실행 실패 복구 및 디버깅 인계",
       "published_on": "2026-11-28"
@@ -9,11 +14,6 @@
     {
       "filename": "L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md",
       "title": "L1 Viewer 자동 업데이트 — G0 현장 조사 인계 r0001",
-      "published_on": "2026-11-28"
-    },
-    {
-      "filename": "L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0005_20261128_KST.md",
-      "title": "L1 Knowledge Updater · 업무 GPT 실행 인계 r0005",
       "published_on": "2026-11-28"
     }
   ]
