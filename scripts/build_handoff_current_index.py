@@ -61,7 +61,7 @@ def build():
             documents.append(name)
             links.append("[" + safe(r["label"]) + "](" + name + ")")
         dates = [run("log", "-1", "--format=%ct", "--", "handoffs/" + doc).strip() for doc in documents]
-        updated = datetime.fromtimestamp(max(int(d) for d in dates), timezone(timedelta(hours=9))).strftime("%Y-%m-%d") if all(dates) else "미확인"
+        updated = datetime.fromtimestamp(max(int(d) for d in dates), timezone(timedelta(hours=9))).strftime("%Y-%m-%d %H:%M") if all(dates) else "미확인"
         rows.append("| " + safe(p["title"]) + " | " + " · ".join(links) + " | "
                     + updated + " | " + safe(p["status"]) + " | " + safe(p["next_action"]) + " |")
     changed = run("diff", "--name-only", baseline, "HEAD", "--", "handoffs/").splitlines()
@@ -72,7 +72,7 @@ def build():
     for name in pending:
         document(name)
     lines = [START, "# 인계서 최신 정본 인덱스", "",
-             "> 최신 정본은 명시적으로 검토·등록합니다. 새 인계서 게시와 업무 GPT 실제 적용·운영은 구분합니다. 업데이트 날짜는 등록된 정본·보완 문서의 마지막 Git 커밋 날짜 중 최신값(KST)입니다.", "",
+             "> 최신 정본은 명시적으로 검토·등록합니다. 새 인계서 게시와 업무 GPT 실제 적용·운영은 구분합니다. 업데이트 날짜는 등록된 정본·보완 문서의 마지막 Git 커밋 일시 중 최신값(KST)입니다.", "",
              "| 관리 영역 | 최신 정본 및 보완 문서 | 마지막 문서 업데이트 (KST) | 현재 확인 상태 | 다음 조치 |",
              "|---|---|---|---|---|", *rows, "",
              "## 신규·변경 인계서 (정본 미분류)", ""]
