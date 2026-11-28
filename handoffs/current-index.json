@@ -1,0 +1,88 @@
+{
+  "schema": "HANDOFF_CURRENT_INDEX_V1",
+  "baseline_commit": "ac93cb166914e34174a28d5adb05a5695473244a",
+  "projects": [
+    {
+      "id": "updater",
+      "title": "Knowledge Updater",
+      "primary": "L1_KNOWLEDGE_UPDATER_QWEN36_ANALYSIS_QUALITY_IMPLEMENTATION_HANDOFF_r0005_20261128_KST.md",
+      "primary_label": "r0005",
+      "related": [
+        {
+          "file": "L1_KNOWLEDGE_UPDATER_QWEN36_EXECUTION_REFERENCE_r0005_20261128_KST.md",
+          "label": "실행 참조"
+        }
+      ],
+      "status": "인계 / G0 대기",
+      "next_action": "실제 진입점·SHA 확인"
+    },
+    {
+      "id": "source-map",
+      "title": "Source Map",
+      "primary": "L1_SOURCE_MAP_1500_UPDATER_INTEGRATED_HANDOFF_r0003_20261127_KST.md",
+      "primary_label": "통합 r0003",
+      "related": [
+        {
+          "file": "L1_SOURCE_MAP_EXTRACTION_PILOT_HANDOFF_r0001_20261128_KST.md",
+          "label": "파일럿 r0001"
+        }
+      ],
+      "status": "인계 / 파일럿 대기",
+      "next_action": "대표 모듈 근거 대조"
+    },
+    {
+      "id": "viewer-analyzer",
+      "title": "Viewer · Code Analyzer",
+      "primary": "L1_SOURCE_MAP_VIEWER_ANALYZER_DEVELOPMENT_DELIVERY_r0001_20261127_KST.md",
+      "primary_label": "Viewer v0.5.8 / Analyzer v0.15.7",
+      "related": [],
+      "status": "개발 패키지 게시 / 운영 미확인",
+      "next_action": "회귀·활성본 검증"
+    },
+    {
+      "id": "recovery",
+      "title": "Channel Recovery",
+      "primary": "L1_RECOVERY_POINT_ANALYSIS_INTEGRATED_IMPLEMENTATION_HANDOFF_r0008_20261127_KST.md",
+      "primary_label": "통합 r0008",
+      "related": [],
+      "status": "인계 / 실행 미확인",
+      "next_action": "Seed 1건 V2·V3 회귀"
+    },
+    {
+      "id": "viewer-joblist",
+      "title": "Viewer 자동 업데이트 · Job-list",
+      "primary": "L1_VIEWER_AUTO_UPDATE_G0_DISCOVERY_HANDOFF_r0001_20261128_KST.md",
+      "primary_label": "G0 조사",
+      "related": [
+        {
+          "file": "L1_VIEWER_AUTO_UPDATE_JOBLIST_DELIVERY_AND_RECOVERY_HANDOFF_r0003_20261128_KST.md",
+          "label": "Job-list v0.4.39 배송 r0003"
+        },
+        {
+          "file": "L1_VIEWER_AUTO_UPDATE_JOBLIST_RECOVERY_HANDOFF_r0002_20261128_KST.md",
+          "label": "실패 복구 r0002"
+        }
+      ],
+      "status": "조사 / v0.4.39 ZIP 미게시",
+      "next_action": "ZIP 게시·SHA 확인"
+    },
+    {
+      "id": "job-mcp",
+      "title": "Job-list · Agent MCP",
+      "primary": "L1_JOBLIST_KNOWLEDGE_UPDATER_RECOVERY_MCP_EXECUTION_RESULT_HANDOFF_r0001_20261128_KST.md",
+      "primary_label": "통합 r0001",
+      "related": [],
+      "status": "인계 / 호스트 G0 대기",
+      "next_action": "기존 Run·Result 조회 확인"
+    },
+    {
+      "id": "control-center",
+      "title": "Project Control Center",
+      "primary": "L1_PROJECT_CONTROL_CENTER_WORK_GPT_HANDOFF_r0001_20261128_KST.md",
+      "primary_label": "구축 r0001",
+      "related": [],
+      "status": "인계 / 업무 적용 미확인",
+      "next_action": "권한·환경 G0 조사"
+    }
+  ]
+}

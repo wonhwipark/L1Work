@@ -1,11 +1,14 @@
-name: Publish public handoff history
+name: Publish public handoff history and current index
 
 on:
   push:
     branches: [main]
     paths:
       - 'handoffs/*.md'
+      - 'handoffs/current-index.json'
       - 'scripts/build_handoff_history.py'
+      - 'scripts/build_handoff_current_index.py'
+      - 'scripts/tests/test_handoff_current_index.py'
       - '.github/workflows/handoff-history.yml'
   workflow_dispatch:
 
@@ -26,25 +29,30 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: true
-      - name: Generate the latest three public documents
-        run: python3 scripts/build_handoff_history.py
-      - name: Commit history manifest when changed
+      - name: Validate current index tests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_handoff_current_index.py' -v
+      - name: Generate and check current index and recent history
+        run: |
+          python3 scripts/build_handoff_current_index.py
+          python3 scripts/build_handoff_current_index.py --check
+          python3 scripts/build_handoff_history.py
+      - name: Commit handoff README and history manifest when changed
         id: publish
         shell: bash
         run: |
           set -euo pipefail
-          git add docs/cowork-dashboard/handoffs.json
+          git add handoffs/README.md docs/cowork-dashboard/handoffs.json
           if git diff --cached --quiet; then
-            echo "HANDOFF_HISTORY=UNCHANGED"
+            echo "HANDOFF_INDEX=UNCHANGED"
             echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "docs(pages): refresh recent public handoff history"
+          git commit -m "docs(handoffs): refresh current index and recent history"
           git pull --rebase origin main
           git push origin HEAD:main
-          echo "HANDOFF_HISTORY=PUBLISHED"
+          echo "HANDOFF_INDEX=PUBLISHED"
           echo "changed=true" >> "$GITHUB_OUTPUT"
       - name: Request Pages build after action-authored commit
         if: steps.publish.outputs.changed == 'true'
