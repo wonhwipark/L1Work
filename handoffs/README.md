@@ -15,7 +15,9 @@
 
 ## 신규·변경 인계서 (정본 미분류)
 
-현재 정본 인덱스 생성 기준 이후 신규·변경 미분류 문서는 없습니다. 새 문서는 정본 자동 승격 대신 이곳에 표시됩니다.
+새로 게시되었지만 정본으로 승격되지 않았습니다. 대체·보완 관계를 검토한 뒤 handoffs/current-index.json에 등록하세요.
+
+- [L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md](L1_VIEWER_AUTO_UPDATE_JOBLIST_PUBLIC_RELEASE_AND_RECOVERY_HANDOFF_r0004_20261128_KST.md) — 정본 미분류 / 실제 적용 미확인
 
 기존 인계서와 검증 기록은 아래의 작성 당시 이력을 보존합니다.
 <!-- END HANDOFF_CURRENT_INDEX -->
